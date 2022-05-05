@@ -1,0 +1,19 @@
+plugins {
+	id 'java'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group = 'pl.netroute'
+version = '1.0'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+}
+
+test {
+	useJUnitPlatform()
+}
