@@ -1,17 +1,23 @@
 plugins {
 	id 'java'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 group = 'pl.netroute'
 version = '1.0'
-sourceCompatibility = '17'
+sourceCompatibility = '11'
+
+ext {
+	assertjVersion = "3.22.0"
+	junitVersion = "5.8.2"
+}
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	testImplementation "org.assertj:assertj-core:${assertjVersion}"
+	testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
 }
 
 test {
