@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.mock;
+package pl.netroute.hussar.core;
 
 import java.util.Objects;
 
