@@ -18,17 +18,25 @@ class EnvironmentOrchestrator {
 
     private final PropertiesConfigurer propertiesConfigurer;
     private final PropertiesCleaner propertiesCleaner;
+    private final ServicesStarter servicesStarter;
+    private final ServicesStopper servicesStopper;
 
     private final ReentrantReadWriteLock lock;
     private final Map<EnvironmentConfigurerProvider, Environment> initializedEnvironments;
 
     EnvironmentOrchestrator(PropertiesConfigurer propertiesConfigurer,
-                            PropertiesCleaner propertiesCleaner) {
+                            PropertiesCleaner propertiesCleaner,
+                            ServicesStarter servicesStarter,
+                            ServicesStopper servicesStopper) {
         Objects.requireNonNull(propertiesConfigurer, "propertiesInjector is required");
         Objects.requireNonNull(propertiesCleaner, "propertiesCleaner is required");
+        Objects.requireNonNull(servicesStarter, "servicesStarter is required");
+        Objects.requireNonNull(servicesStopper, "servicesStopper is required");
 
         this.propertiesConfigurer = propertiesConfigurer;
         this.propertiesCleaner = propertiesCleaner;
+        this.servicesStarter = servicesStarter;
+        this.servicesStopper = servicesStopper;
         this.lock = new ReentrantReadWriteLock();
         this.initializedEnvironments = new ConcurrentHashMap<>();
     }
@@ -40,7 +48,7 @@ class EnvironmentOrchestrator {
     }
 
     void shutdown() {
-        LOG.debug("Shutting down all environments");
+        LOG.info("Shutting down all environments");
 
         exclusiveLockedAction(() -> {
             initializedEnvironments
@@ -48,20 +56,24 @@ class EnvironmentOrchestrator {
                     .stream()
                     .map(Map.Entry::getValue)
                     .forEach(this::shutdownEnvironment);
+
+            initializedEnvironments.clear();
         });
     }
 
     private Environment initializeEnvironment(EnvironmentConfigurerProvider provider) {
+        LOG.info("Initializing environment for {}", provider.getClass());
+
         var environment = provider
                 .provide()
                 .configure();
 
         var properties = environment.getPropertiesConfiguration();
-        var mocks = environment.getMocksConfiguration();
-        var application = environment.getApplicationProvider();
+        var services = environment.getServicesConfiguration();
+        var application = environment.getApplication();
 
         configureProperties(properties);
-        startMocks(mocks);
+        startServices(services);
         startApplication(application);
 
         return environment;
@@ -69,26 +81,28 @@ class EnvironmentOrchestrator {
 
     private void shutdownEnvironment(Environment setup) {
         var properties = setup.getPropertiesConfiguration();
-        var mocks = setup.getMocksConfiguration();
-        var application = setup.getApplicationProvider();
+        var services = setup.getServicesConfiguration();
+        var application = setup.getApplication();
 
         shutdownApplication(application);
-        shutdownMocks(mocks);
+        shutdownServices(services);
         clearProperties(properties);
     }
 
-    private void configureProperties(PropertiesConfiguration properties) {
-        propertiesConfigurer.configure(properties);
+    private void configureProperties(PropertiesConfiguration propertiesConfig) {
+        propertiesConfigurer.configure(propertiesConfig);
     }
 
-    private void clearProperties(PropertiesConfiguration properties) {
-        propertiesCleaner.clean(properties);
+    private void clearProperties(PropertiesConfiguration propertiesConfig) {
+        propertiesCleaner.clean(propertiesConfig);
     }
 
-    private void startMocks(MocksConfiguration mocks) {
+    private void startServices(ServicesConfiguration servicesConfig) {
+        servicesStarter.start(servicesConfig);
     }
 
-    private void shutdownMocks(MocksConfiguration mocks) {
+    private void shutdownServices(ServicesConfiguration servicesConfig) {
+        servicesStopper.stop(servicesConfig);
     }
 
     private void startApplication(Application application) {

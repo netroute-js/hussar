@@ -3,19 +3,22 @@ package pl.netroute.hussar.core;
 import java.util.Objects;
 
 public class Hussar {
-    private final EnvironmentConfigurerProviderResolver setupProviderResolver;
+    private final EnvironmentConfigurerProviderResolver configurerProviderResolver;
     private final EnvironmentOrchestrator environmentOrchestrator;
 
-    private Hussar(EnvironmentConfigurerProviderResolver setupProviderResolver,
-                   EnvironmentOrchestrator environmentOrchestrator) {
-        this.setupProviderResolver = setupProviderResolver;
+    Hussar(EnvironmentConfigurerProviderResolver configurerProviderResolver,
+           EnvironmentOrchestrator environmentOrchestrator) {
+        Objects.requireNonNull(configurerProviderResolver, "configurerProviderResolver is required");
+        Objects.requireNonNull(environmentOrchestrator, "environmentOrchestrator is required");
+
+        this.configurerProviderResolver = configurerProviderResolver;
         this.environmentOrchestrator = environmentOrchestrator;
     }
 
     public void initializeFor(Object testObject) {
         Objects.requireNonNull(testObject, "testObject is required");
 
-        setupProviderResolver
+        configurerProviderResolver
                 .resolve(testObject)
                 .ifPresent(environmentOrchestrator::initialize);
     }

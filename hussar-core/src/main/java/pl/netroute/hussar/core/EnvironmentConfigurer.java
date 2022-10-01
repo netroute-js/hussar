@@ -1,7 +1,7 @@
 package pl.netroute.hussar.core;
 
 import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.api.Mock;
+import pl.netroute.hussar.core.api.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +13,11 @@ public final class EnvironmentConfigurer {
     private Application application;
 
     private final Map<String, String> properties;
-    private final List<Mock> mocks;
+    private final List<Service> standaloneServices;
 
     private EnvironmentConfigurer() {
         this.properties = new HashMap<>();
-        this.mocks = new ArrayList<>();
+        this.standaloneServices = new ArrayList<>();
     }
 
     public EnvironmentConfigurer withProperty(String key,
@@ -30,10 +30,10 @@ public final class EnvironmentConfigurer {
         return this;
     }
 
-    public EnvironmentConfigurer withMock(Mock mock) {
-        Objects.requireNonNull(mock, "mock is required");
+    public EnvironmentConfigurer withStandaloneService(Service service) {
+        Objects.requireNonNull(service, "service is required");
 
-        mocks.add(mock);
+        standaloneServices.add(service);
 
         return this;
     }
@@ -50,7 +50,7 @@ public final class EnvironmentConfigurer {
         Objects.requireNonNull(application, "application needs to be configured");
 
         var propertiesConfig = new PropertiesConfiguration(properties);
-        var mocksConfig = new MocksConfiguration(mocks);
+        var mocksConfig = new ServicesConfiguration(standaloneServices);
 
         return new Environment(
                 application,

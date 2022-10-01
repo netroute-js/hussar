@@ -7,26 +7,26 @@ import java.util.Objects;
 class Environment {
     private final Application application;
     private final PropertiesConfiguration propertiesConfiguration;
-    private final MocksConfiguration mocksConfiguration;
+    private final ServicesConfiguration servicesConfiguration;
 
     Environment(Application application,
                 PropertiesConfiguration propertiesConfiguration,
-                MocksConfiguration mocksConfiguration) {
+                ServicesConfiguration servicesConfiguration) {
         Objects.requireNonNull(application, "applicationProvider is required");
         Objects.requireNonNull(propertiesConfiguration, "propertiesConfiguration is required");
-        Objects.requireNonNull(application, "mocksConfiguration is required");
+        Objects.requireNonNull(servicesConfiguration, "servicesConfiguration is required");
 
         this.application = application;
         this.propertiesConfiguration = propertiesConfiguration;
-        this.mocksConfiguration = mocksConfiguration;
+        this.servicesConfiguration = servicesConfiguration;
     }
 
-    Application getApplicationProvider() {
+    Application getApplication() {
         return application;
     }
 
-    MocksConfiguration getMocksConfiguration() {
-        return mocksConfiguration;
+    ServicesConfiguration getServicesConfiguration() {
+        return servicesConfiguration;
     }
 
     PropertiesConfiguration getPropertiesConfiguration() {

@@ -10,6 +10,8 @@ ext {
 	slf4jVersion = "1.7.36"
 	assertjVersion = "3.22.0"
 	junitVersion = "5.8.2"
+	mockitoVersion = "4.6.1"
+	logbackVersion = "1.2.11"
 }
 
 repositories {
@@ -19,6 +21,8 @@ repositories {
 dependencies {
 	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
+	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
+	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
 	testImplementation "org.assertj:assertj-core:${assertjVersion}"
 	testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
 }
