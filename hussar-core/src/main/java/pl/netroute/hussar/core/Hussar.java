@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core;
 
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 
 public class Hussar {
     private final EnvironmentConfigurerProviderResolver configurerProviderResolver;
@@ -25,6 +26,18 @@ public class Hussar {
 
     public void shutdown() {
         environmentOrchestrator.shutdown();
+    }
+
+    public static Hussar newInstance() {
+        var configurerResolver = new EnvironmentConfigurerProviderResolver();
+        var orchestrator = new EnvironmentOrchestrator(
+                new PropertiesConfigurer(),
+                new PropertiesCleaner(),
+                new ServicesStarter(ForkJoinPool.commonPool()),
+                new ServicesStopper(ForkJoinPool.commonPool())
+        );
+
+        return new Hussar(configurerResolver, orchestrator);
     }
 
 }
