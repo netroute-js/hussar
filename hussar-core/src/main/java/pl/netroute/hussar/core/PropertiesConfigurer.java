@@ -1,5 +1,7 @@
 package pl.netroute.hussar.core;
 
+import pl.netroute.hussar.core.helper.PropertiesHelper;
+
 import java.util.Map;
 import java.util.Objects;
 

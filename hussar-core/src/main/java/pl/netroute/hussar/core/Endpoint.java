@@ -1,9 +1,10 @@
 package pl.netroute.hussar.core;
 
+import pl.netroute.hussar.core.helper.SchemesHelper;
+
 import java.util.Objects;
 
 public class Endpoint {
-    private static final String EMPTY_SCHEME = "";
     private static final String ADDRESS_FORMAT = "%s%s:%d";
 
     private final String address;
@@ -39,7 +40,7 @@ public class Endpoint {
 
     public static Endpoint of(String host,
                               int port) {
-        return new Endpoint(EMPTY_SCHEME, host, port);
+        return new Endpoint(SchemesHelper.EMPTY_SCHEME, host, port);
     }
 
     public static Endpoint of(String scheme,

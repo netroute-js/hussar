@@ -1,3 +1,4 @@
 rootProject.name = 'hussar'
 
 include 'hussar-core'
+include 'hussar-spring-boot'

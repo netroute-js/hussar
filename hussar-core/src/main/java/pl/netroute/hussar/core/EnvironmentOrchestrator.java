@@ -4,24 +4,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.lock.LockedAction;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class EnvironmentOrchestrator {
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentOrchestrator.class);
-    private static final Duration TRY_LOCK_TIMEOUT = Duration.ofSeconds(10L);
 
     private final PropertiesConfigurer propertiesConfigurer;
     private final PropertiesCleaner propertiesCleaner;
     private final ServicesStarter servicesStarter;
     private final ServicesStopper servicesStopper;
 
-    private final ReentrantReadWriteLock lock;
+    private final LockedAction lockedAction;
     private final Map<EnvironmentConfigurerProvider, Environment> initializedEnvironments;
 
     EnvironmentOrchestrator(PropertiesConfigurer propertiesConfigurer,
@@ -37,20 +34,20 @@ class EnvironmentOrchestrator {
         this.propertiesCleaner = propertiesCleaner;
         this.servicesStarter = servicesStarter;
         this.servicesStopper = servicesStopper;
-        this.lock = new ReentrantReadWriteLock();
+        this.lockedAction = new LockedAction();
         this.initializedEnvironments = new ConcurrentHashMap<>();
     }
 
     void initialize(EnvironmentConfigurerProvider environmentConfigurerProvider) {
         Objects.requireNonNull(environmentConfigurerProvider, "environmentConfigurerProvider is required");
 
-        sharedLockedAction(() -> initializedEnvironments.computeIfAbsent(environmentConfigurerProvider, this::initializeEnvironment));
+        lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(environmentConfigurerProvider, this::initializeEnvironment));
     }
 
     void shutdown() {
         LOG.info("Shutting down all environments");
 
-        exclusiveLockedAction(() -> {
+        lockedAction.exclusiveAction(() -> {
             initializedEnvironments
                     .entrySet()
                     .stream()
@@ -111,28 +108,6 @@ class EnvironmentOrchestrator {
 
     private void shutdownApplication(Application application) {
         application.shutdown();
-    }
-
-    private void exclusiveLockedAction(Runnable action) {
-        lockedAction(action, true);
-    }
-
-    private void sharedLockedAction(Runnable action) {
-        lockedAction(action, false);
-    }
-
-    private void lockedAction(Runnable action, boolean isWriteLock) {
-        var acquiredLock = isWriteLock ? lock.writeLock() : lock.readLock();
-
-        try {
-            acquiredLock.tryLock(TRY_LOCK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
-
-            action.run();
-        } catch (InterruptedException ex) {
-            throw new IllegalStateException("Could not acquire lock", ex);
-        } finally {
-            acquiredLock.unlock();
-        }
     }
 
 }

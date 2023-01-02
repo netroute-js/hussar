@@ -1,0 +1,38 @@
+plugins {
+	id 'java'
+}
+
+group = 'pl.netroute'
+version = '1.0'
+sourceCompatibility = '11'
+
+ext {
+	slf4jVersion = "1.7.36"
+	assertjVersion = "3.22.0"
+	junitVersion = "5.8.2"
+	mockitoVersion = "4.6.1"
+	logbackVersion = "1.2.11"
+	springBootVersion = "2.6.0"
+	okHttpVersion = "4.10.0"
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation project(":hussar-core")
+	implementation "org.springframework.boot:spring-boot-test:${springBootVersion}"
+	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+
+	testImplementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+	testImplementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
+	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+	testImplementation "org.assertj:assertj-core:${assertjVersion}"
+	testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+}
+
+test {
+	useJUnitPlatform()
+}
