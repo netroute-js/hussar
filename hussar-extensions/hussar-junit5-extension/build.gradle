@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
 	implementation project(":hussar-core")
-	implementation project(":hussar-spring-boot")
+	implementation project(":hussar-applications:hussar-spring-boot-application")
 	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 	implementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
 

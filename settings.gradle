@@ -1,6 +1,6 @@
 rootProject.name = 'hussar'
 
 include 'hussar-core'
-include 'hussar-junit5'
-include 'hussar-spring-boot'
+include 'hussar-extensions:hussar-junit5-extension'
+include 'hussar-applications:hussar-spring-boot-application'
 include 'hussar-services:hussar-wiremock-service'
