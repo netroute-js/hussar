@@ -4,27 +4,29 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.springframework.lang.NonNull;
 import pl.netroute.hussar.core.Endpoint;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 public class SimpleApplicationClient {
     private static final String PING_PATH = "/api/v1/ping";
 
-    private final Endpoint endpoint;
+    private final String endpoint;
     private final OkHttpClient httpClient;
 
-    public SimpleApplicationClient(@NonNull Endpoint endpoint) {
-        this.endpoint = endpoint;
+    public SimpleApplicationClient(Endpoint endpoint) {
+        Objects.requireNonNull(endpoint, "endpoint is required");
+
+        this.endpoint = endpoint.getAddress();
         this.httpClient = new OkHttpClient();
     }
 
     public String ping() {
         var request = new Request
                 .Builder()
-                .url(endpoint.getAddress() + PING_PATH)
+                .url(endpoint + PING_PATH)
                 .build();
 
         try(var response = httpClient.newCall(request).execute()) {

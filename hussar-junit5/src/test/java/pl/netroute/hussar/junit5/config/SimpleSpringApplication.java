@@ -1,4 +1,4 @@
-package pl.netroute.hussar.spring.boot;
+package pl.netroute.hussar.junit5.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-public class SimpleApplication {
+public class SimpleSpringApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SimpleApplication.class, args);
+        SpringApplication.run(SimpleSpringApplication.class, args);
     }
 
     @RestController

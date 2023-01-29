@@ -22,7 +22,7 @@ public class SpringApplicationTest {
 
     @BeforeEach
     public void setup() {
-        application = SpringApplication.newApplication(SimpleApplication.class);
+        application = SpringApplication.newApplication(SimpleSpringApplication.class);
     }
 
     @Test

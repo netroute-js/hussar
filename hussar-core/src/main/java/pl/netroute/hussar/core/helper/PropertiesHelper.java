@@ -1,9 +1,13 @@
 package pl.netroute.hussar.core.helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Objects;
 import java.util.Optional;
 
 public class PropertiesHelper {
+    private static final Logger LOG = LoggerFactory.getLogger(PropertiesHelper.class);
 
     private PropertiesHelper() {
     }
@@ -12,6 +16,8 @@ public class PropertiesHelper {
         Objects.requireNonNull(key, "key is required");
         Objects.requireNonNull(value, "value is required");
 
+        LOG.info("Setting {} property to {}", key, value);
+
         System.setProperty(key, value);
     }
 
@@ -19,6 +25,12 @@ public class PropertiesHelper {
         Objects.requireNonNull(key, "key is required");
 
         return Optional.ofNullable(System.getProperty(key));
+    }
+
+    public static String getPropertyOrFail(String key) {
+        ValidatorHelper.requireNonEmpty(key, "key is required");
+
+        return getProperty(key).orElseThrow();
     }
 
     public static Optional<Integer> getIntProperty(String key) {
@@ -32,6 +44,8 @@ public class PropertiesHelper {
 
     public static void clearProperty(String key) {
         Objects.requireNonNull(key, "key is required");
+
+        LOG.info("Clearing {} property", key);
 
         System.clearProperty(key);
     }

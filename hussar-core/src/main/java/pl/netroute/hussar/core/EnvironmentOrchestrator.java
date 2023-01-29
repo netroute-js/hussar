@@ -19,7 +19,7 @@ class EnvironmentOrchestrator {
     private final ServicesStopper servicesStopper;
 
     private final LockedAction lockedAction;
-    private final Map<EnvironmentConfigurerProvider, Environment> initializedEnvironments;
+    private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments;
 
     EnvironmentOrchestrator(PropertiesConfigurer propertiesConfigurer,
                             PropertiesCleaner propertiesCleaner,
@@ -41,7 +41,9 @@ class EnvironmentOrchestrator {
     void initialize(EnvironmentConfigurerProvider environmentConfigurerProvider) {
         Objects.requireNonNull(environmentConfigurerProvider, "environmentConfigurerProvider is required");
 
-        lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(environmentConfigurerProvider, this::initializeEnvironment));
+        var configurerType = environmentConfigurerProvider.getClass();
+
+        lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(configurerType, actualConfigurerType -> initializeEnvironment(environmentConfigurerProvider)));
     }
 
     void shutdown() {
