@@ -7,11 +7,14 @@ import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class HussarTest {
     private EnvironmentConfigurerProviderResolver configurerProviderResolver;
@@ -30,6 +33,11 @@ public class HussarTest {
     public void shouldInitializeEnvironment() {
         // given
         var testInstance = new ConfigurerAwareTest();
+
+        var environment = mock(Environment.class);
+
+        when(environment.getServicesConfiguration()).thenReturn(new ServicesConfiguration(List.of()));
+        when(environmentOrchestrator.initialize(isA(TestEnvironmentConfigurerProvider.class))).thenReturn(environment);
 
         // when
         hussar.initializeFor(testInstance);

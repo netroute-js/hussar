@@ -3,6 +3,8 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +24,8 @@ public class EnvironmentConfigurerTest {
         var propertyB = "propertyB";
         var propertyValueB = "property value B";
 
-        var standaloneServiceA = mock(Service.class);
-        var standaloneServiceB = mock(Service.class);
+        var standaloneServiceA = mock(ServiceTestA.class);
+        var standaloneServiceB = mock(ServiceTestB.class);
 
         var application = mock(Application.class);
 
@@ -38,7 +40,7 @@ public class EnvironmentConfigurerTest {
                 .configure();
 
         // then
-        var expectedServices = List.of(standaloneServiceA, standaloneServiceB);
+        var expectedServices = List.<Service>of(standaloneServiceA, standaloneServiceB);
         var expectedProperties = Map.of(
                 propertyA, propertyValueA,
                 propertyB, propertyValueB

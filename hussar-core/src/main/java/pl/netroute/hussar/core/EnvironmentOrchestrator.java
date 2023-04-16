@@ -38,12 +38,12 @@ class EnvironmentOrchestrator {
         this.initializedEnvironments = new ConcurrentHashMap<>();
     }
 
-    void initialize(EnvironmentConfigurerProvider environmentConfigurerProvider) {
+    Environment initialize(EnvironmentConfigurerProvider environmentConfigurerProvider) {
         Objects.requireNonNull(environmentConfigurerProvider, "environmentConfigurerProvider is required");
 
         var configurerType = environmentConfigurerProvider.getClass();
 
-        lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(configurerType, actualConfigurerType -> initializeEnvironment(environmentConfigurerProvider)));
+        return lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(configurerType, actualConfigurerType -> initializeEnvironment(environmentConfigurerProvider)));
     }
 
     void shutdown() {
@@ -51,9 +51,7 @@ class EnvironmentOrchestrator {
 
         lockedAction.exclusiveAction(() -> {
             initializedEnvironments
-                    .entrySet()
-                    .stream()
-                    .map(Map.Entry::getValue)
+                    .values()
                     .forEach(this::shutdownEnvironment);
 
             initializedEnvironments.clear();

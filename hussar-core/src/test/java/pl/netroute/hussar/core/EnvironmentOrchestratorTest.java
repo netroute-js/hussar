@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -41,14 +43,15 @@ public class EnvironmentOrchestratorTest {
         var configurerProvider = new TestEnvironmentConfigurerProvider();
 
         // when
-        orchestrator.initialize(configurerProvider);
+        var environment = orchestrator.initialize(configurerProvider);
 
         // then
+        assertEnvironmentInitialized(environment);
         assertApplicationStarted(configurerProvider.application);
-        assertStandaloneServiceStarted(configurerProvider.standaloneServiceA);
-        assertStandaloneServiceStarted(configurerProvider.standaloneServiceB);
-        assertPropertiesSet(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
-        assertPropertiesSet(TestEnvironmentConfigurerProvider.PROPERTY_2, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_2);
+        assertServiceStarted(configurerProvider.standaloneServiceA);
+        assertServiceStarted(configurerProvider.standaloneServiceB);
+        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
+        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_2, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_2);
     }
 
     @Test
@@ -59,7 +62,7 @@ public class EnvironmentOrchestratorTest {
         // when
         var initializationFutures = IntStream
                 .range(0, 10)
-                .mapToObj(index -> CompletableFuture.runAsync(() -> orchestrator.initialize(configurerProvider)))
+                .mapToObj(index -> CompletableFuture.supplyAsync(() -> orchestrator.initialize(configurerProvider)))
                 .collect(Collectors.toUnmodifiableList());
 
         CompletableFuture
@@ -67,22 +70,31 @@ public class EnvironmentOrchestratorTest {
                 .join();
 
         // then
+        initializationFutures
+                .stream()
+                .map(CompletableFuture::join)
+                .forEach(this::assertEnvironmentInitialized);
+
         assertApplicationStarted(configurerProvider.application);
-        assertStandaloneServiceStarted(configurerProvider.standaloneServiceA);
-        assertStandaloneServiceStarted(configurerProvider.standaloneServiceB);
-        assertPropertiesSet(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
-        assertPropertiesSet(TestEnvironmentConfigurerProvider.PROPERTY_2, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_2);
+        assertServiceStarted(configurerProvider.standaloneServiceA);
+        assertServiceStarted(configurerProvider.standaloneServiceB);
+        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
+        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_2, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_2);
+    }
+
+    private void assertEnvironmentInitialized(Environment environment) {
+        assertThat(environment).isNotNull();
     }
 
     private void assertApplicationStarted(Application application) {
         verify(application).start();
     }
 
-    private void assertStandaloneServiceStarted(Service service) {
+    private void assertServiceStarted(Service service) {
         verify(service).start();
     }
 
-    private void assertPropertiesSet(String key, String value) {
+    private void assertPropertySet(String key, String value) {
         assertThat(System.getProperty(key)).isEqualTo(value);
     }
 
@@ -94,8 +106,8 @@ public class EnvironmentOrchestratorTest {
         private static final String PROPERTY_VALUE_2 = "property_value2";
 
         private final Application application = mock(Application.class);
-        private final Service standaloneServiceA = mock(Service.class);
-        private final Service standaloneServiceB = mock(Service.class);
+        private final ServiceTestA standaloneServiceA = mock(ServiceTestA.class);
+        private final ServiceTestB standaloneServiceB = mock(ServiceTestB.class);
 
         @Override
         public EnvironmentConfigurer provide() {

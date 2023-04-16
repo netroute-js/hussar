@@ -6,6 +6,9 @@ import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.spring.boot.SpringApplication;
 
 public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
+    public static final String WIREMOCK_A = "WiremockA";
+    public static final String WIREMOCK_B = "WiremockB";
+
     public static final String PROPERTY_A = "propertyA";
     public static final String PROPERTY_A_VALUE = "propertyA_value";
 
@@ -18,11 +21,13 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
 
         var wiremockServiceA = WiremockServiceConfigurer
                 .newInstance()
+                .name(WIREMOCK_A)
                 .registerEndpointUnderProperty(WIREMOCK_INSTANCE_A_URL_PROPERTY)
                 .configure();
 
         var wiremockServiceB = WiremockServiceConfigurer
                 .newInstance()
+                .name(WIREMOCK_B)
                 .registerEndpointUnderProperty(WIREMOCK_INSTANCE_B_URL_PROPERTY)
                 .configure();
 

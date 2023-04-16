@@ -1,5 +1,7 @@
 package pl.netroute.hussar.core;
 
+import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
 
@@ -21,11 +23,22 @@ public class Hussar {
 
         configurerProviderResolver
                 .resolve(testObject)
-                .ifPresent(environmentOrchestrator::initialize);
+                .ifPresent(environmentConfigurerProvider -> initializeEnvironment(testObject, environmentConfigurerProvider));
     }
 
     public void shutdown() {
         environmentOrchestrator.shutdown();
+    }
+
+    private void initializeEnvironment(Object testObject, EnvironmentConfigurerProvider environmentConfigurerProvider) {
+        Environment environment = environmentOrchestrator.initialize(environmentConfigurerProvider);
+
+        injectServices(testObject, environment);
+    }
+
+    private void injectServices(Object testObject, Environment environment) {
+        var servicesInjector = ServicesInjector.newInstance(environment);
+        servicesInjector.inject(testObject);
     }
 
     public static Hussar newInstance() {

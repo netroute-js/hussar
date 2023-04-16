@@ -3,6 +3,8 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
 
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -11,6 +13,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class ServicesStarterTest {
+    private ServiceTestA serviceA;
+    private ServiceTestB serviceB;
+
     private ServicesStarter starter;
 
     @BeforeEach
@@ -21,9 +26,9 @@ public class ServicesStarterTest {
     @Test
     public void shouldStartStandaloneServices() {
         // given
-        var serviceA = mock(Service.class);
-        var serviceB = mock(Service.class);
-        var standaloneServices = List.of(serviceA, serviceB);
+        serviceA = mock(ServiceTestA.class);
+        serviceB = mock(ServiceTestB.class);
+        var standaloneServices = List.<Service>of(serviceA, serviceB);
 
         var servicesConfig = new ServicesConfiguration(standaloneServices);
 
