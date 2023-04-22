@@ -12,7 +12,9 @@ ext {
 	junitVersion = "5.8.2"
 	mockitoVersion = "4.6.1"
 	logbackVersion = "1.2.11"
-	springBootVersion = "2.6.0"
+	springBootVersion = "2.7.10"
+	springOpenFeignVersion = "3.1.6"
+	feignVersion = "12.3"
 	okHttpVersion = "4.10.0"
 }
 
@@ -25,7 +27,10 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-test:${springBootVersion}"
 	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
+	testImplementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
 	testImplementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+	testImplementation "org.springframework.cloud:spring-cloud-openfeign-core:${springOpenFeignVersion}"
+	testImplementation "io.github.openfeign:feign-core:${feignVersion}"
 	testImplementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
 	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
 	testImplementation "org.mockito:mockito-core:${mockitoVersion}"

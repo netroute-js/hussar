@@ -3,6 +3,7 @@ package pl.netroute.hussar.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.lock.LockedAction;
 
@@ -103,7 +104,9 @@ class EnvironmentOrchestrator {
     }
 
     private void startApplication(Application application) {
-        application.start();
+        var startupContext = new ApplicationStartupContext(Map.of());
+
+        application.start(startupContext);
     }
 
     private void shutdownApplication(Application application) {

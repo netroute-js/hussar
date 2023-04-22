@@ -3,11 +3,13 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -87,7 +89,9 @@ public class EnvironmentOrchestratorTest {
     }
 
     private void assertApplicationStarted(Application application) {
-        verify(application).start();
+        var context = new ApplicationStartupContext(Map.of());
+
+        verify(application).start(context);
     }
 
     private void assertServiceStarted(Service service) {

@@ -1,11 +1,12 @@
 package pl.netroute.hussar.spring.boot;
 
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
-import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.helper.PropertiesHelper;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +16,6 @@ public class SpringApplication implements Application {
     private static final String HOSTNAME = "localhost";
 
     private final Class<?> applicationClass;
-    private final RandomPortConfigurer portConfigurer;
     private final LockedAction lockedAction;
 
     private ConfigurableApplicationContext applicationContext;
@@ -24,7 +24,6 @@ public class SpringApplication implements Application {
         Objects.requireNonNull(applicationClass, "applicationClass is required");
 
         this.applicationClass = applicationClass;
-        this.portConfigurer = new RandomPortConfigurer();
         this.lockedAction = new LockedAction();
     }
 
@@ -50,13 +49,13 @@ public class SpringApplication implements Application {
     }
 
     @Override
-    public void start() {
+    public void start(ApplicationStartupContext context) {
         lockedAction.exclusiveAction(() ->
             Optional
                     .ofNullable(applicationContext)
                     .ifPresentOrElse(
                             appContext -> {},
-                            () -> this.applicationContext = initializeApplication()
+                            () -> this.applicationContext = initializeApplication(context)
                     )
         );
     }
@@ -71,17 +70,19 @@ public class SpringApplication implements Application {
     }
 
     private Endpoint resolveEndpoint() {
-        var port = PropertiesHelper
-                .getIntProperty(SpringProperties.SERVER_PORT)
-                .orElseThrow(() -> new IllegalStateException("Could not resolve SpringBoot's application port"));
+        var port = applicationContext
+                .getEnvironment()
+                .getProperty(SpringProperties.SERVER_PORT, Integer.class);
 
         return Endpoint.of(SchemesHelper.HTTP_SCHEME, HOSTNAME, port);
     }
 
-    private ConfigurableApplicationContext initializeApplication() {
-        portConfigurer.configure();
+    private ConfigurableApplicationContext initializeApplication(ApplicationStartupContext startupContext) {
+        var properties = SpringProperties.withDynamicPort(startupContext.getProperties());
 
-        return new org.springframework.boot.SpringApplication(applicationClass).run();
+        return new SpringApplicationBuilder(applicationClass)
+                .initializers(context -> new PropertySourceConfigurer().configure(properties, context))
+                .run();
     }
 
     public static SpringApplication newApplication(Class<?> applicationClass) {

@@ -3,9 +3,12 @@ package pl.netroute.hussar.spring.boot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.spring.boot.client.ClientFactory;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +21,12 @@ public class SpringApplicationTest {
 
     private static final String PING_RESPONSE = "pong";
 
+    private static final String MY_PROPERTY_A = "my.propertyA";
+    private static final String MY_PROPERTY_B = "my.propertyB";
+
+    private static final String MY_PROPERTY_VALUE_A = "some-valueA";
+    private static final String MY_PROPERTY_VALUE_B = "some-valueB";
+
     private SpringApplication application;
 
     @BeforeEach
@@ -28,47 +37,61 @@ public class SpringApplicationTest {
     @Test
     public void shouldStartApplication() {
         // given
+        var startupContext = new ApplicationStartupContext(Map.of(MY_PROPERTY_B, MY_PROPERTY_VALUE_B));
+
         // when
-        application.start();
+        application.start(startupContext);
 
         // then
         var initialized = application.isInitialized();
-        var endpoints = application.getEndpoints();
-
         assertInitialized(initialized);
+
+        var endpoints = application.getEndpoints();
         assertEndpointExists(endpoints);
-        assertPingEndpointAccessible();
+
+        var client = applicationClient(endpoints);
+        assertPingEndpointAccessible(client);
+        assertConfiguredProperties(client);
+        assertNotConfiguredProperties(client);
     }
 
     @Test
     public void shouldSkipStartingApplicationWhenAlreadyStarted() {
         // given
+        var startupContext = new ApplicationStartupContext(Map.of(MY_PROPERTY_B, MY_PROPERTY_VALUE_B));
+
         // when
-        application.start();
-        application.start();
+        application.start(startupContext);
+        application.start(startupContext);
 
         // then
         var initialized = application.isInitialized();
-        var endpoints = application.getEndpoints();
-
         assertInitialized(initialized);
+
+        var endpoints = application.getEndpoints();
         assertEndpointExists(endpoints);
-        assertPingEndpointAccessible();
+
+        var client = applicationClient(endpoints);
+        assertPingEndpointAccessible(client);
+        assertConfiguredProperties(client);
+        assertNotConfiguredProperties(client);
     }
 
     @Test
     public void shouldShutdownApplication() {
         // given
-        application.start();
+        var startupContext = new ApplicationStartupContext(Map.of());
+
+        application.start(startupContext);
 
         // when
         application.shutdown();
 
         // then
         var initialized = application.isInitialized();
-        var endpoints = application.getEndpoints();
-
         assertNotInitialized(initialized);
+
+        var endpoints = application.getEndpoints();
         assertNoEndpointExists(endpoints);
     }
 
@@ -121,13 +144,42 @@ public class SpringApplicationTest {
         assertThat(endpoint.getAddress()).matches(ENDPOINT_REGEX);
     }
 
-    private void assertPingEndpointAccessible() {
-        var endpoint = application
-                .getEndpoints()
-                .get(0);
+    private void assertPingEndpointAccessible(SimpleApplicationClient client) {
+        var pingResponse = client.ping();
 
-        var pingResponse = new SimpleApplicationClient(endpoint).ping();
         assertThat(pingResponse).isEqualTo(PING_RESPONSE);
     }
 
+    private void assertConfiguredProperties(SimpleApplicationClient client) {
+        assertPropertyConfigured(client, SpringProperties.SERVER_PORT);
+        assertPropertyConfigured(client, MY_PROPERTY_B, MY_PROPERTY_VALUE_B);
+    }
+
+    private void assertNotConfiguredProperties(SimpleApplicationClient client) {
+        assertPropertyNotConfigured(client, MY_PROPERTY_A);
+    }
+
+    private void assertPropertyNotConfigured(SimpleApplicationClient client, String property) {
+        var foundProperty = client.getProperty(property);
+
+        assertThat(foundProperty).isEmpty();
+    }
+
+    private void assertPropertyConfigured(SimpleApplicationClient client, String property, String expectedValue) {
+        var foundProperty = client.getProperty(property);
+
+        assertThat(foundProperty).hasValue(expectedValue);
+    }
+
+    private void assertPropertyConfigured(SimpleApplicationClient client, String property) {
+        var foundProperty = client.getProperty(property);
+
+        assertThat(foundProperty).isPresent();
+    }
+
+    private SimpleApplicationClient applicationClient(List<Endpoint> endpoints) {
+        var endpoint = endpoints.get(0);
+
+        return ClientFactory.create(endpoint, SimpleApplicationClient.class);
+    }
 }
