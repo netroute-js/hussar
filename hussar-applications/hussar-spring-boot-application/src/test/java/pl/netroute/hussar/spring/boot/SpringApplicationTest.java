@@ -7,8 +7,10 @@ import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.spring.boot.client.ClientFactory;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,8 +26,9 @@ public class SpringApplicationTest {
     private static final String MY_PROPERTY_A = "my.propertyA";
     private static final String MY_PROPERTY_B = "my.propertyB";
 
-    private static final String MY_PROPERTY_VALUE_A = "some-valueA";
     private static final String MY_PROPERTY_VALUE_B = "some-valueB";
+
+    private static final String APPLICATION_CUSTOM_YML = "application-custom.yml";
 
     private SpringApplication application;
 
@@ -123,6 +126,44 @@ public class SpringApplicationTest {
         assertNoEndpointExists(endpoints);
     }
 
+    @Test
+    public void shouldResolveDefaultConfigurationFile() {
+        // given
+        // when
+        var maybeConfigurationFile = application.getConfigurationFile();
+
+        // then
+        var expectedConfigurationFile = FileLoader.fromClasspath(ConfigurationFileResolver.APPLICATION_YML);
+
+        assertConfigurationFilePresent(maybeConfigurationFile, expectedConfigurationFile);
+    }
+
+    @Test
+    public void shouldResolveConfigurationFile() {
+        // given
+        var configurationFile = FileLoader.fromClasspath(APPLICATION_CUSTOM_YML);
+
+        application = SpringApplication.newApplication(SimpleSpringApplication.class, configurationFile);
+
+        // when
+        var maybeConfigurationFile = application.getConfigurationFile();
+
+        // then
+        assertConfigurationFilePresent(maybeConfigurationFile, configurationFile);
+    }
+
+    @Test
+    public void shouldNotResolveConfigurationFileWhenNonExistingConfigurationFile() {
+        // given
+        application = SpringApplication.newApplication(SimpleSpringApplication.class, Path.of("application.properties"));
+
+        // when
+        var maybeConfigurationFile = application.getConfigurationFile();
+
+        // then
+        assertConfigurationFileNotPresent(maybeConfigurationFile);
+    }
+
     private void assertInitialized(boolean initialized) {
         assertThat(initialized).isTrue();
     }
@@ -151,7 +192,7 @@ public class SpringApplicationTest {
     }
 
     private void assertConfiguredProperties(SimpleApplicationClient client) {
-        assertPropertyConfigured(client, SpringProperties.SERVER_PORT);
+        assertPropertyConfigured(client, PropertiesFactory.SERVER_PORT);
         assertPropertyConfigured(client, MY_PROPERTY_B, MY_PROPERTY_VALUE_B);
     }
 
@@ -177,9 +218,18 @@ public class SpringApplicationTest {
         assertThat(foundProperty).isPresent();
     }
 
+    private void assertConfigurationFilePresent(Optional<Path> maybeConfigurationFile, Path expectedConfigurationFile) {
+        assertThat(maybeConfigurationFile).hasValue(expectedConfigurationFile);
+    }
+
+    private void assertConfigurationFileNotPresent(Optional<Path> maybeConfigurationFile) {
+        assertThat(maybeConfigurationFile).isEmpty();
+    }
+
     private SimpleApplicationClient applicationClient(List<Endpoint> endpoints) {
         var endpoint = endpoints.get(0);
 
         return ClientFactory.create(endpoint, SimpleApplicationClient.class);
     }
+
 }

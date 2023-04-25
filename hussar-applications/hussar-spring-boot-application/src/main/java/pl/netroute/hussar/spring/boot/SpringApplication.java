@@ -8,6 +8,8 @@ import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,15 +18,26 @@ public class SpringApplication implements Application {
     private static final String HOSTNAME = "localhost";
 
     private final Class<?> applicationClass;
+    private final Path configurationFile;
     private final LockedAction lockedAction;
 
     private ConfigurableApplicationContext applicationContext;
 
-    private SpringApplication(Class<?> applicationClass) {
+    private SpringApplication(Class<?> applicationClass, Path configurationFile) {
         Objects.requireNonNull(applicationClass, "applicationClass is required");
 
+        if(!isConfigurationFilePresent(configurationFile)) {
+            configurationFile = null;
+        }
+
         this.applicationClass = applicationClass;
+        this.configurationFile = configurationFile;
         this.lockedAction = new LockedAction();
+    }
+
+    @Override
+    public Optional<Path> getConfigurationFile() {
+        return Optional.ofNullable(configurationFile);
     }
 
     @Override
@@ -69,16 +82,24 @@ public class SpringApplication implements Application {
         );
     }
 
+    private boolean isConfigurationFilePresent(Path configurationFile) {
+        return Optional
+                .ofNullable(configurationFile)
+                .map(Path::toFile)
+                .map(File::exists)
+                .orElse(Boolean.FALSE);
+    }
+
     private Endpoint resolveEndpoint() {
         var port = applicationContext
                 .getEnvironment()
-                .getProperty(SpringProperties.SERVER_PORT, Integer.class);
+                .getProperty(PropertiesFactory.SERVER_PORT, Integer.class);
 
         return Endpoint.of(SchemesHelper.HTTP_SCHEME, HOSTNAME, port);
     }
 
     private ConfigurableApplicationContext initializeApplication(ApplicationStartupContext startupContext) {
-        var properties = SpringProperties.withDynamicPort(startupContext.getProperties());
+        var properties = PropertiesFactory.createWithDynamicPort(startupContext.getProperties());
 
         return new SpringApplicationBuilder(applicationClass)
                 .initializers(context -> new PropertySourceConfigurer().configure(properties, context))
@@ -86,7 +107,15 @@ public class SpringApplication implements Application {
     }
 
     public static SpringApplication newApplication(Class<?> applicationClass) {
-        return new SpringApplication(applicationClass);
+        var configurationFile = new ConfigurationFileResolver()
+                .resolveDefault(applicationClass)
+                .orElse(null);
+
+        return new SpringApplication(applicationClass, configurationFile);
+    }
+
+    public static SpringApplication newApplication(Class<?> applicationClass, Path configurationFile) {
+        return new SpringApplication(applicationClass, configurationFile);
     }
 
 }

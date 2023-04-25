@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core;
 
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.ServiceStartupContext;
 
 import java.time.Duration;
 import java.util.List;
@@ -27,7 +28,7 @@ class ServicesStarter {
     private void startStandaloneServices(List<Service> services) {
         services
                 .stream()
-                .map(service -> executorService.submit(service::start))
+                .map(service -> executorService.submit(() -> service.start(ServiceStartupContext.empty())))
                 .forEach(task -> FutureHelper.waitForTaskCompletion(task, SERVICE_STARTUP_TIMEOUT));
     }
 

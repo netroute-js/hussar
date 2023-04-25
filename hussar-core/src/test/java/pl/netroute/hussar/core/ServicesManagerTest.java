@@ -79,33 +79,6 @@ public class ServicesManagerTest {
         assertNamedServiceFound(foundService, namedService);
     }
 
-    private static abstract class AbstractService implements Service {
-        private final String name;
-
-        public AbstractService(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public List<Endpoint> getEndpoints() {
-            return List.of();
-        }
-
-        @Override
-        public void start() {
-        }
-
-        @Override
-        public void shutdown() {
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-    }
-
     private void assertNamedServiceFound(Optional<? extends Service> service, String expectedServiceName) {
         assertThat(service).hasValueSatisfying(
                 actualService -> assertThat(actualService.getName()).isEqualTo(expectedServiceName)

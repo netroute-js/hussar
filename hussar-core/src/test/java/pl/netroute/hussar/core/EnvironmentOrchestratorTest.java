@@ -6,6 +6,7 @@ import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -95,7 +97,7 @@ public class EnvironmentOrchestratorTest {
     }
 
     private void assertServiceStarted(Service service) {
-        verify(service).start();
+        verify(service).start(isA(ServiceStartupContext.class));
     }
 
     private void assertPropertySet(String key, String value) {

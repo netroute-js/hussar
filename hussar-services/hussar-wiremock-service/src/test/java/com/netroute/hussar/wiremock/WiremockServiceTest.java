@@ -5,6 +5,7 @@ import org.apache.hc.client5.http.HttpHostConnectException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.PropertiesHelper;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class WiremockServiceTest {
                 .configure();
 
         // when
-        wiremockService.start();
+        wiremockService.start(ServiceStartupContext.empty());
 
         // then
         var endpoints = wiremockService.getEndpoints();
@@ -58,7 +59,7 @@ public class WiremockServiceTest {
                 .configure();
 
         // when
-        wiremockService.start();
+        wiremockService.start(ServiceStartupContext.empty());
 
         // then
         var endpoints = wiremockService.getEndpoints();
@@ -87,7 +88,7 @@ public class WiremockServiceTest {
                 .configure();
 
         // when
-        wiremockService.start();
+        wiremockService.start(ServiceStartupContext.empty());
 
         var endpoints = wiremockService.getEndpoints();
 

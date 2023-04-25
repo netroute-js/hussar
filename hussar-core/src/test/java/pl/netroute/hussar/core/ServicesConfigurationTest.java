@@ -2,6 +2,10 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
+import pl.netroute.hussar.core.domain.ServiceTestC;
 
 import java.util.List;
 
@@ -13,10 +17,10 @@ public class ServicesConfigurationTest {
     @Test
     public void shouldBuildConfiguration() {
         // given
-        var firstServiceA = new ServiceA("first-serviceA");
-        var secondServiceA = new ServiceA("second-serviceA");
-        var serviceB = new ServiceB("serviceB");
-        var serviceC = new ServiceC();
+        var firstServiceA = new ServiceTestA("first-serviceA");
+        var secondServiceA = new ServiceTestB("second-serviceA");
+        var serviceB = new ServiceTestB("serviceB");
+        var serviceC = new ServiceTestC();
 
         var services = List.<Service>of(firstServiceA, secondServiceA, serviceB, serviceC);
 
@@ -30,9 +34,9 @@ public class ServicesConfigurationTest {
     @Test
     public void shouldFailBuildingConfigurationWhenMultipleServicesWithSameName() {
         // given
-        var serviceA = new ServiceA("some-service");
-        var serviceB = new ServiceB("some-service");
-        var serviceC = new ServiceC("serviceC");
+        var serviceA = new ServiceTestA("some-service");
+        var serviceB = new ServiceTestB("some-service");
+        var serviceC = new ServiceTestC("serviceC");
 
         // when
         // then
@@ -44,82 +48,19 @@ public class ServicesConfigurationTest {
     @Test
     public void shouldFailBuildingConfigurationWhenMultipleTypedServicesButNameMissing() {
         // given
-        var firstServiceA = new ServiceA("some-service");
-        var secondServiceA = new ServiceA();
-        var serviceC = new ServiceC();
+        var firstServiceA = new ServiceTestA("some-service");
+        var secondServiceA = new ServiceTestA();
+        var serviceC = new ServiceTestC();
 
         // when
         // then
         assertThatThrownBy(() -> new ServicesConfiguration(List.of(firstServiceA, secondServiceA, serviceC)))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Multiple services of the same type detected. Expected all of them to be named - [pl.netroute.hussar.core.ServicesConfigurationTest.ServiceA]");
+                .hasMessage("Multiple services of the same type detected. Expected all of them to be named - [pl.netroute.hussar.core.domain.ServiceTestA]");
     }
 
     private void assertServicesPresent(ServicesConfiguration configuration, List<Service> expectedServices) {
         assertThat(configuration.getStandaloneServices()).containsExactlyInAnyOrderElementsOf(expectedServices);
-    }
-
-    private static abstract class AbstractService implements Service {
-        private final String name;
-
-        public AbstractService(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public List<Endpoint> getEndpoints() {
-            return List.of();
-        }
-
-        @Override
-        public void start() {
-        }
-
-        @Override
-        public void shutdown() {
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-    }
-
-    private static class ServiceA extends AbstractService {
-
-        public ServiceA() {
-            this(null);
-        }
-
-        public ServiceA(String name) {
-            super(name);
-        }
-
-    }
-
-    private static class ServiceB extends AbstractService {
-
-        public ServiceB() {
-            this(null);
-        }
-
-        public ServiceB(String name) {
-            super(name);
-        }
-
-    }
-
-    private static class ServiceC extends AbstractService {
-
-        public ServiceC() {
-            this(null);
-        }
-
-        public ServiceC(String name) {
-            super(name);
-        }
-
     }
 
 }

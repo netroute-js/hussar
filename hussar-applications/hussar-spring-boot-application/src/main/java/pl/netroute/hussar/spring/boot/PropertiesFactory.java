@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-class SpringProperties {
+class PropertiesFactory {
     public static final String SERVER_PORT = "server.port";
 
-    private SpringProperties() {}
+    private PropertiesFactory() {}
 
-    static Map<String, Object> withDynamicPort(Map<String, Object> properties) {
+    static Map<String, Object> createWithDynamicPort(Map<String, Object> properties) {
         Objects.requireNonNull(properties, "properties are required");
 
         var mutableProperties = new HashMap<>(properties);

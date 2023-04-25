@@ -1,6 +1,6 @@
 package pl.netroute.hussar.core.api;
 
-public interface ServiceLifecycle {
-    void start();
+public interface Lifecycle<T> {
+    void start(T context);
     void shutdown();
 }

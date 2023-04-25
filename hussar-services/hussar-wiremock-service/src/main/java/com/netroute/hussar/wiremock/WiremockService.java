@@ -6,6 +6,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.PropertiesHelper;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 
@@ -37,7 +38,9 @@ public class WiremockService implements Service {
     }
 
     @Override
-    public void start() {
+    public void start(ServiceStartupContext context) {
+        Objects.requireNonNull(context, "context is required");
+
         this.container = configureContainer(config);
 
         boostrapContainer(config);
