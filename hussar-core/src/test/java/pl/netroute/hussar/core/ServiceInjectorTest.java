@@ -3,6 +3,7 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.annotation.HussarService;
+import pl.netroute.hussar.core.api.ServiceRegistry;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
@@ -17,15 +18,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ServicesInjectorTest {
-    private ServicesManager servicesManager;
-    private ServicesInjector servicesInjector;
+public class ServiceInjectorTest {
+    private ServiceRegistry serviceRegistry;
+    private ServiceInjector serviceInjector;
 
     @BeforeEach
     public void setup() {
-        servicesManager = mock(ServicesManager.class);
+        serviceRegistry = mock(ServiceRegistry.class);
 
-        servicesInjector = new ServicesInjector(servicesManager);
+        serviceInjector = new ServiceInjector(serviceRegistry);
     }
 
     @Test
@@ -34,10 +35,10 @@ public class ServicesInjectorTest {
         var testInstance = new TestClassWithoutServices();
 
         // when
-        servicesInjector.inject(testInstance);
+        serviceInjector.inject(testInstance);
 
         // then
-        assertNoServiceLookupPerformed(servicesManager);
+        assertNoServiceLookupPerformed(serviceRegistry);
     }
 
     @Test
@@ -51,15 +52,15 @@ public class ServicesInjectorTest {
 
         var testInstance = new TestClassWithServices();
 
-        when(servicesManager.findByType(serviceTypeA)).thenReturn(Optional.of(serviceA));
-        when(servicesManager.findByName(serviceNameB)).thenReturn(Optional.of(serviceB));
+        when(serviceRegistry.findEntryByType(serviceTypeA)).thenReturn(Optional.of(serviceA));
+        when(serviceRegistry.findEntryByName(serviceNameB)).thenReturn(Optional.of(serviceB));
 
         // when
-        servicesInjector.inject(testInstance);
+        serviceInjector.inject(testInstance);
 
         // then
-        assertServiceLookupByTypePerformed(servicesManager);
-        assertServiceLookupByNamePerformed(servicesManager);
+        assertServiceLookupByTypePerformed(serviceRegistry);
+        assertServiceLookupByNamePerformed(serviceRegistry);
         assertServicesInjected(testInstance, serviceA, serviceB);
     }
 
@@ -70,15 +71,15 @@ public class ServicesInjectorTest {
 
         var testInstance = new TestClassWithTypeService();
 
-        when(servicesManager.findByType(serviceType)).thenReturn(Optional.empty());
+        when(serviceRegistry.findEntryByType(serviceType)).thenReturn(Optional.empty());
 
         // when
         // then
-        assertThatThrownBy(() -> servicesInjector.inject(testInstance))
+        assertThatThrownBy(() -> serviceInjector.inject(testInstance))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(String.format("Expected exactly one HussarService of %s type", serviceType));
 
-        assertServiceLookupByTypePerformed(servicesManager);
+        assertServiceLookupByTypePerformed(serviceRegistry);
     }
 
     @Test
@@ -88,28 +89,28 @@ public class ServicesInjectorTest {
 
         var testInstance = new TestClassWithNameService();
 
-        when(servicesManager.findByName(serviceName)).thenReturn(Optional.empty());
+        when(serviceRegistry.findEntryByName(serviceName)).thenReturn(Optional.empty());
 
         // when
         // then
-        assertThatThrownBy(() -> servicesInjector.inject(testInstance))
+        assertThatThrownBy(() -> serviceInjector.inject(testInstance))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(String.format("Expected exactly one HussarService named %s", serviceName));
 
-        assertServiceLookupByNamePerformed(servicesManager);
+        assertServiceLookupByNamePerformed(serviceRegistry);
     }
 
-    private void assertNoServiceLookupPerformed(ServicesManager servicesManager) {
-        verify(servicesManager, never()).findByName(anyString());
-        verify(servicesManager, never()).findByType(any());
+    private void assertNoServiceLookupPerformed(ServiceRegistry serviceRegistry) {
+        verify(serviceRegistry, never()).findEntryByName(anyString());
+        verify(serviceRegistry, never()).findEntryByType(any());
     }
 
-    private void assertServiceLookupByNamePerformed(ServicesManager servicesManager) {
-        verify(servicesManager).findByName(anyString());
+    private void assertServiceLookupByNamePerformed(ServiceRegistry serviceRegistry) {
+        verify(serviceRegistry).findEntryByName(anyString());
     }
 
-    private void assertServiceLookupByTypePerformed(ServicesManager servicesManager) {
-        verify(servicesManager).findByType(any());
+    private void assertServiceLookupByTypePerformed(ServiceRegistry serviceRegistry) {
+        verify(serviceRegistry).findEntryByType(any());
     }
 
     private void assertServicesInjected(TestClassWithServices testInstance, ServiceTestA expectedServiceA, ServiceTestB expectedServiceB) {

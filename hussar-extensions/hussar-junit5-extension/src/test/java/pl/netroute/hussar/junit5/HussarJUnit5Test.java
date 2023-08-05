@@ -32,15 +32,8 @@ public class HussarJUnit5Test {
 
         // when
         // then
-        assertServiceInjected(wiremockServiceA);
-        assertServiceInjected(wiremockServiceB);
-
         assertWiremockReachable(wiremockClientA);
         assertWiremockReachable(wiremockClientB);
-    }
-
-    private void assertServiceInjected(Service service) {
-        assertThat(service).isNotNull();
     }
 
     private void assertWiremockReachable(WiremockClient wiremock) {

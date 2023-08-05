@@ -1,13 +1,14 @@
 package com.netroute.hussar.wiremock;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.apache.hc.client5.http.HttpHostConnectException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.PropertiesHelper;
+import pl.netroute.hussar.core.service.api.RegistrableConfigurationEntry;
 
+import java.net.SocketException;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,15 +48,15 @@ public class WiremockServiceTest {
         // given
         var name = "wiremock-instance";
         var dockerVersion = "2.34.0";
-        var endpointPropertyA = "propertyA.wiremock.url";
-        var endpointPropertyB = "propertyB.wiremock.url";
+        var endpointProperty = "propertyA.wiremock.url";
+        var endpointEnvVariable = "WIREMOCK_URL";
 
         wiremockService = WiremockServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
-                .registerEndpointUnderProperty(endpointPropertyA)
-                .registerEndpointUnderProperty(endpointPropertyB)
+                .registerEndpointUnderEntry(RegistrableConfigurationEntry.property(endpointProperty))
+                .registerEndpointUnderEntry(RegistrableConfigurationEntry.envVariable(endpointEnvVariable))
                 .configure();
 
         // when
@@ -67,8 +68,10 @@ public class WiremockServiceTest {
 
         var endpoint = endpoints.get(0);
         assertWiremockAccessible(endpoint);
-        assertRegisteredEndpointUnderProperty(endpointPropertyA, endpoint);
-        assertRegisteredEndpointUnderProperty(endpointPropertyB, endpoint);
+
+        var configRegistry = wiremockService.getConfigurationRegistry();
+        assertRegisteredEndpointInConfigRegistry(endpointProperty, configRegistry, endpoint);
+        assertRegisteredEndpointInConfigRegistry(endpointEnvVariable, configRegistry, endpoint);
     }
 
     @Test
@@ -76,15 +79,11 @@ public class WiremockServiceTest {
         // given
         var name = "wiremock-instance";
         var dockerVersion = "2.34.0";
-        var endpointPropertyA = "propertyA.wiremock.url";
-        var endpointPropertyB = "propertyB.wiremock.url";
 
         wiremockService = WiremockServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
-                .registerEndpointUnderProperty(endpointPropertyA)
-                .registerEndpointUnderProperty(endpointPropertyB)
                 .configure();
 
         // when
@@ -99,20 +98,22 @@ public class WiremockServiceTest {
 
         var endpoint = endpoints.get(0);
         assertWiremockNotAccessible(endpoint);
-        assertPropertyNotSet(endpointPropertyA);
-        assertPropertyNotSet(endpointPropertyB);
     }
 
     private void assertSingleEndpoint(List<Endpoint> endpoints) {
         assertThat(endpoints).hasSize(1);
     }
 
-    private void assertRegisteredEndpointUnderProperty(String property, Endpoint endpoint) {
-        assertThat(PropertiesHelper.getProperty(property)).hasValue(endpoint.getAddress());
-    }
-
-    private void assertPropertyNotSet(String property) {
-        assertThat(PropertiesHelper.getProperty(property)).isEmpty();
+    private void assertRegisteredEndpointInConfigRegistry(String registeredEntryName, ConfigurationRegistry registry, Endpoint endpoint) {
+        registry
+                .getEntries()
+                .stream()
+                .filter(configEntry -> configEntry.getName().equals(registeredEntryName))
+                .findFirst()
+                .ifPresentOrElse(
+                        configEntry -> assertThat(configEntry.getValue()).isEqualTo(endpoint.getAddress()),
+                        () -> { throw new AssertionError("Expected registered endpoint in config registry. Found none"); }
+                );
     }
 
     private void assertWiremockAccessible(Endpoint endpoint) {
@@ -125,8 +126,8 @@ public class WiremockServiceTest {
         var wiremockClient = new WireMock(endpoint.getHost(), endpoint.getPort());
 
         assertThatThrownBy(() -> wiremockClient.resetToDefaultMappings())
-                .isInstanceOf(HttpHostConnectException.class)
-                .hasMessageContaining("failed: Connection refused: connect");
+                .isInstanceOf(SocketException.class)
+                .hasMessageContaining("Connection reset");
     }
 
 }

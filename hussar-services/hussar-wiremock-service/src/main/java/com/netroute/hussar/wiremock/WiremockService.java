@@ -5,14 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.PropertiesHelper;
 import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.service.api.RegistrableConfigurationEntry;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class WiremockService implements Service {
     private static final int HTTP_PORT = 8080;
@@ -20,12 +22,15 @@ public class WiremockService implements Service {
     private static final Logger LOG = LoggerFactory.getLogger(WiremockService.class);
 
     private final WiremockServiceConfig config;
+    private final ConfigurationRegistry configRegistry;
     private GenericContainer<?> container;
 
-    WiremockService(WiremockServiceConfig config) {
+    WiremockService(WiremockServiceConfig config, ConfigurationRegistry configRegistry) {
         Objects.requireNonNull(config, "config is required");
+        Objects.requireNonNull(configRegistry, "configRegistry is required");
 
         this.config = config;
+        this.configRegistry = configRegistry;
     }
 
     @Override
@@ -52,13 +57,16 @@ public class WiremockService implements Service {
         Optional
                 .ofNullable(container)
                 .ifPresent(this::stopContainer);
-
-        afterContainerShutdown(config);
     }
 
     @Override
     public String getName() {
         return config.getName();
+    }
+
+    @Override
+    public ConfigurationRegistry getConfigurationRegistry() {
+        return configRegistry;
     }
 
     private void boostrapContainer(WiremockServiceConfig config) {
@@ -78,27 +86,17 @@ public class WiremockService implements Service {
     }
 
     private void afterContainerBoostrap(WiremockServiceConfig config) {
-        registerUrlEndpoint(config.getRegisterEndpointUnderProperties());
+        registerUrlEndpoint(config.getRegisterEndpointUnderEntries());
     }
 
-    private void afterContainerShutdown(WiremockServiceConfig config) {
-        deregisterUrlEndpoint(config.getRegisterEndpointUnderProperties());
-    }
-
-    private void registerUrlEndpoint(List<String> endpointProperties) {
-        if(!endpointProperties.isEmpty()) {
+    private void registerUrlEndpoint(Set<RegistrableConfigurationEntry> endpointEntries) {
+        if(!endpointEntries.isEmpty()) {
             var endpointAddress = getEndpoints().get(0).getAddress();
-            LOG.info("Registering Wiremock endpoint[{}] for properties {}", endpointAddress, endpointProperties);
 
-            endpointProperties.forEach(property -> PropertiesHelper.setProperty(property, endpointAddress));
-        }
-    }
-
-    private void deregisterUrlEndpoint(List<String> endpointProperties) {
-        if(!endpointProperties.isEmpty()) {
-            LOG.info("De-registering Wiremock endpoint's related {} properties", endpointProperties);
-
-            endpointProperties.forEach(PropertiesHelper::clearProperty);
+            endpointEntries
+                    .stream()
+                    .map(registrableEntry -> registrableEntry.toResolvedConfigurationEntry(endpointAddress))
+                    .forEach(configRegistry::register);
         }
     }
 

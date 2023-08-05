@@ -1,9 +1,12 @@
 package com.netroute.hussar.wiremock;
 
+import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.helper.ValidatorHelper;
+import pl.netroute.hussar.core.service.api.RegistrableConfigurationEntry;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 public class WiremockServiceConfigurer {
@@ -15,7 +18,7 @@ public class WiremockServiceConfigurer {
     private String dockerImage = "wiremock/wiremock";
     private String dockerImageVersion = "latest";
 
-    private List<String> registerEndpointUnderProperties = new ArrayList<>();
+    private Set<RegistrableConfigurationEntry> registerEndpointUnderEntries = new HashSet<>();
 
     public WiremockServiceConfigurer name(String name) {
         ValidatorHelper.requireNonEmpty(name, "name");
@@ -33,10 +36,10 @@ public class WiremockServiceConfigurer {
         return this;
     }
 
-    public WiremockServiceConfigurer registerEndpointUnderProperty(String property) {
-        ValidatorHelper.requireNonEmpty(property, "property");
+    public WiremockServiceConfigurer registerEndpointUnderEntry(RegistrableConfigurationEntry registerEndpointUnderEntry) {
+        Objects.requireNonNull(registerEndpointUnderEntry, "registerEndpointUnderEntry is required");
 
-        this.registerEndpointUnderProperties.add(property);
+        this.registerEndpointUnderEntries.add(registerEndpointUnderEntry);
 
         return this;
     }
@@ -44,9 +47,10 @@ public class WiremockServiceConfigurer {
     public WiremockService configure() {
         var resolvedName = resolveName();
         var resolvedDockerImage = resolveDockerImage();
-        var config = new WiremockServiceConfig(resolvedName, resolvedDockerImage, registerEndpointUnderProperties);
+        var config = new WiremockServiceConfig(resolvedName, resolvedDockerImage, registerEndpointUnderEntries);
+        var configRegistry = new MapConfigurationRegistry();
 
-        return new WiremockService(config);
+        return new WiremockService(config, configRegistry);
     }
 
     private String resolveName() {

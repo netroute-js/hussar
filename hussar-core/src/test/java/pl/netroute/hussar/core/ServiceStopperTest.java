@@ -2,24 +2,25 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.MapServiceRegistry;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class ServicesStopperTest {
+public class ServiceStopperTest {
     private ServiceTestA serviceA;
     private ServiceTestB serviceB;
-    private ServicesStopper stopper;
+    private ServiceStopper stopper;
 
     @BeforeEach
     public void setup() {
-        stopper = new ServicesStopper(ForkJoinPool.commonPool());
+        stopper = new ServiceStopper(ForkJoinPool.commonPool());
     }
 
     @Test
@@ -27,9 +28,9 @@ public class ServicesStopperTest {
         // given
         serviceA = mock(ServiceTestA.class);
         serviceB = mock(ServiceTestB.class);
-        var standaloneServices = List.<Service>of(serviceA, serviceB);
+        var standaloneServices = Set.<Service>of(serviceA, serviceB);
 
-        var servicesConfig = new ServicesConfiguration(standaloneServices);
+        var servicesConfig = new MapServiceRegistry(standaloneServices);
 
         // when
         stopper.stop(servicesConfig);

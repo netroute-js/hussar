@@ -2,7 +2,9 @@ package pl.netroute.hussar.junit5.config;
 
 import com.netroute.hussar.wiremock.WiremockServiceConfigurer;
 import pl.netroute.hussar.core.EnvironmentConfigurer;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.service.api.RegistrableConfigurationEntry;
 import pl.netroute.hussar.spring.boot.SpringApplication;
 
 public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
@@ -12,8 +14,11 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
     public static final String PROPERTY_A = "propertyA";
     public static final String PROPERTY_A_VALUE = "propertyA_value";
 
+    public static final String ENV_VARIABLE_A = "SOME_ENV_VARIABLE_A";
+    public static final String ENV_VARIABLE_A_VALUE = "SOME_ENV_VARIABLE_A_VALUE";
+
     public static final String WIREMOCK_INSTANCE_A_URL_PROPERTY = "pl.netroute.wiremockA.url";
-    public static final String WIREMOCK_INSTANCE_B_URL_PROPERTY = "pl.netroute.wiremockB.url";
+    public static final String WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE = "WIREMOCK_B_URL";
 
     @Override
     public EnvironmentConfigurer provide() {
@@ -22,18 +27,19 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
         var wiremockServiceA = WiremockServiceConfigurer
                 .newInstance()
                 .name(WIREMOCK_A)
-                .registerEndpointUnderProperty(WIREMOCK_INSTANCE_A_URL_PROPERTY)
+                .registerEndpointUnderEntry(RegistrableConfigurationEntry.property(WIREMOCK_INSTANCE_A_URL_PROPERTY))
                 .configure();
 
         var wiremockServiceB = WiremockServiceConfigurer
                 .newInstance()
                 .name(WIREMOCK_B)
-                .registerEndpointUnderProperty(WIREMOCK_INSTANCE_B_URL_PROPERTY)
+                .registerEndpointUnderEntry(RegistrableConfigurationEntry.envVariable(WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE))
                 .configure();
 
         return EnvironmentConfigurer
                 .newConfigurer()
-                .withProperty(PROPERTY_A, PROPERTY_A_VALUE)
+                .withStaticConfigurationEntry(ConfigurationEntry.property(PROPERTY_A, PROPERTY_A_VALUE))
+                .withStaticConfigurationEntry(ConfigurationEntry.envVariable(ENV_VARIABLE_A, ENV_VARIABLE_A_VALUE))
                 .withStandaloneService(wiremockServiceA)
                 .withStandaloneService(wiremockServiceB)
                 .withApplication(application);

@@ -2,12 +2,12 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,8 +21,8 @@ public class EnvironmentConfigurerTest {
         var propertyA = "propertyA";
         var propertyValueA = "property value A";
 
-        var propertyB = "propertyB";
-        var propertyValueB = "property value B";
+        var envVariableB = "SOME_ENV_VARIABLE_B";
+        var envVariableValueB = "some env variable value B";
 
         var standaloneServiceA = mock(ServiceTestA.class);
         var standaloneServiceB = mock(ServiceTestB.class);
@@ -32,23 +32,23 @@ public class EnvironmentConfigurerTest {
         // when
         var environment = EnvironmentConfigurer
                 .newConfigurer()
-                .withProperty(propertyA, propertyValueA)
-                .withProperty(propertyB, propertyValueB)
+                .withStaticConfigurationEntry(ConfigurationEntry.property(propertyA, propertyValueA))
+                .withStaticConfigurationEntry(ConfigurationEntry.envVariable(envVariableB, envVariableValueB))
                 .withStandaloneService(standaloneServiceA)
                 .withStandaloneService(standaloneServiceB)
                 .withApplication(application)
                 .configure();
 
         // then
-        var expectedServices = List.<Service>of(standaloneServiceA, standaloneServiceB);
-        var expectedProperties = Map.of(
-                propertyA, propertyValueA,
-                propertyB, propertyValueB
+        var expectedServices = Set.<Service>of(standaloneServiceA, standaloneServiceB);
+        var expectedConfigurationEntries = Set.<ConfigurationEntry>of(
+                ConfigurationEntry.property(propertyA, propertyValueA),
+                ConfigurationEntry.envVariable(envVariableB, envVariableValueB)
         );
 
         assertApplicationConfigured(environment, application);
         assertStandaloneServicesConfigured(environment, expectedServices);
-        assertPropertiesConfigured(environment, expectedProperties);
+        assertStaticConfigurationEntriesSetup(environment, expectedConfigurationEntries);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class EnvironmentConfigurerTest {
         // then
         assertApplicationConfigured(environment, application);
         assertNoStandaloneServicesConfigured(environment);
-        assertNoPropertiesConfigured(environment);
+        assertNoStaticConfigurationEntriesSetup(environment);
     }
 
     @Test
@@ -82,20 +82,20 @@ public class EnvironmentConfigurerTest {
         assertThat(environment.getApplication()).isEqualTo(expectedApplication);
     }
 
-    private void assertStandaloneServicesConfigured(Environment environment, List<Service> expectedServices) {
-        assertThat(environment.getServicesConfiguration().getStandaloneServices()).containsExactlyElementsOf(expectedServices);
+    private void assertStandaloneServicesConfigured(Environment environment, Set<Service> expectedServices) {
+        assertThat(environment.getServiceRegistry().getEntries()).containsExactlyInAnyOrderElementsOf(expectedServices);
     }
 
-    private void assertPropertiesConfigured(Environment environment, Map<String, String> expectedProperties) {
-        assertThat(environment.getPropertiesConfiguration().getProperties()).containsExactlyInAnyOrderEntriesOf(expectedProperties);
+    private void assertStaticConfigurationEntriesSetup(Environment environment, Set<ConfigurationEntry> expectedConfigEntries) {
+        assertThat(environment.getStaticConfigurationRegistry().getEntries()).containsExactlyInAnyOrderElementsOf(expectedConfigEntries);
     }
 
     private void assertNoStandaloneServicesConfigured(Environment environment) {
-        assertThat(environment.getServicesConfiguration().getStandaloneServices()).isEmpty();
+        assertThat(environment.getServiceRegistry().getEntries()).isEmpty();
     }
 
-    private void assertNoPropertiesConfigured(Environment environment) {
-        assertThat(environment.getPropertiesConfiguration().getProperties()).isEmpty();
+    private void assertNoStaticConfigurationEntriesSetup(Environment environment) {
+        assertThat(environment.getStaticConfigurationRegistry().getEntries()).isEmpty();
     }
 
 }

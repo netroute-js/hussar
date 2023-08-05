@@ -1,31 +1,30 @@
 package pl.netroute.hussar.core;
 
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.api.MapServiceRegistry;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.ServiceRegistry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public final class EnvironmentConfigurer {
     private Application application;
 
-    private final Map<String, String> properties;
-    private final List<Service> standaloneServices;
+    private final ConfigurationRegistry staticConfigurationRegistry;
+    private final ServiceRegistry serviceRegistry;
 
     private EnvironmentConfigurer() {
-        this.properties = new HashMap<>();
-        this.standaloneServices = new ArrayList<>();
+        this.staticConfigurationRegistry = new MapConfigurationRegistry();
+        this.serviceRegistry = new MapServiceRegistry();
     }
 
-    public EnvironmentConfigurer withProperty(String key,
-                                              String value) {
-        Objects.requireNonNull(key, "key is required");
-        Objects.requireNonNull(value, "value is required");
+    public EnvironmentConfigurer withStaticConfigurationEntry(ConfigurationEntry configEntry) {
+        Objects.requireNonNull(configEntry, "configEntry is required");
 
-        this.properties.put(key, value);
+        this.staticConfigurationRegistry.register(configEntry);
 
         return this;
     }
@@ -33,7 +32,7 @@ public final class EnvironmentConfigurer {
     public EnvironmentConfigurer withStandaloneService(Service service) {
         Objects.requireNonNull(service, "service is required");
 
-        standaloneServices.add(service);
+        serviceRegistry.register(service);
 
         return this;
     }
@@ -49,13 +48,10 @@ public final class EnvironmentConfigurer {
     Environment configure() {
         Objects.requireNonNull(application, "application needs to be configured");
 
-        var propertiesConfig = new PropertiesConfiguration(properties);
-        var mocksConfig = new ServicesConfiguration(standaloneServices);
-
         return new Environment(
                 application,
-                propertiesConfig,
-                mocksConfig
+                staticConfigurationRegistry,
+                serviceRegistry
         );
     }
 

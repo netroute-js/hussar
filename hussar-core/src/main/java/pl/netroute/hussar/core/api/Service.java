@@ -1,5 +1,5 @@
 package pl.netroute.hussar.core.api;
 
-public interface Service extends Accessible, Lifecycle<ServiceStartupContext> {
+public interface Service extends Accessible, Lifecycle<ServiceStartupContext>, ResolvableConfiguration {
     String getName();
 }

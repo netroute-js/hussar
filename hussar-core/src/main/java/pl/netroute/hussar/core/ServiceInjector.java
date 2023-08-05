@@ -4,22 +4,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.annotation.HussarService;
 import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.ServiceRegistry;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
 
-class ServicesInjector {
-    private static final Logger LOG = LoggerFactory.getLogger(ServicesInjector.class);
+class ServiceInjector {
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceInjector.class);
 
     private static final Class<HussarService> HUSSAR_SERVICE_ANNOTATION_CLASS = HussarService.class;
 
-    private final ServicesManager servicesManager;
+    private final ServiceRegistry serviceRegistry;
 
-    ServicesInjector(ServicesManager servicesManager) {
-        Objects.requireNonNull(servicesManager, "servicesManager is required");
+    ServiceInjector(ServiceRegistry serviceRegistry) {
+        Objects.requireNonNull(serviceRegistry, "serviceRegistry is required");
 
-        this.servicesManager = servicesManager;
+        this.serviceRegistry = serviceRegistry;
     }
 
     void inject(Object targetInstance) {
@@ -57,7 +58,7 @@ class ServicesInjector {
 
         Optional
                 .of(serviceType)
-                .flatMap(servicesManager::findByType)
+                .flatMap(serviceRegistry::findEntryByType)
                 .ifPresentOrElse(
                         service -> doServiceInjection(targetInstance, serviceField, service),
                         () -> { throw new IllegalStateException(String.format("Expected exactly one HussarService of %s type", serviceType)); }
@@ -69,7 +70,7 @@ class ServicesInjector {
 
         Optional
                 .of(serviceName)
-                .flatMap(servicesManager::findByName)
+                .flatMap(serviceRegistry::findEntryByName)
                 .ifPresentOrElse(
                         actualService -> doServiceInjection(targetInstance, serviceField, actualService),
                         () -> { throw new IllegalStateException(String.format("Expected exactly one HussarService named %s", serviceName)); }
@@ -83,11 +84,11 @@ class ServicesInjector {
         ReflectionHelper.setValue(targetInstance, serviceField, service);
     }
 
-    static ServicesInjector newInstance(Environment environment) {
+    static ServiceInjector newInstance(Environment environment) {
         Objects.requireNonNull(environment, "environment is required");
 
-        var servicesManager = new ServicesManager(environment.getServicesConfiguration());
+        var serviceRegistry = environment.getServiceRegistry();
 
-        return new ServicesInjector(servicesManager);
+        return new ServiceInjector(serviceRegistry);
     }
 }

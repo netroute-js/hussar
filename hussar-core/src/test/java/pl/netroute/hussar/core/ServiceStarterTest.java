@@ -2,27 +2,28 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.MapServiceRegistry;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class ServicesStarterTest {
+public class ServiceStarterTest {
     private ServiceTestA serviceA;
     private ServiceTestB serviceB;
 
-    private ServicesStarter starter;
+    private ServiceStarter starter;
 
     @BeforeEach
     public void setup() {
-        starter = new ServicesStarter(ForkJoinPool.commonPool());
+        starter = new ServiceStarter(ForkJoinPool.commonPool());
     }
 
     @Test
@@ -30,12 +31,12 @@ public class ServicesStarterTest {
         // given
         serviceA = mock(ServiceTestA.class);
         serviceB = mock(ServiceTestB.class);
-        var standaloneServices = List.<Service>of(serviceA, serviceB);
+        var standaloneServices = Set.<Service>of(serviceA, serviceB);
 
-        var servicesConfig = new ServicesConfiguration(standaloneServices);
+        var serviceRegistry = new MapServiceRegistry(standaloneServices);
 
         // when
-        starter.start(servicesConfig);
+        starter.start(serviceRegistry);
 
         // then
         assertServiceStarted(serviceA);

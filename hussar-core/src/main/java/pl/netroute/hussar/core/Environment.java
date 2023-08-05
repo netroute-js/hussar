@@ -1,36 +1,38 @@
 package pl.netroute.hussar.core;
 
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.ServiceRegistry;
 
 import java.util.Objects;
 
 class Environment {
     private final Application application;
-    private final PropertiesConfiguration propertiesConfiguration;
-    private final ServicesConfiguration servicesConfiguration;
+    private final ConfigurationRegistry staticConfigurationRegistry;
+    private final ServiceRegistry serviceRegistry;
 
     Environment(Application application,
-                PropertiesConfiguration propertiesConfiguration,
-                ServicesConfiguration servicesConfiguration) {
+                ConfigurationRegistry staticConfigurationRegistry,
+                ServiceRegistry serviceRegistry) {
         Objects.requireNonNull(application, "applicationProvider is required");
-        Objects.requireNonNull(propertiesConfiguration, "propertiesConfiguration is required");
-        Objects.requireNonNull(servicesConfiguration, "servicesConfiguration is required");
+        Objects.requireNonNull(staticConfigurationRegistry, "staticConfigurationRegistry is required");
+        Objects.requireNonNull(serviceRegistry, "serviceRegistry is required");
 
         this.application = application;
-        this.propertiesConfiguration = propertiesConfiguration;
-        this.servicesConfiguration = servicesConfiguration;
+        this.staticConfigurationRegistry = staticConfigurationRegistry;
+        this.serviceRegistry = serviceRegistry;
     }
 
     Application getApplication() {
         return application;
     }
 
-    ServicesConfiguration getServicesConfiguration() {
-        return servicesConfiguration;
+    ServiceRegistry getServiceRegistry() {
+        return serviceRegistry;
     }
 
-    PropertiesConfiguration getPropertiesConfiguration() {
-        return propertiesConfiguration;
+    ConfigurationRegistry getStaticConfigurationRegistry() {
+        return staticConfigurationRegistry;
     }
 
 }

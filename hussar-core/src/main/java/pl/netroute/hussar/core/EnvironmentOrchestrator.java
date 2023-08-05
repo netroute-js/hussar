@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.api.ServiceRegistry;
 import pl.netroute.hussar.core.lock.LockedAction;
 
 import java.util.Map;
@@ -14,27 +15,19 @@ import java.util.concurrent.ConcurrentHashMap;
 class EnvironmentOrchestrator {
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentOrchestrator.class);
 
-    private final PropertiesConfigurer propertiesConfigurer;
-    private final PropertiesCleaner propertiesCleaner;
-    private final ServicesStarter servicesStarter;
-    private final ServicesStopper servicesStopper;
+    private final ServiceStarter serviceStarter;
+    private final ServiceStopper serviceStopper;
 
     private final LockedAction lockedAction;
     private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments;
 
-    EnvironmentOrchestrator(PropertiesConfigurer propertiesConfigurer,
-                            PropertiesCleaner propertiesCleaner,
-                            ServicesStarter servicesStarter,
-                            ServicesStopper servicesStopper) {
-        Objects.requireNonNull(propertiesConfigurer, "propertiesInjector is required");
-        Objects.requireNonNull(propertiesCleaner, "propertiesCleaner is required");
-        Objects.requireNonNull(servicesStarter, "servicesStarter is required");
-        Objects.requireNonNull(servicesStopper, "servicesStopper is required");
+    EnvironmentOrchestrator(ServiceStarter serviceStarter,
+                            ServiceStopper serviceStopper) {
+        Objects.requireNonNull(serviceStarter, "servicesStarter is required");
+        Objects.requireNonNull(serviceStopper, "servicesStopper is required");
 
-        this.propertiesConfigurer = propertiesConfigurer;
-        this.propertiesCleaner = propertiesCleaner;
-        this.servicesStarter = servicesStarter;
-        this.servicesStopper = servicesStopper;
+        this.serviceStarter = serviceStarter;
+        this.serviceStopper = serviceStopper;
         this.lockedAction = new LockedAction();
         this.initializedEnvironments = new ConcurrentHashMap<>();
     }
@@ -66,11 +59,9 @@ class EnvironmentOrchestrator {
                 .provide()
                 .configure();
 
-        var properties = environment.getPropertiesConfiguration();
-        var services = environment.getServicesConfiguration();
+        var services = environment.getServiceRegistry();
         var application = environment.getApplication();
 
-        configureProperties(properties);
         startServices(services);
         startApplication(application);
 
@@ -78,29 +69,19 @@ class EnvironmentOrchestrator {
     }
 
     private void shutdownEnvironment(Environment setup) {
-        var properties = setup.getPropertiesConfiguration();
-        var services = setup.getServicesConfiguration();
+        var services = setup.getServiceRegistry();
         var application = setup.getApplication();
 
         shutdownApplication(application);
         shutdownServices(services);
-        clearProperties(properties);
     }
 
-    private void configureProperties(PropertiesConfiguration propertiesConfig) {
-        propertiesConfigurer.configure(propertiesConfig);
+    private void startServices(ServiceRegistry serviceRegistry) {
+        serviceStarter.start(serviceRegistry);
     }
 
-    private void clearProperties(PropertiesConfiguration propertiesConfig) {
-        propertiesCleaner.clean(propertiesConfig);
-    }
-
-    private void startServices(ServicesConfiguration servicesConfig) {
-        servicesStarter.start(servicesConfig);
-    }
-
-    private void shutdownServices(ServicesConfiguration servicesConfig) {
-        servicesStopper.stop(servicesConfig);
+    private void shutdownServices(ServiceRegistry serviceRegistry) {
+        serviceStopper.stop(serviceRegistry);
     }
 
     private void startApplication(Application application) {

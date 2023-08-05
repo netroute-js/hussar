@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
@@ -26,16 +27,11 @@ public class EnvironmentOrchestratorTest {
 
     @BeforeEach
     public void setup() {
-        var propertiesConfigurer = new PropertiesConfigurer();
-        var propertiesCleaner = new PropertiesCleaner();
-
         var executor = Executors.newFixedThreadPool(2);
-        var servicesStarter = new ServicesStarter(executor);
-        var servicesStopper = new ServicesStopper(executor);
+        var servicesStarter = new ServiceStarter(executor);
+        var servicesStopper = new ServiceStopper(executor);
 
         orchestrator = new EnvironmentOrchestrator(
-                propertiesConfigurer,
-                propertiesCleaner,
                 servicesStarter,
                 servicesStopper
         );
@@ -54,8 +50,6 @@ public class EnvironmentOrchestratorTest {
         assertApplicationStarted(configurerProvider.application);
         assertServiceStarted(configurerProvider.standaloneServiceA);
         assertServiceStarted(configurerProvider.standaloneServiceB);
-        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
-        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_2, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_2);
     }
 
     @Test
@@ -82,8 +76,6 @@ public class EnvironmentOrchestratorTest {
         assertApplicationStarted(configurerProvider.application);
         assertServiceStarted(configurerProvider.standaloneServiceA);
         assertServiceStarted(configurerProvider.standaloneServiceB);
-        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
-        assertPropertySet(TestEnvironmentConfigurerProvider.PROPERTY_2, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_2);
     }
 
     private void assertEnvironmentInitialized(Environment environment) {
@@ -100,16 +92,12 @@ public class EnvironmentOrchestratorTest {
         verify(service).start(isA(ServiceStartupContext.class));
     }
 
-    private void assertPropertySet(String key, String value) {
-        assertThat(System.getProperty(key)).isEqualTo(value);
-    }
-
     private static class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
-        private static final String PROPERTY_1 = "property1";
-        private static final String PROPERTY_VALUE_1 = "property_value1";
+        private static final String PROPERTY_1 = "some.property";
+        private static final String PROPERTY_VALUE_1 = "some_property_value";
 
-        private static final String PROPERTY_2 = "property2";
-        private static final String PROPERTY_VALUE_2 = "property_value2";
+        private static final String ENV_VARIABLE_1 = "SOME_ENV_VARIABLE";
+        private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
 
         private final Application application = mock(Application.class);
         private final ServiceTestA standaloneServiceA = mock(ServiceTestA.class);
@@ -122,8 +110,8 @@ public class EnvironmentOrchestratorTest {
                     .withApplication(application)
                     .withStandaloneService(standaloneServiceA)
                     .withStandaloneService(standaloneServiceB)
-                    .withProperty(PROPERTY_1, PROPERTY_VALUE_1)
-                    .withProperty(PROPERTY_2, PROPERTY_VALUE_2);
+                    .withStaticConfigurationEntry(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
+                    .withStaticConfigurationEntry(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1));
         }
 
     }

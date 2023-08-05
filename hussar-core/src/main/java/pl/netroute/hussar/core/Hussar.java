@@ -37,17 +37,15 @@ public class Hussar {
     }
 
     private void injectServices(Object testObject, Environment environment) {
-        var servicesInjector = ServicesInjector.newInstance(environment);
+        var servicesInjector = ServiceInjector.newInstance(environment);
         servicesInjector.inject(testObject);
     }
 
     public static Hussar newInstance() {
         var configurerResolver = new EnvironmentConfigurerProviderResolver();
         var orchestrator = new EnvironmentOrchestrator(
-                new PropertiesConfigurer(),
-                new PropertiesCleaner(),
-                new ServicesStarter(ForkJoinPool.commonPool()),
-                new ServicesStopper(ForkJoinPool.commonPool())
+                new ServiceStarter(ForkJoinPool.commonPool()),
+                new ServiceStopper(ForkJoinPool.commonPool())
         );
 
         return new Hussar(configurerResolver, orchestrator);

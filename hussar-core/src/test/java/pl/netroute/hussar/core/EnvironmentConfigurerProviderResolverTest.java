@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.annotation.HussarEnvironment;
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
 
@@ -48,11 +49,11 @@ public class EnvironmentConfigurerProviderResolverTest {
     }
 
     static class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
-        private static final String PROPERTY_1 = "property1";
-        private static final String PROPERTY_VALUE_1 = "property_value1";
+        private static final String PROPERTY_1 = "some.property";
+        private static final String PROPERTY_VALUE_1 = "some_property_value";
 
-        private static final String PROPERTY_2 = "property2";
-        private static final String PROPERTY_VALUE_2 = "property_value2";
+        private static final String ENV_VARIABLE_1 = "SOME_ENV_VARIABLE";
+        private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
 
         private final Application application = mock(Application.class);
         private final Service standaloneServiceA = mock(Service.class);
@@ -68,8 +69,8 @@ public class EnvironmentConfigurerProviderResolverTest {
                     .withApplication(application)
                     .withStandaloneService(standaloneServiceA)
                     .withStandaloneService(standaloneServiceB)
-                    .withProperty(PROPERTY_1, PROPERTY_VALUE_1)
-                    .withProperty(PROPERTY_2, PROPERTY_VALUE_2);
+                    .withStaticConfigurationEntry(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
+                    .withStaticConfigurationEntry(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1));
         }
 
     }
