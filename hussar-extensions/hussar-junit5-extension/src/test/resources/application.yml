@@ -1,0 +1,5 @@
+propertyA: default-valueA
+propertyB: default-valueB
+subA: ${SOME_ENV_VARIABLE_A}
+wiremockA.url: https://dev.local
+wiremockB.url: ${WIREMOCK_B_URL}

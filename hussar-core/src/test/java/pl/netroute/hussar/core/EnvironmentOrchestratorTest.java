@@ -31,9 +31,14 @@ public class EnvironmentOrchestratorTest {
         var servicesStarter = new ServiceStarter(executor);
         var servicesStopper = new ServiceStopper(executor);
 
+        var applicationConfigurationFlattener = new ApplicationConfigurationFlattener();
+        var applicationConfigurationLoader = new ApplicationConfigurationLoader(applicationConfigurationFlattener);
+        var applicationConfigurationResolver = new ApplicationConfigurationResolver(applicationConfigurationLoader, applicationConfigurationFlattener);
+
         orchestrator = new EnvironmentOrchestrator(
                 servicesStarter,
-                servicesStopper
+                servicesStopper,
+                applicationConfigurationResolver
         );
     }
 
@@ -83,7 +88,11 @@ public class EnvironmentOrchestratorTest {
     }
 
     private void assertApplicationStarted(Application application) {
-        var context = new ApplicationStartupContext(Map.of());
+        var configurationMap = Map.<String, Object>of(
+                TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1
+        );
+
+        var context = new ApplicationStartupContext(configurationMap);
 
         verify(application).start(context);
     }

@@ -10,6 +10,7 @@ public class PropertyConfigurationEntry implements ConfigurationEntry {
 
     PropertyConfigurationEntry(String name, String value) {
         ValidatorHelper.requireNonEmpty(name, "name is required");
+        ValidatorHelper.requireNonEmpty(value, "value is required");
 
         this.name = name;
         this.value = value;

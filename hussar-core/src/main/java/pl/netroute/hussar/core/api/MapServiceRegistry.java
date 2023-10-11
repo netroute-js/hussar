@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MapServiceRegistry implements ServiceRegistry {
     private final Set<Service> registeredServices;
@@ -17,9 +16,9 @@ public class MapServiceRegistry implements ServiceRegistry {
     }
 
     public MapServiceRegistry(Set<Service> services) {
-        this.registeredServices = new HashSet<>();
-        this.registeredServices.addAll(services);
+        Objects.requireNonNull(services, "services is required");
 
+        this.registeredServices = new HashSet<>(services);
     }
 
     @Override

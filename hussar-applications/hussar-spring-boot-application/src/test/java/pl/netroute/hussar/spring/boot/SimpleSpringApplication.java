@@ -1,6 +1,5 @@
 package pl.netroute.hussar.spring.boot;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
@@ -22,10 +21,12 @@ public class SimpleSpringApplication {
 
     @RestController
     @RequestMapping("/api/v1")
-    public static class PingController {
+    public static class DefaultController {
+        private final Environment environment;
 
-        @Autowired
-        Environment environment;
+        public DefaultController(Environment environment) {
+            this.environment = environment;
+        }
 
         @GetMapping("/ping")
         public ResponseEntity<String> ping() {

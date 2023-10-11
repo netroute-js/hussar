@@ -12,12 +12,17 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
     public static final String WIREMOCK_B = "WiremockB";
 
     public static final String PROPERTY_A = "propertyA";
-    public static final String PROPERTY_A_VALUE = "propertyA_value";
+    public static final String SUB_PROPERTY_A = "subA";
+    public static final String PROPERTY_B = "propertyB";
+    public static final String WIREMOCK_INSTANCE_A_URL_PROPERTY = "wiremockA.url";
+    public static final String WIREMOCK_INSTANCE_B_URL_PROPERTY = "wiremockB.url";
 
     public static final String ENV_VARIABLE_A = "SOME_ENV_VARIABLE_A";
-    public static final String ENV_VARIABLE_A_VALUE = "SOME_ENV_VARIABLE_A_VALUE";
 
-    public static final String WIREMOCK_INSTANCE_A_URL_PROPERTY = "pl.netroute.wiremockA.url";
+    public static final String PROPERTY_A_VALUE = "propertyA_value";
+    public static final String PROPERTY_B_VALUE = "default-valueB";
+
+    public static final String ENV_VARIABLE_A_VALUE = "SOME_ENV_VARIABLE_A_VALUE";
     public static final String WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE = "WIREMOCK_B_URL";
 
     @Override

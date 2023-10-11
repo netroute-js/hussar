@@ -1,0 +1,21 @@
+some.propertyA: some-valueA
+another:
+  propertyB: some-valueB
+  propertyC:
+    - some-valueC1
+    - some-valueC2
+    - ${ENV_VARIABLE_C}
+  propertyE:
+    key1: 1
+    key2: ${ENV_VARIABLE_E}
+    key3: 3
+  propertyH:
+    - some-valueH1
+    - some-valueH2
+propertyD: ${ENV_VARIABLE_D}
+some.propertyF: ${ENV_VARIABLE_F}
+propertyG:
+  subG1:
+    - some-valueSubG1-1
+    - some-valueSubG1-2
+  subG2: some-valueSubG2

@@ -5,22 +5,28 @@ import java.util.Objects;
 import java.util.Set;
 
 public class MapConfigurationRegistry implements ConfigurationRegistry {
-    private final Set<ConfigurationEntry> registeredEntries;
+    private final Set<ConfigurationEntry> registeredConfigurations;
 
     public MapConfigurationRegistry() {
-        this.registeredEntries = new HashSet<>();
+        this(Set.of());
+    }
+
+    public MapConfigurationRegistry(Set<ConfigurationEntry> configurations) {
+        Objects.requireNonNull(configurations, "configurations is required");
+
+        this.registeredConfigurations = new HashSet<>(configurations);
     }
 
     @Override
-    public void register(ConfigurationEntry configurationEntry) {
-        Objects.requireNonNull(configurationEntry, "configurationEntry is required");
+    public void register(ConfigurationEntry configuration) {
+        Objects.requireNonNull(configuration, "configuration is required");
 
-        registeredEntries.add(configurationEntry);
+        registeredConfigurations.add(configuration);
     }
 
     @Override
     public Set<ConfigurationEntry> getEntries() {
-        return Set.copyOf(registeredEntries);
+        return Set.copyOf(registeredConfigurations);
     }
 
 }

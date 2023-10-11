@@ -1,0 +1,12 @@
+some.propertyA: some-valueA
+another:
+  propertyB: some-valueB
+  propertyC:
+    - some-valueC1
+    - some-valueC2
+    - some-valueC3
+  propertyE:
+    key1: 1
+    key2: 2
+    key3: 3
+propertyD: some-valueD

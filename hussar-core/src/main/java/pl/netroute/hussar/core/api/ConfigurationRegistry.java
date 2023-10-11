@@ -6,5 +6,4 @@ public interface ConfigurationRegistry {
     void register(ConfigurationEntry entry);
 
     Set<ConfigurationEntry> getEntries();
-
 }

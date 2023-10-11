@@ -3,16 +3,19 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.annotation.HussarEnvironment;
-import pl.netroute.hussar.core.api.*;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
+import pl.netroute.hussar.core.domain.TestApplication;
 
-import java.util.List;
+import java.util.concurrent.Executors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class HussarTest {
     private EnvironmentConfigurerProviderResolver configurerProviderResolver;
@@ -22,7 +25,15 @@ public class HussarTest {
     @BeforeEach
     public void setup() {
         configurerProviderResolver = new EnvironmentConfigurerProviderResolver();
-        environmentOrchestrator = mock(EnvironmentOrchestrator.class);
+
+        var serviceStarter = new ServiceStarter(Executors.newSingleThreadExecutor());
+        var servicesStopper = new ServiceStopper(Executors.newSingleThreadExecutor());
+        var configurationFlattener = new ApplicationConfigurationFlattener();
+        var configurationResolver = new ApplicationConfigurationResolver(
+                new ApplicationConfigurationLoader(configurationFlattener),
+                configurationFlattener
+        );
+        environmentOrchestrator = spy(new EnvironmentOrchestrator(serviceStarter, servicesStopper, configurationResolver));
 
         hussar = new Hussar(configurerProviderResolver, environmentOrchestrator);
     }
@@ -31,11 +42,6 @@ public class HussarTest {
     public void shouldInitializeEnvironment() {
         // given
         var testInstance = new ConfigurerAwareTest();
-
-        var environment = mock(Environment.class);
-
-        when(environment.getServiceRegistry()).thenReturn(new MapServiceRegistry());
-        when(environmentOrchestrator.initialize(isA(TestEnvironmentConfigurerProvider.class))).thenReturn(environment);
 
         // when
         hussar.initializeFor(testInstance);
@@ -92,15 +98,15 @@ public class HussarTest {
         private static final String ENV_VARIABLE_1 = "SOME_ENV_VARIABLE";
         private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
 
-        private final Application application = mock(Application.class);
-        private final Service standaloneServiceA = mock(Service.class);
-        private final Service standaloneServiceB = mock(Service.class);
-
         public TestEnvironmentConfigurerProvider() {
         }
 
         @Override
         public EnvironmentConfigurer provide() {
+            var application = new TestApplication();
+            var standaloneServiceA = new ServiceTestA();
+            var standaloneServiceB = new ServiceTestB();
+
             return EnvironmentConfigurer
                     .newConfigurer()
                     .withApplication(application)

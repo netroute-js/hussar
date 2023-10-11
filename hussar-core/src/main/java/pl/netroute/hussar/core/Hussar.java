@@ -34,6 +34,7 @@ public class Hussar {
         Environment environment = environmentOrchestrator.initialize(environmentConfigurerProvider);
 
         injectServices(testObject, environment);
+        injectApplication(testObject, environment);
     }
 
     private void injectServices(Object testObject, Environment environment) {
@@ -41,11 +42,21 @@ public class Hussar {
         servicesInjector.inject(testObject);
     }
 
+    private void injectApplication(Object testObject, Environment environment) {
+        var applicationInjector = ApplicationInjector.newInstance(environment);
+        applicationInjector.inject(testObject);
+    }
+
     public static Hussar newInstance() {
         var configurerResolver = new EnvironmentConfigurerProviderResolver();
+
+        var applicationConfigurationFlattener = new ApplicationConfigurationFlattener();
+        var applicationConfigurationLoader = new ApplicationConfigurationLoader(applicationConfigurationFlattener);
+
         var orchestrator = new EnvironmentOrchestrator(
                 new ServiceStarter(ForkJoinPool.commonPool()),
-                new ServiceStopper(ForkJoinPool.commonPool())
+                new ServiceStopper(ForkJoinPool.commonPool()),
+                new ApplicationConfigurationResolver(applicationConfigurationLoader, applicationConfigurationFlattener)
         );
 
         return new Hussar(configurerResolver, orchestrator);

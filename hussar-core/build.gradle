@@ -8,6 +8,7 @@ sourceCompatibility = '11'
 
 ext {
 	slf4jVersion = "1.7.36"
+	snakeYmlVersion = "2.1"
 	assertjVersion = "3.22.0"
 	junitVersion = "5.8.2"
 	mockitoVersion = "4.6.1"
@@ -20,6 +21,7 @@ repositories {
 
 dependencies {
 	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+	implementation "org.yaml:snakeyaml:${snakeYmlVersion}"
 
 	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
 	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
