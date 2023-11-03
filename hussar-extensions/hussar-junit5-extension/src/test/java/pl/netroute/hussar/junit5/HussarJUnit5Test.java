@@ -1,6 +1,6 @@
 package pl.netroute.hussar.junit5;
 
-import com.netroute.hussar.wiremock.WiremockService;
+import com.netroute.hussar.service.wiremock.WiremockDockerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import pl.netroute.hussar.core.annotation.HussarApplication;
@@ -23,10 +23,10 @@ public class HussarJUnit5Test {
     Application application;
 
     @HussarService(name = TestEnvironmentConfigurerProvider.WIREMOCK_A)
-    WiremockService wiremockServiceA;
+    WiremockDockerService wiremockServiceA;
 
     @HussarService(name = TestEnvironmentConfigurerProvider.WIREMOCK_B)
-    WiremockService wiremockServiceB;
+    WiremockDockerService wiremockServiceB;
 
     @Test
     public void shouldStartupEnvironment() {

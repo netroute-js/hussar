@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core;
+package pl.netroute.hussar.core.helper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -7,22 +7,25 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class ReflectionHelper {
+public class ReflectionHelper {
 
     private ReflectionHelper() {
     }
 
-    static <T> T newInstance(Class<T> type) {
+    public static <T> T newInstance(Class<T> type) {
         Objects.requireNonNull(type, "type is required");
 
         try {
-            return type.getConstructor().newInstance();
+            var constructor = type.getConstructor();
+            constructor.setAccessible(true);
+
+            return constructor.newInstance();
         } catch (Exception ex) {
             throw new IllegalStateException("Could not create new instance of " + type, ex);
         }
     }
 
-    static <A extends Annotation> List<Field> getFieldsAnnotatedWith(Object target, Class<A> annotationType) {
+    public static <A extends Annotation> List<Field> getFieldsAnnotatedWith(Object target, Class<A> annotationType) {
         Objects.requireNonNull(target, "target is required");
         Objects.requireNonNull(annotationType, "annotationType is required");
 
@@ -36,7 +39,7 @@ class ReflectionHelper {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    static void setValue(Object target, Field field, Object value) {
+    public static void setValue(Object target, Field field, Object value) {
         Objects.requireNonNull(target, "target is required");
         Objects.requireNonNull(field, "field is required");
 

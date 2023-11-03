@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.annotation.HussarService;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceRegistry;
+import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.util.Objects;

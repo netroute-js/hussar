@@ -8,6 +8,7 @@ sourceCompatibility = '11'
 
 ext {
 	slf4jVersion = "1.7.36"
+	testcontainersVersion = "1.19.1"
 	assertjVersion = "3.22.0"
 	junitVersion = "5.8.2"
 	mockitoVersion = "4.6.1"
@@ -20,6 +21,7 @@ repositories {
 dependencies {
 	implementation project(":hussar-core")
 	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+	implementation "org.testcontainers:testcontainers:${testcontainersVersion}"
 
 	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
 	testImplementation "org.assertj:assertj-core:${assertjVersion}"

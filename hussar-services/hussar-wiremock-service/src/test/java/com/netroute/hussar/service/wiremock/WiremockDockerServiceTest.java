@@ -1,4 +1,4 @@
-package com.netroute.hussar.wiremock;
+package com.netroute.hussar.service.wiremock;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.AfterEach;
@@ -15,20 +15,20 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class WiremockServiceTest {
-    private WiremockService wiremockService;
+public class WiremockDockerServiceTest {
+    private WiremockDockerService wiremockService;
 
     @AfterEach
     public void cleanup() {
         Optional
                 .ofNullable(wiremockService)
-                .ifPresent(WiremockService::shutdown);
+                .ifPresent(WiremockDockerService::shutdown);
     }
 
     @Test
     public void shouldStartWiremockService() {
         // given
-        wiremockService = WiremockServiceConfigurer
+        wiremockService = WiremockDockerServiceConfigurer
                 .newInstance()
                 .configure();
 
@@ -51,7 +51,7 @@ public class WiremockServiceTest {
         var endpointProperty = "propertyA.wiremock.url";
         var endpointEnvVariable = "WIREMOCK_URL";
 
-        wiremockService = WiremockServiceConfigurer
+        wiremockService = WiremockDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -80,7 +80,7 @@ public class WiremockServiceTest {
         var name = "wiremock-instance";
         var dockerVersion = "2.34.0";
 
-        wiremockService = WiremockServiceConfigurer
+        wiremockService = WiremockDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)

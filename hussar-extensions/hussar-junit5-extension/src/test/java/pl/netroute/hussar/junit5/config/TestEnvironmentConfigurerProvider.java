@@ -1,6 +1,6 @@
 package pl.netroute.hussar.junit5.config;
 
-import com.netroute.hussar.wiremock.WiremockServiceConfigurer;
+import com.netroute.hussar.service.wiremock.WiremockDockerServiceConfigurer;
 import pl.netroute.hussar.core.EnvironmentConfigurer;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
@@ -29,13 +29,13 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
     public EnvironmentConfigurer provide() {
         var application = SpringApplication.newApplication(SimpleSpringApplication.class);
 
-        var wiremockServiceA = WiremockServiceConfigurer
+        var wiremockServiceA = WiremockDockerServiceConfigurer
                 .newInstance()
                 .name(WIREMOCK_A)
                 .registerEndpointUnderEntry(RegistrableConfigurationEntry.property(WIREMOCK_INSTANCE_A_URL_PROPERTY))
                 .configure();
 
-        var wiremockServiceB = WiremockServiceConfigurer
+        var wiremockServiceB = WiremockDockerServiceConfigurer
                 .newInstance()
                 .name(WIREMOCK_B)
                 .registerEndpointUnderEntry(RegistrableConfigurationEntry.envVariable(WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE))
