@@ -2,6 +2,7 @@ package pl.netroute.hussar.core.service;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

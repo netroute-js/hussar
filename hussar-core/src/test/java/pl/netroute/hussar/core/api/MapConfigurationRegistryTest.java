@@ -85,9 +85,9 @@ public class MapConfigurationRegistryTest {
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Expected config entry to be registered"));
 
-        assertThat(registeredEntry.getName()).isEqualTo(expectedEntry.getName());
-        assertThat(registeredEntry.getFormattedName()).isEqualTo(expectedEntry.getFormattedName());
-        assertThat(registeredEntry.getValue()).isEqualTo(expectedEntry.getValue());
+        assertThat(registeredEntry.name()).isEqualTo(expectedEntry.name());
+        assertThat(registeredEntry.formattedName()).isEqualTo(expectedEntry.formattedName());
+        assertThat(registeredEntry.value()).isEqualTo(expectedEntry.value());
     }
 
 }

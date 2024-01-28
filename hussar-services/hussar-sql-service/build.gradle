@@ -1,0 +1,13 @@
+dependencies {
+	implementation project(":hussar-core")
+	implementation project(":hussar-services:hussar-core-service")
+	implementation libs.slf4j.api
+	implementation libs.testcontainers
+	implementation libs.flyway.core
+	implementation libs.flyway.mysql
+	implementation libs.mysql.connector
+
+	testImplementation libs.logback.classic
+	testImplementation libs.spring.jdbc
+	testImplementation libs.bundles.testing
+}

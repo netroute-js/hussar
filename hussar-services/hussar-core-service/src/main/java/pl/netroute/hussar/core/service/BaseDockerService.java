@@ -7,6 +7,7 @@ import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class BaseDockerService<C extends BaseDockerServiceConfig> extends BaseService<C> {
@@ -21,7 +22,9 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
     @Override
     public final List<Endpoint> getEndpoints() {
         var host = container.getHost();
-        var scheme = config.getScheme().orElse(SchemesHelper.EMPTY_SCHEME);
+        var scheme = Optional
+                .ofNullable(config.getScheme())
+                .orElse(SchemesHelper.EMPTY_SCHEME);
 
         return container
                 .getExposedPorts()
@@ -33,7 +36,7 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
 
     @Override
     protected final void bootstrapService(ServiceStartupContext context) {
-        log.info("Bootstrapping Docker[{},{}] Service", config.getName(), config.getDockerImage());
+        log.info("Using DockerImage[{}] for {} Service", config.getDockerImage(), config.getName());
 
         configureContainer(container);
         container.start();
@@ -41,8 +44,6 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
 
     @Override
     protected final void shutdownService() {
-        log.info("Shutting down Docker[{},{}] Service", config.getName(), config.getDockerImage());
-
         container.stop();
     }
 

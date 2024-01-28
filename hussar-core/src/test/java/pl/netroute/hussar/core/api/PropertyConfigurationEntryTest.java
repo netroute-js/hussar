@@ -20,9 +20,9 @@ public class PropertyConfigurationEntryTest {
     }
 
     private void assertCreatedEntry(String expectedName, String expectedValue, PropertyConfigurationEntry entry) {
-        assertThat(entry.getName()).isEqualTo(expectedName);
-        assertThat(entry.getFormattedName()).isEqualTo(expectedName);
-        assertThat(entry.getValue()).isEqualTo(expectedValue);
+        assertThat(entry.name()).isEqualTo(expectedName);
+        assertThat(entry.formattedName()).isEqualTo(expectedName);
+        assertThat(entry.value()).isEqualTo(expectedValue);
     }
 
 }

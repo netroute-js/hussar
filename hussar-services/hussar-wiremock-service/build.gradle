@@ -1,40 +1,11 @@
-plugins {
-	id 'java'
-}
-
-group = 'pl.netroute'
-version = '1.0'
-sourceCompatibility = '11'
-
-ext {
-	slf4jVersion = "1.7.36"
-	assertjVersion = "3.22.0"
-	junitVersion = "5.8.2"
-	mockitoVersion = "4.6.1"
-	logbackVersion = "1.2.11"
-	testcontainersVersion = "1.17.6"
-	okHttpVersion = "4.10.0"
-	wiremockVersion = "3.0.0-beta-2"
-}
-
-repositories {
-	mavenCentral()
-}
-
 dependencies {
 	implementation project(":hussar-core")
 	implementation project(":hussar-services:hussar-core-service")
-	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-	implementation "org.testcontainers:testcontainers:${testcontainersVersion}"
+	implementation libs.slf4j.api
+	implementation libs.testcontainers
 
-	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
-	testImplementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-	testImplementation "com.github.tomakehurst:wiremock:${wiremockVersion}"
-	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-	testImplementation "org.assertj:assertj-core:${assertjVersion}"
-	testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
-}
-
-test {
-	useJUnitPlatform()
+	testImplementation libs.logback.classic
+	testImplementation libs.okhttp
+	testImplementation libs.wiremock
+	testImplementation libs.bundles.testing
 }

@@ -1,17 +1,22 @@
 package pl.netroute.hussar.core.service;
 
-import pl.netroute.hussar.core.helper.ValidatorHelper;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.SuperBuilder;
 
+import java.util.Set;
+
+@Getter
+@SuperBuilder
 public abstract class BaseServiceConfig {
+
+    @NonNull
     private final String name;
 
-    public BaseServiceConfig(String name) {
-        ValidatorHelper.requireNonEmpty(name, "name is required");
+    @NonNull
+    private final Set<String> registerEndpointUnderProperties;
 
-        this.name = name;
-    }
+    @NonNull
+    private final Set<String> registerEndpointUnderEnvironmentVariables;
 
-    public String getName() {
-        return name;
-    }
 }

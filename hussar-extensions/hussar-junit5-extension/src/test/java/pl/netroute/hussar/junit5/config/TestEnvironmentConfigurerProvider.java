@@ -4,7 +4,6 @@ import com.netroute.hussar.service.wiremock.WiremockDockerServiceConfigurer;
 import pl.netroute.hussar.core.EnvironmentConfigurer;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.service.api.RegistrableConfigurationEntry;
 import pl.netroute.hussar.spring.boot.SpringApplication;
 
 public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
@@ -32,13 +31,15 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
         var wiremockServiceA = WiremockDockerServiceConfigurer
                 .newInstance()
                 .name(WIREMOCK_A)
-                .registerEndpointUnderEntry(RegistrableConfigurationEntry.property(WIREMOCK_INSTANCE_A_URL_PROPERTY))
+                .registerEndpointUnderProperty(WIREMOCK_INSTANCE_A_URL_PROPERTY)
+                .done()
                 .configure();
 
         var wiremockServiceB = WiremockDockerServiceConfigurer
                 .newInstance()
                 .name(WIREMOCK_B)
-                .registerEndpointUnderEntry(RegistrableConfigurationEntry.envVariable(WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE))
+                .registerEndpointUnderEnvironmentVariable(WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE)
+                .done()
                 .configure();
 
         return EnvironmentConfigurer

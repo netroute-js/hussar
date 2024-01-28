@@ -1,0 +1,20 @@
+plugins {
+    id "java" apply true
+    id "io.freefair.lombok" version "8.4" apply true
+}
+
+allprojects {
+    apply plugin: "java"
+    apply plugin: "io.freefair.lombok"
+
+    group = "pl.netroute"
+    sourceCompatibility = "17"
+
+    test {
+        useJUnitPlatform()
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}

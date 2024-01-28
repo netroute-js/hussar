@@ -1,46 +1,16 @@
-plugins {
-	id 'java'
-}
-
-group = 'pl.netroute'
-version = '1.0'
-sourceCompatibility = '11'
-
-ext {
-	slf4jVersion = "1.7.36"
-	assertjVersion = "3.22.0"
-	junitVersion = "5.8.2"
-	mockitoVersion = "4.6.1"
-	logbackVersion = "1.2.11"
-	springBootVersion = "2.6.0"
-	okHttpVersion = "4.10.0"
-	springOpenFeignVersion = "3.1.6"
-	feignVersion = "12.3"
-}
-
-repositories {
-	mavenCentral()
-}
-
 dependencies {
 	implementation project(":hussar-core")
 	implementation project(":hussar-applications:hussar-spring-boot-application")
-	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-	implementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+	implementation libs.slf4j.api
+	implementation libs.junit.jupiter
 
 	testImplementation project(":hussar-services:hussar-core-service")
 	testImplementation project(":hussar-services:hussar-wiremock-service")
-	testImplementation "org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}"
-	testImplementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
-	testImplementation "org.springframework.cloud:spring-cloud-openfeign-core:${springOpenFeignVersion}"
-	testImplementation "io.github.openfeign:feign-core:${feignVersion}"
-	testImplementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
-	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-	testImplementation "org.assertj:assertj-core:${assertjVersion}"
-	testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
-}
-
-test {
-	useJUnitPlatform()
+	testImplementation libs.spring.boot.autoconfigure
+	testImplementation libs.spring.boot.web
+	testImplementation libs.spring.cloud.openfeign.core
+	testImplementation libs.feign.core
+	testImplementation libs.okhttp
+	testImplementation libs.logback.classic
+	testImplementation libs.bundles.testing
 }

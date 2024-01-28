@@ -1,15 +1,19 @@
 package pl.netroute.hussar.core.api;
 
-public interface ConfigurationEntry {
-    String getName();
-    String getFormattedName();
-    String getValue();
+import lombok.NonNull;
 
-    static EnvVariableConfigurationEntry envVariable(String name, String value) {
+public interface ConfigurationEntry {
+    String name();
+    String formattedName();
+    String value();
+
+    static EnvVariableConfigurationEntry envVariable(@NonNull String name,
+                                                     @NonNull String value) {
         return new EnvVariableConfigurationEntry(name, value);
     }
 
-    static PropertyConfigurationEntry property(String name, String value) {
+    static PropertyConfigurationEntry property(@NonNull String name,
+                                               @NonNull String value) {
         return new PropertyConfigurationEntry(name, value);
     }
 

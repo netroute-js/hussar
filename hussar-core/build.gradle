@@ -1,34 +1,7 @@
-plugins {
-	id 'java'
-}
-
-group = 'pl.netroute'
-version = '1.0'
-sourceCompatibility = '11'
-
-ext {
-	slf4jVersion = "1.7.36"
-	snakeYmlVersion = "2.1"
-	assertjVersion = "3.22.0"
-	junitVersion = "5.8.2"
-	mockitoVersion = "4.6.1"
-	logbackVersion = "1.2.11"
-}
-
-repositories {
-	mavenCentral()
-}
-
 dependencies {
-	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-	implementation "org.yaml:snakeyaml:${snakeYmlVersion}"
+	implementation libs.slf4j.api
+	implementation libs.snakeyaml
 
-	testImplementation "ch.qos.logback:logback-classic:${logbackVersion}"
-	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-	testImplementation "org.assertj:assertj-core:${assertjVersion}"
-	testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
-}
-
-test {
-	useJUnitPlatform()
+	testImplementation libs.logback.classic
+	testImplementation libs.bundles.testing
 }

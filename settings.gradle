@@ -1,7 +1,61 @@
-rootProject.name = 'hussar'
+rootProject.name = "hussar"
 
-include 'hussar-core'
-include 'hussar-extensions:hussar-junit5-extension'
-include 'hussar-applications:hussar-spring-boot-application'
-include 'hussar-services:hussar-core-service'
-include 'hussar-services:hussar-wiremock-service'
+include "hussar-core"
+include "hussar-extensions:hussar-junit5-extension"
+include "hussar-applications:hussar-spring-boot-application"
+include "hussar-services:hussar-core-service"
+include "hussar-services:hussar-wiremock-service"
+include "hussar-services:hussar-sql-service"
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            def springBootVersion = version("springBoot", "2.7.10")
+            def springJdbcVersion = version("springJdbc", "6.1.2")
+            def springCloudVersion = version("springCloud", "3.1.6")
+            def flywayVersion = version("flyway", "10.1.0")
+            def mysqlConnectorVersion = version("mysqlConnector", "8.3.0")
+            def okHttpVersion = version("okHttp", "4.10.0")
+            def feignVersion = version("feign", "12.3")
+            def snakeYamlVersion = version("snakeYaml", "2.1")
+            def slf4jVersion = version("slf4j", "1.7.36")
+            def logbackVersion = version("logback", "1.2.11")
+            def testcontainersVersion = version("testcontainers", "1.19.1")
+            def wiremockVersion = version("wiremock", "3.3.1")
+            def mockitoVersion = version("mockito", "4.6.1")
+            def assertjVersion = version("assertj", "3.22.0")
+            def junit5Version = version("junit", "5.8.2")
+
+            library("spring-boot-test", "org.springframework.boot", "spring-boot-test").versionRef(springBootVersion)
+            library("spring-boot-autoconfigure", "org.springframework.boot", "spring-boot-autoconfigure").versionRef(springBootVersion)
+            library("spring-boot-web", "org.springframework.boot", "spring-boot-starter-web").versionRef(springBootVersion)
+
+            library("spring-jdbc", "org.springframework", "spring-jdbc").versionRef(springJdbcVersion)
+
+            library("spring-cloud-openfeign-core", "org.springframework.cloud", "spring-cloud-openfeign-core").versionRef(springCloudVersion)
+
+            library("flyway-core", "org.flywaydb", "flyway-core").versionRef(flywayVersion)
+            library("flyway-mysql", "org.flywaydb", "flyway-mysql").versionRef(flywayVersion)
+
+            library("mysql-connector", "com.mysql", "mysql-connector-j").versionRef(mysqlConnectorVersion)
+
+            library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4jVersion)
+            library("logback-classic", "ch.qos.logback", "logback-classic").versionRef(logbackVersion)
+
+            library("okhttp", "com.squareup.okhttp3", "okhttp").versionRef(okHttpVersion)
+            library("feign-core", "io.github.openfeign", "feign-core").versionRef(feignVersion)
+
+            library("snakeyaml", "org.yaml", "snakeyaml").versionRef(snakeYamlVersion)
+
+            library("testcontainers", "org.testcontainers", "testcontainers").versionRef(testcontainersVersion)
+
+            library("wiremock", "org.wiremock", "wiremock").versionRef(wiremockVersion)
+
+            library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef(junit5Version)
+            library("assertj-core", "org.assertj", "assertj-core").versionRef(assertjVersion)
+            library("mockito-core", "org.mockito", "mockito-core").versionRef(mockitoVersion)
+
+            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core'])
+        }
+    }
+}

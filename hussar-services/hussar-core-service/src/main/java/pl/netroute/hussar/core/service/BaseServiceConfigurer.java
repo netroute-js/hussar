@@ -1,28 +1,25 @@
 package pl.netroute.hussar.core.service;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Singular;
+import lombok.experimental.SuperBuilder;
 import pl.netroute.hussar.core.api.Service;
-import pl.netroute.hussar.core.helper.ValidatorHelper;
 
-public abstract class BaseServiceConfigurer<S extends Service, C extends BaseServiceConfigurer<S, C>> {
-    private String name;
+import java.util.Set;
 
-    public C name(String name) {
-        ValidatorHelper.requireNonEmpty(name, "name");
+@Getter(AccessLevel.PROTECTED)
+@SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
+public abstract class BaseServiceConfigurer<S extends Service> {
 
-        this.name = name;
+    private final String name;
 
-        return (C) this;
-    }
+    @Singular
+    private Set<String> registerEndpointUnderProperties;
 
-    protected String resolveName(String service) {
-        ValidatorHelper.requireNonEmpty(service, "service is required");
-
-        return ServiceNameResolver.resolve(service, getName());
-    }
-
-    protected String getName() {
-        return name;
-    }
+    @Singular
+    private Set<String> registerEndpointUnderEnvironmentVariables;
 
     protected abstract S configure();
+
 }

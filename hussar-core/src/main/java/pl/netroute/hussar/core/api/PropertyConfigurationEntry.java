@@ -1,34 +1,15 @@
 package pl.netroute.hussar.core.api;
 
-import pl.netroute.hussar.core.helper.ValidatorHelper;
+import lombok.NonNull;
 
 import java.util.Objects;
 
-public class PropertyConfigurationEntry implements ConfigurationEntry {
-    private final String name;
-    private final String value;
-
-    PropertyConfigurationEntry(String name, String value) {
-        ValidatorHelper.requireNonEmpty(name, "name is required");
-        ValidatorHelper.requireNonEmpty(value, "value is required");
-
-        this.name = name;
-        this.value = value;
-    }
+public record PropertyConfigurationEntry(@NonNull String name,
+                                         @NonNull String value) implements ConfigurationEntry {
 
     @Override
-    public String getName() {
+    public String formattedName() {
         return name;
-    }
-
-    @Override
-    public String getFormattedName() {
-        return name;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
     }
 
     @Override

@@ -21,8 +21,8 @@ public class EnvVariableConfigurationEntryTest {
     }
 
     private void assertCreatedEntry(String expectedName, String expectedValue, EnvVariableConfigurationEntry entry) {
-        assertThat(entry.getName()).isEqualTo(expectedName);
-        assertThat(entry.getFormattedName()).isEqualTo(String.format(FORMATTED_NAME_TEMPLATE, expectedName));
-        assertThat(entry.getValue()).isEqualTo(expectedValue);
+        assertThat(entry.name()).isEqualTo(expectedName);
+        assertThat(entry.formattedName()).isEqualTo(String.format(FORMATTED_NAME_TEMPLATE, expectedName));
+        assertThat(entry.value()).isEqualTo(expectedValue);
     }
 }

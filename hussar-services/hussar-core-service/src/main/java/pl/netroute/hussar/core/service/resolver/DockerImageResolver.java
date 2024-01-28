@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.service;
+package pl.netroute.hussar.core.service.resolver;
 
 import pl.netroute.hussar.core.helper.ValidatorHelper;
 

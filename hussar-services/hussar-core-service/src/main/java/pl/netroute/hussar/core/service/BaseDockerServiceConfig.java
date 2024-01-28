@@ -1,30 +1,16 @@
 package pl.netroute.hussar.core.service;
 
-import pl.netroute.hussar.core.helper.ValidatorHelper;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.SuperBuilder;
 
-import java.util.Objects;
-import java.util.Optional;
-
+@SuperBuilder
+@Getter(AccessLevel.PACKAGE)
 public abstract class BaseDockerServiceConfig extends BaseServiceConfig {
+
+    @NonNull
     private final String dockerImage;
-    private final Optional<String> scheme;
 
-    public BaseDockerServiceConfig(String name, String dockerImage, Optional<String> scheme) {
-        super(name);
-
-        ValidatorHelper.requireNonEmpty(dockerImage, "dockerImage is required");
-        Objects.requireNonNull(scheme, "scheme is required");
-
-        this.dockerImage = dockerImage;
-        this.scheme = scheme;
-    }
-
-    public String getDockerImage() {
-        return dockerImage;
-    }
-
-    public Optional<String> getScheme() {
-        return scheme;
-    }
-
+    private final String scheme;
 }

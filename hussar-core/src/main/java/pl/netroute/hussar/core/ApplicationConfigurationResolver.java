@@ -52,8 +52,8 @@ class ApplicationConfigurationResolver {
     }
 
     private void replaceEnvironmentVariable(Map<String, Object> applicationConfiguration, EnvVariableConfigurationEntry envVariable) {
-        var envVariableName = envVariable.getFormattedName();
-        var envVariableValue = envVariable.getValue();
+        var envVariableName = envVariable.formattedName();
+        var envVariableValue = envVariable.value();
 
         var configurationsToReplace = applicationConfiguration
                 .entrySet()
@@ -71,8 +71,8 @@ class ApplicationConfigurationResolver {
     }
 
     private void replaceProperty(Map<String, Object> applicationConfiguration, PropertyConfigurationEntry property) {
-        var propertyName = property.getFormattedName();
-        var propertyValue = property.getValue();
+        var propertyName = property.formattedName();
+        var propertyValue = property.value();
         var resolvedConfigurations = resolveConfigurations(propertyName, propertyValue);
 
         var configurationsToReplace = applicationConfiguration
