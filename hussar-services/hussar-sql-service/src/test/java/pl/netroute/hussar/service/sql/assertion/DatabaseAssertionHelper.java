@@ -1,6 +1,7 @@
 package pl.netroute.hussar.service.sql.assertion;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RequiredArgsConstructor
 public class DatabaseAssertionHelper {
     private static final int SINGLE = 1;
     private static final int DATABASE_CHARS_COUNT = 15;
@@ -26,11 +28,8 @@ public class DatabaseAssertionHelper {
     private static final String SELECT_ALL_QUERY_TEMPLATE = "SELECT * FROM %s";
     private static final String CREATE_DATABASE_QUERY_TEMPLATE = "CREATE DATABASE %s";
 
+    @NonNull
     private final DatabaseDockerService database;
-
-    public DatabaseAssertionHelper(@NonNull DatabaseDockerService database) {
-        this.database = database;
-    }
 
     public void assertSingleEndpoint() {
         assertThat(database.getEndpoints()).hasSize(SINGLE);

@@ -1,17 +1,16 @@
 package pl.netroute.hussar.core.service.resolver;
 
-import pl.netroute.hussar.core.helper.ValidatorHelper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DockerImageResolver {
     private static final String DOCKER_IMAGE_TEMPLATE = "%s:%s";
 
-    private DockerImageResolver() {}
-
-    public static String resolve(String dockerImage, String dockerImageVersion) {
-        ValidatorHelper.requireNonEmpty(dockerImage, "dockerImage");
-        ValidatorHelper.requireNonEmpty(dockerImageVersion, "dockerImageVersion");
-
-        return String.format(DOCKER_IMAGE_TEMPLATE, dockerImage, dockerImageVersion);
+    public static String resolve(@NonNull String dockerImage,
+                                 @NonNull String dockerImageVersion) {
+        return DOCKER_IMAGE_TEMPLATE.formatted(dockerImage, dockerImageVersion);
     }
 
 }

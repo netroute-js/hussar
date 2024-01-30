@@ -3,6 +3,8 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.Environment;
+import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
@@ -30,13 +32,14 @@ public class EnvironmentConfigurerTest {
         var application = mock(Application.class);
 
         // when
-        var environment = EnvironmentConfigurer
-                .newConfigurer()
-                .withStaticConfigurationEntry(ConfigurationEntry.property(propertyA, propertyValueA))
-                .withStaticConfigurationEntry(ConfigurationEntry.envVariable(envVariableB, envVariableValueB))
-                .withStandaloneService(standaloneServiceA)
-                .withStandaloneService(standaloneServiceB)
+        var environment = LocalEnvironmentConfigurer
+                .newInstance()
+                .withProperty(ConfigurationEntry.property(propertyA, propertyValueA))
+                .withEnvironmentVariable(ConfigurationEntry.envVariable(envVariableB, envVariableValueB))
+                .withService(standaloneServiceA)
+                .withService(standaloneServiceB)
                 .withApplication(application)
+                .done()
                 .configure();
 
         // then
@@ -57,9 +60,10 @@ public class EnvironmentConfigurerTest {
         var application = mock(Application.class);
 
         // when
-        var environment = EnvironmentConfigurer
-                .newConfigurer()
+        var environment = LocalEnvironmentConfigurer
+                .newInstance()
                 .withApplication(application)
+                .done()
                 .configure();
 
         // then
@@ -73,29 +77,32 @@ public class EnvironmentConfigurerTest {
         // given
         // when
         // then
-        assertThatThrownBy(() -> EnvironmentConfigurer.newConfigurer().configure())
+        assertThatThrownBy(() -> LocalEnvironmentConfigurer
+                    .newInstance()
+                    .done()
+                    .configure())
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("application needs to be configured");
+                .hasMessage("application is marked non-null but is null");
     }
 
     private void assertApplicationConfigured(Environment environment, Application expectedApplication) {
-        assertThat(environment.getApplication()).isEqualTo(expectedApplication);
+        assertThat(environment.application()).isEqualTo(expectedApplication);
     }
 
     private void assertStandaloneServicesConfigured(Environment environment, Set<Service> expectedServices) {
-        assertThat(environment.getServiceRegistry().getEntries()).containsExactlyInAnyOrderElementsOf(expectedServices);
+        assertThat(environment.serviceRegistry().getEntries()).containsExactlyInAnyOrderElementsOf(expectedServices);
     }
 
     private void assertStaticConfigurationEntriesSetup(Environment environment, Set<ConfigurationEntry> expectedConfigEntries) {
-        assertThat(environment.getStaticConfigurationRegistry().getEntries()).containsExactlyInAnyOrderElementsOf(expectedConfigEntries);
+        assertThat(environment.configurationRegistry().getEntries()).containsExactlyInAnyOrderElementsOf(expectedConfigEntries);
     }
 
     private void assertNoStandaloneServicesConfigured(Environment environment) {
-        assertThat(environment.getServiceRegistry().getEntries()).isEmpty();
+        assertThat(environment.serviceRegistry().getEntries()).isEmpty();
     }
 
     private void assertNoStaticConfigurationEntriesSetup(Environment environment) {
-        assertThat(environment.getStaticConfigurationRegistry().getEntries()).isEmpty();
+        assertThat(environment.configurationRegistry().getEntries()).isEmpty();
     }
 
 }

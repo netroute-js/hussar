@@ -1,6 +1,6 @@
 package pl.netroute.hussar.core.api;
 
-public class ServiceStartupContext {
+public record ServiceStartupContext() {
 
     public static ServiceStartupContext empty() {
         return new ServiceStartupContext();

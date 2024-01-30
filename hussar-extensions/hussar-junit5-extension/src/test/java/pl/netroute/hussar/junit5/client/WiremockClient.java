@@ -1,23 +1,20 @@
 package pl.netroute.hussar.junit5.client;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 import java.io.IOException;
-import java.util.Objects;
 
+@RequiredArgsConstructor
 public class WiremockClient {
     private static final String ADMIN_PATH = "/__admin";
 
+    @NonNull
     private final String endpoint;
-    private final OkHttpClient httpClient;
 
-    public WiremockClient(String endpoint) {
-        Objects.requireNonNull(endpoint, "endpoint is required");
-
-        this.endpoint = endpoint;
-        this.httpClient = new OkHttpClient();
-    }
+    private final OkHttpClient httpClient = new OkHttpClient();
 
     public boolean isReachable() {
         var request = new Request

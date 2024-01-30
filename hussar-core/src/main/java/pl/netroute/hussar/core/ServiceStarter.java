@@ -1,28 +1,25 @@
 package pl.netroute.hussar.core;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.helper.FutureHelper;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ServiceStarter {
     private static final Duration SERVICE_STARTUP_TIMEOUT = Duration.ofMinutes(1L);
 
+    @NonNull
     private final ExecutorService executorService;
 
-    ServiceStarter(ExecutorService executorService) {
-        Objects.requireNonNull(executorService, "executorService is required");
-
-        this.executorService = executorService;
-    }
-
-    void start(ServiceRegistry serviceRegistry) {
-        Objects.requireNonNull(serviceRegistry, "serviceRegistry is required");
-
+    void start(@NonNull ServiceRegistry serviceRegistry) {
         startStandaloneServices(serviceRegistry.getEntries());
     }
 

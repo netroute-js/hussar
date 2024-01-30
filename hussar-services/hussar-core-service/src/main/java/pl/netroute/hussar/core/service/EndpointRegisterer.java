@@ -12,6 +12,8 @@ import java.util.Optional;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class EndpointRegisterer {
+
+    @NonNull
     private final ConfigurationRegistry configurationRegistry;
 
     void registerUnderProperty(@NonNull Endpoint endpoint,

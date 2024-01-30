@@ -1,5 +1,6 @@
 package pl.netroute.hussar.core.service;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.Endpoint;
@@ -9,8 +10,6 @@ import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 
-import java.util.Objects;
-
 public abstract class BaseService<C extends BaseServiceConfig> implements Service {
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -19,16 +18,14 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
 
     private final EndpointRegisterer endpointRegisterer;
 
-    public BaseService(C config) {
-        Objects.requireNonNull(config, "config is required");
-
+    public BaseService(@NonNull C config) {
         this.config = config;
         this.configurationRegistry = new MapConfigurationRegistry();
         this.endpointRegisterer = new EndpointRegisterer(configurationRegistry);
     }
 
     @Override
-    public final void start(ServiceStartupContext context) {
+    public final void start(@NonNull ServiceStartupContext context) {
         var serviceName = getName();
 
         log.info("Starting {} Service", serviceName);

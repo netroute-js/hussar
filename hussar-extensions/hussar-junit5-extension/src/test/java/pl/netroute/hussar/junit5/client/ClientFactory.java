@@ -2,6 +2,9 @@ package pl.netroute.hussar.junit5.client;
 
 import feign.Feign;
 import feign.optionals.OptionalDecoder;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -11,20 +14,16 @@ import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import pl.netroute.hussar.core.Endpoint;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientFactory {
 
-    private ClientFactory() {}
+    public static <T> T create(@NonNull Endpoint endpoint,
+                               @NonNull Class<T> type) {
+        var url = endpoint.getAddress();
 
-    public static <T> T create(Endpoint endpoint, Class<T> type) {
-        Objects.requireNonNull(endpoint, "endpoint is required");
-        Objects.requireNonNull(type, "type is required");
-
-        String url = endpoint.getAddress();
-
-        Feign.Builder clientBuilder = Feign.builder()
+        var clientBuilder = Feign.builder()
                 .encoder(new SpringEncoder(HttpMessageConverters::new))
                 .decoder(new OptionalDecoder(new ResponseEntityDecoder(new SpringDecoder(HttpMessageConverters::new, new EmptyObjectProvider<>()))))
                 .dismiss404()
@@ -57,7 +56,6 @@ public class ClientFactory {
 
         @Override
         public void forEach(Consumer action) {
-            // do nothing
         }
 
     }

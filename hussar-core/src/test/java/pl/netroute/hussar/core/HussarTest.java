@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.annotation.HussarEnvironment;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 import pl.netroute.hussar.core.domain.TestApplication;
@@ -102,18 +103,19 @@ public class HussarTest {
         }
 
         @Override
-        public EnvironmentConfigurer provide() {
+        public LocalEnvironmentConfigurer provide() {
             var application = new TestApplication();
             var standaloneServiceA = new ServiceTestA();
             var standaloneServiceB = new ServiceTestB();
 
-            return EnvironmentConfigurer
-                    .newConfigurer()
+            return LocalEnvironmentConfigurer
+                    .newInstance()
+                    .withProperty(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
+                    .withEnvironmentVariable(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1))
                     .withApplication(application)
-                    .withStandaloneService(standaloneServiceA)
-                    .withStandaloneService(standaloneServiceB)
-                    .withStaticConfigurationEntry(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
-                    .withStaticConfigurationEntry(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1));
+                    .withService(standaloneServiceA)
+                    .withService(standaloneServiceB)
+                    .done();
         }
 
     }

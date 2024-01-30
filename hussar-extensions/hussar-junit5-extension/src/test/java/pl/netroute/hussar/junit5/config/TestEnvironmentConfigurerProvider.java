@@ -1,7 +1,7 @@
 package pl.netroute.hussar.junit5.config;
 
 import com.netroute.hussar.service.wiremock.WiremockDockerServiceConfigurer;
-import pl.netroute.hussar.core.EnvironmentConfigurer;
+import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.spring.boot.SpringApplication;
@@ -25,7 +25,7 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
     public static final String WIREMOCK_INSTANCE_B_URL_ENV_VARIABLE = "WIREMOCK_B_URL";
 
     @Override
-    public EnvironmentConfigurer provide() {
+    public LocalEnvironmentConfigurer provide() {
         var application = SpringApplication.newApplication(SimpleSpringApplication.class);
 
         var wiremockServiceA = WiremockDockerServiceConfigurer
@@ -42,13 +42,14 @@ public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerP
                 .done()
                 .configure();
 
-        return EnvironmentConfigurer
-                .newConfigurer()
-                .withStaticConfigurationEntry(ConfigurationEntry.property(PROPERTY_A, PROPERTY_A_VALUE))
-                .withStaticConfigurationEntry(ConfigurationEntry.envVariable(ENV_VARIABLE_A, ENV_VARIABLE_A_VALUE))
-                .withStandaloneService(wiremockServiceA)
-                .withStandaloneService(wiremockServiceB)
-                .withApplication(application);
+        return LocalEnvironmentConfigurer
+                .newInstance()
+                .withProperty(ConfigurationEntry.property(PROPERTY_A, PROPERTY_A_VALUE))
+                .withEnvironmentVariable(ConfigurationEntry.envVariable(ENV_VARIABLE_A, ENV_VARIABLE_A_VALUE))
+                .withService(wiremockServiceA)
+                .withService(wiremockServiceB)
+                .withApplication(application)
+                .done();
     }
 
 }

@@ -1,5 +1,8 @@
 package pl.netroute.hussar.core;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
@@ -10,26 +13,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ApplicationConfigurationResolver {
+
+    @NonNull
     private final ApplicationConfigurationLoader applicationConfigurationLoader;
+
+    @NonNull
     private final ApplicationConfigurationFlattener applicationConfigurationFlattener;
 
-    ApplicationConfigurationResolver(ApplicationConfigurationLoader applicationConfigurationLoader,
-                                     ApplicationConfigurationFlattener applicationConfigurationFlattener) {
-        Objects.requireNonNull(applicationConfigurationLoader, "applicationConfigurationLoader is required");
-        Objects.requireNonNull(applicationConfigurationFlattener, "applicationConfigurationFlattener is required");
-
-        this.applicationConfigurationLoader = applicationConfigurationLoader;
-        this.applicationConfigurationFlattener = applicationConfigurationFlattener;
-    }
-
-    Map<String, Object> resolve(Application application, List<ConfigurationRegistry> externalConfiguration) {
-        Objects.requireNonNull(application, "application is required");
-        Objects.requireNonNull(externalConfiguration, "externalConfiguration is required");
-
+    Map<String, Object> resolve(@NonNull Application application,
+                                @NonNull List<ConfigurationRegistry> externalConfiguration) {
         var mutableConfiguration = new HashMap<>(applicationConfigurationLoader.load(application));
 
         externalConfiguration
@@ -60,7 +55,7 @@ class ApplicationConfigurationResolver {
                 .stream()
                 .filter(configuration -> envVariableName.equals(configuration.getValue()))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         removeConfigurations(applicationConfiguration, configurationsToReplace);
 
@@ -80,10 +75,9 @@ class ApplicationConfigurationResolver {
                 .stream()
                 .filter(configuration -> configuration.getKey().startsWith(propertyName))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         removeConfigurations(applicationConfiguration, configurationsToReplace);
-
         combineConfigurations(applicationConfiguration, resolvedConfigurations);
     }
 

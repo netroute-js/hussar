@@ -1,26 +1,23 @@
 package pl.netroute.hussar.core.api;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class MapConfigurationRegistry implements ConfigurationRegistry {
+
+    @NonNull
     private final Set<ConfigurationEntry> registeredConfigurations;
 
     public MapConfigurationRegistry() {
-        this(Set.of());
-    }
-
-    public MapConfigurationRegistry(Set<ConfigurationEntry> configurations) {
-        Objects.requireNonNull(configurations, "configurations is required");
-
-        this.registeredConfigurations = new HashSet<>(configurations);
+        this(new HashSet<>());
     }
 
     @Override
-    public void register(ConfigurationEntry configuration) {
-        Objects.requireNonNull(configuration, "configuration is required");
-
+    public void register(@NonNull ConfigurationEntry configuration) {
         registeredConfigurations.add(configuration);
     }
 

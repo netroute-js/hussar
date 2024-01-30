@@ -1,10 +1,13 @@
 package pl.netroute.hussar.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.Environment;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceRegistry;
@@ -15,42 +18,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class EnvironmentOrchestrator {
-    private static final Logger LOG = LoggerFactory.getLogger(EnvironmentOrchestrator.class);
 
+    @NonNull
     private final ServiceStarter serviceStarter;
+
+    @NonNull
     private final ServiceStopper serviceStopper;
+
+    @NonNull
     private final ApplicationConfigurationResolver applicationConfigurationResolver;
 
-    private final LockedAction lockedAction;
-    private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments;
+    private final LockedAction lockedAction = new LockedAction();
+    private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments = new ConcurrentHashMap<>();
 
-    EnvironmentOrchestrator(ServiceStarter serviceStarter,
-                            ServiceStopper serviceStopper,
-                            ApplicationConfigurationResolver applicationConfigurationResolver) {
-        Objects.requireNonNull(serviceStarter, "servicesStarter is required");
-        Objects.requireNonNull(serviceStopper, "servicesStopper is required");
-        Objects.requireNonNull(serviceStopper, "applicationConfigurationResolver is required");
-
-        this.serviceStarter = serviceStarter;
-        this.serviceStopper = serviceStopper;
-        this.applicationConfigurationResolver = applicationConfigurationResolver;
-        this.lockedAction = new LockedAction();
-        this.initializedEnvironments = new ConcurrentHashMap<>();
-    }
-
-    Environment initialize(EnvironmentConfigurerProvider environmentConfigurerProvider) {
-        Objects.requireNonNull(environmentConfigurerProvider, "environmentConfigurerProvider is required");
-
+    Environment initialize(@NonNull EnvironmentConfigurerProvider environmentConfigurerProvider) {
         var configurerType = environmentConfigurerProvider.getClass();
 
         return lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(configurerType, actualConfigurerType -> initializeEnvironment(environmentConfigurerProvider)));
     }
 
     void shutdown() {
-        LOG.info("Shutting down all environments");
+        log.info("Shutting down all environments");
 
         lockedAction.exclusiveAction(() -> {
             initializedEnvironments
@@ -62,14 +54,14 @@ class EnvironmentOrchestrator {
     }
 
     private Environment initializeEnvironment(EnvironmentConfigurerProvider provider) {
-        LOG.info("Initializing environment for {}", provider.getClass());
+        log.info("Initializing environment for {}", provider.getClass());
 
         var environment = provider
                 .provide()
                 .configure();
 
-        var serviceRegistry = environment.getServiceRegistry();
-        var application = environment.getApplication();
+        var serviceRegistry = environment.serviceRegistry();
+        var application = environment.application();
 
         startServices(serviceRegistry);
         startApplication(application, environment);
@@ -78,8 +70,8 @@ class EnvironmentOrchestrator {
     }
 
     private void shutdownEnvironment(Environment setup) {
-        var services = setup.getServiceRegistry();
-        var application = setup.getApplication();
+        var services = setup.serviceRegistry();
+        var application = setup.application();
 
         shutdownApplication(application);
         shutdownServices(services);
@@ -98,20 +90,20 @@ class EnvironmentOrchestrator {
         var applicationConfiguration = applicationConfigurationResolver.resolve(application, externalConfiguration);
         var startupContext = new ApplicationStartupContext(applicationConfiguration);
 
-        LOG.info("Starting application {}. Configuration {}", application.getClass().getCanonicalName(), startupContext.getProperties());
+        log.info("Starting application {}. Configuration {}", application.getClass().getCanonicalName(), startupContext.properties());
         application.start(startupContext);
     }
 
     private List<ConfigurationRegistry> extractExternalConfiguration(Environment environment) {
-        var staticConfiguration = List.of(environment.getStaticConfigurationRegistry());
+        var staticConfiguration = List.of(environment.configurationRegistry());
 
         var servicesConfiguration = environment
-                .getServiceRegistry()
+                .serviceRegistry()
                 .getEntries()
                 .stream()
                 .map(Service::getConfigurationRegistry)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         return CollectionHelper.mergeLists(staticConfiguration, servicesConfiguration);
     }

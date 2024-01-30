@@ -1,17 +1,16 @@
 package pl.netroute.hussar.spring.boot;
 
-import pl.netroute.hussar.core.helper.ValidatorHelper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class FileLoader {
 
-    private FileLoader() {}
-
-    static Path fromClasspath(String fileName) {
-        ValidatorHelper.requireNonEmpty(fileName, "fileName is required");
-
+    static Path fromClasspath(@NonNull String fileName) {
         try {
             var fileURI = FileLoader.class
                     .getClassLoader()

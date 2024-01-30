@@ -1,19 +1,20 @@
 package pl.netroute.hussar.spring.boot;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
 import java.util.Map;
-import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class PropertySourceConfigurer {
     static final String PROPERTY_SOURCE_NAME = "hussar-spring-boot-application-property-source";
 
-    void configure(Map<String, Object> properties, ConfigurableApplicationContext context) {
-        Objects.requireNonNull(properties, "properties is required");
-        Objects.requireNonNull(context, "context is required");
-
+    void configure(@NonNull Map<String, Object> properties,
+                   @NonNull ConfigurableApplicationContext context) {
         var propertySources = context
                 .getEnvironment()
                 .getPropertySources();

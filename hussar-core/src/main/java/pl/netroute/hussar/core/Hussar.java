@@ -1,26 +1,22 @@
 package pl.netroute.hussar.core;
 
+import lombok.NonNull;
+import pl.netroute.hussar.core.api.Environment;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 
-import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
 
 public class Hussar {
     private final EnvironmentConfigurerProviderResolver configurerProviderResolver;
     private final EnvironmentOrchestrator environmentOrchestrator;
 
-    Hussar(EnvironmentConfigurerProviderResolver configurerProviderResolver,
-           EnvironmentOrchestrator environmentOrchestrator) {
-        Objects.requireNonNull(configurerProviderResolver, "configurerProviderResolver is required");
-        Objects.requireNonNull(environmentOrchestrator, "environmentOrchestrator is required");
-
+    Hussar(@NonNull EnvironmentConfigurerProviderResolver configurerProviderResolver,
+           @NonNull EnvironmentOrchestrator environmentOrchestrator) {
         this.configurerProviderResolver = configurerProviderResolver;
         this.environmentOrchestrator = environmentOrchestrator;
     }
 
-    public void initializeFor(Object testObject) {
-        Objects.requireNonNull(testObject, "testObject is required");
-
+    public void initializeFor(@NonNull Object testObject) {
         configurerProviderResolver
                 .resolve(testObject)
                 .ifPresent(environmentConfigurerProvider -> initializeEnvironment(testObject, environmentConfigurerProvider));

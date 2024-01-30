@@ -1,22 +1,24 @@
 package pl.netroute.hussar.core;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class ApplicationConfigurationFlattener {
     private static final String ROOT_KEY = "";
     private static final String KEY_NAME_SEPARATOR = ".";
     private static final String COLLECTION_INDEX_TEMPLATE = "[%d]";
 
-    Map<String, Object> flatten(Map<String, Object> configuration) {
-        Objects.requireNonNull(configuration, "configuration is required");
-
+    Map<String, Object> flatten(@NonNull Map<String, Object> configuration) {
         return configuration
                 .entrySet()
                 .stream()
@@ -36,7 +38,7 @@ class ApplicationConfigurationFlattener {
             return IntStream
                     .range(0, listConfiguration.size())
                     .mapToObj(index -> createCollectionConfigurationEntry(index, parentKey, configurationKey, listConfiguration.get(index)))
-                    .collect(Collectors.toUnmodifiableList());
+                    .toList();
         } else if(isMapConfiguration(configurationValue)) {
             var mapConfigurationKey = createSimpleConfigurationKey(parentKey, configurationKey);
             var mapConfiguration = (Map<String, Object>) configurationValue;
@@ -46,7 +48,7 @@ class ApplicationConfigurationFlattener {
                     .stream()
                     .map(actualConfigurationEntry -> flattenConfigurationEntry(mapConfigurationKey, actualConfigurationEntry))
                     .flatMap(Collection::stream)
-                    .collect(Collectors.toUnmodifiableList());
+                    .toList();
         } else {
             var simpleConfigurationKey = createSimpleConfigurationKey(parentKey, configurationKey);
             var simpleConfigurationEntry = createConfigurationEntry(simpleConfigurationKey, configurationValue);

@@ -1,19 +1,21 @@
 package pl.netroute.hussar.spring.boot;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class ConfigurationFileResolver {
     static final String APPLICATION_YML = "application.yml";
     static final String APPLICATION_PROPERTIES = "application.properties";
 
-    Optional<Path> resolveDefault(Class<?> applicationClass) {
-        Objects.requireNonNull(applicationClass, "applicationClass is required");
-
+    Optional<Path> resolveDefault(@NonNull Class<?> applicationClass) {
         var classLoader = applicationClass.getClassLoader();
 
         return resolveApplicationYml(classLoader).or(() -> resolveApplicationProperties(classLoader));

@@ -1,5 +1,6 @@
 package pl.netroute.hussar.core.service;
 
+import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import pl.netroute.hussar.core.Endpoint;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 public abstract class BaseDockerService<C extends BaseDockerServiceConfig> extends BaseService<C> {
     protected final GenericContainer<?> container;
 
-    public BaseDockerService(C config) {
+    public BaseDockerService(@NonNull C config) {
         super(config);
 
         this.container = new GenericContainer<>(config.getDockerImage());

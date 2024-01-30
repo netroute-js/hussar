@@ -1,6 +1,5 @@
 package pl.netroute.hussar.service.sql;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
@@ -10,7 +9,7 @@ import pl.netroute.hussar.service.sql.api.DatabaseSchema;
 
 import java.util.List;
 
-@Getter(AccessLevel.PROTECTED)
+@Getter
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 abstract class BaseDatabaseDockerServiceConfigurer<S extends DatabaseDockerService> extends BaseDockerServiceConfigurer<S> {
     private final String registerUsernameUnderProperty;

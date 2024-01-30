@@ -1,46 +1,40 @@
 package pl.netroute.hussar.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.annotation.HussarApplication;
 import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.Environment;
 import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
+@Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ApplicationInjector {
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceInjector.class);
-
     private static final Class<HussarApplication> HUSSAR_APPLICATION_ANNOTATION_CLASS = HussarApplication.class;
 
+    @NonNull
     private final Application application;
 
-    ApplicationInjector(Application application) {
-        Objects.requireNonNull(application, "application is required");
-
-        this.application = application;
-    }
-
-    void inject(Object targetInstance) {
-        Objects.requireNonNull(targetInstance, "targetInstance is required");
-
+    void inject(@NonNull Object targetInstance) {
         ReflectionHelper
                 .getFieldsAnnotatedWith(targetInstance, HUSSAR_APPLICATION_ANNOTATION_CLASS)
                 .forEach(serviceField -> injectApplication(targetInstance, serviceField));
     }
 
     private void injectApplication(Object targetInstance, Field applicationField) {
-        LOG.info("Injecting {} into {}", application.getClass().getSimpleName(), targetInstance.getClass().getSimpleName());
+        log.info("Injecting {} into {}", application.getClass().getSimpleName(), targetInstance.getClass().getSimpleName());
 
         ReflectionHelper.setValue(targetInstance, applicationField, application);
     }
 
-    static ApplicationInjector newInstance(Environment environment) {
-        Objects.requireNonNull(environment, "environment is required");
-
-        var application = environment.getApplication();
+    static ApplicationInjector newInstance(@NonNull Environment environment) {
+        var application = environment.application();
 
         return new ApplicationInjector(application);
     }
+
 }

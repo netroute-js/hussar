@@ -1,32 +1,27 @@
 package pl.netroute.hussar.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.annotation.HussarService;
+import pl.netroute.hussar.core.api.Environment;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceRegistry;
 import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ServiceInjector {
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceInjector.class);
-
     private static final Class<HussarService> HUSSAR_SERVICE_ANNOTATION_CLASS = HussarService.class;
 
+    @NonNull
     private final ServiceRegistry serviceRegistry;
 
-    ServiceInjector(ServiceRegistry serviceRegistry) {
-        Objects.requireNonNull(serviceRegistry, "serviceRegistry is required");
-
-        this.serviceRegistry = serviceRegistry;
-    }
-
-    void inject(Object targetInstance) {
-        Objects.requireNonNull(targetInstance, "targetInstance is required");
-
+    void inject(@NonNull Object targetInstance) {
         injectServices(targetInstance);
     }
 
@@ -80,15 +75,13 @@ class ServiceInjector {
     }
 
     private void doServiceInjection(Object targetInstance, Field serviceField, Service service) {
-        LOG.info("Injecting {} into {}", service.getClass().getSimpleName(), targetInstance.getClass().getSimpleName());
+        log.info("Injecting {} into {}", service.getClass().getSimpleName(), targetInstance.getClass().getSimpleName());
 
         ReflectionHelper.setValue(targetInstance, serviceField, service);
     }
 
-    static ServiceInjector newInstance(Environment environment) {
-        Objects.requireNonNull(environment, "environment is required");
-
-        var serviceRegistry = environment.getServiceRegistry();
+    static ServiceInjector newInstance(@NonNull Environment environment) {
+        var serviceRegistry = environment.serviceRegistry();
 
         return new ServiceInjector(serviceRegistry);
     }

@@ -16,6 +16,7 @@ import java.sql.SQLException;
 class DatabaseSchemaInitializer {
     private static final String CREATE_DATABASE_SQL_TEMPLATE = "CREATE DATABASE %s";
 
+    @NonNull
     private final DataSource dataSource;
 
     void initialize(@NonNull DatabaseSchema database) {

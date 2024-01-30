@@ -12,7 +12,8 @@ import javax.sql.DataSource;
 class DataSourceFactory {
     private static final String UNKNOWN_DRIVER = null;
 
-    static DataSource create(@NonNull String url, @NonNull DatabaseCredentials credentials) {
+    static DataSource create(@NonNull String url,
+                             @NonNull DatabaseCredentials credentials) {
         var classLoader = Thread.currentThread().getContextClassLoader();
 
         var username = credentials.username();

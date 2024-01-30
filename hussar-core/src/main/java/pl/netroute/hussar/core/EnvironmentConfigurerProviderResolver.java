@@ -1,18 +1,19 @@
 package pl.netroute.hussar.core;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import pl.netroute.hussar.core.annotation.HussarEnvironment;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.helper.ReflectionHelper;
 
-import java.util.Objects;
 import java.util.Optional;
 
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class EnvironmentConfigurerProviderResolver {
     private static final Class<HussarEnvironment> TEST_CONFIGURER_ANNOTATION_CLASS = HussarEnvironment.class;
 
-    Optional<EnvironmentConfigurerProvider> resolve(Object testObject) {
-        Objects.requireNonNull("testObject is required");
-
+    Optional<EnvironmentConfigurerProvider> resolve(@NonNull Object testObject) {
         return fromAnnotation(testObject);
     }
 

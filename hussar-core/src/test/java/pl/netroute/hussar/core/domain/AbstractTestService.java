@@ -1,5 +1,6 @@
 package pl.netroute.hussar.core.domain;
 
+import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.MapConfigurationRegistry;
@@ -9,12 +10,9 @@ import pl.netroute.hussar.core.api.ServiceStartupContext;
 import java.util.List;
 import java.util.Objects;
 
+@RequiredArgsConstructor
 abstract class AbstractTestService implements Service {
     private final String name;
-
-    public AbstractTestService(String name) {
-        this.name = name;
-    }
 
     @Override
     public List<Endpoint> getEndpoints() {

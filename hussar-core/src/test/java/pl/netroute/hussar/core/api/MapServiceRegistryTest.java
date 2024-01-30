@@ -1,7 +1,5 @@
 package pl.netroute.hussar.core.api;
 
-import org.assertj.core.api.AbstractThrowableAssert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;

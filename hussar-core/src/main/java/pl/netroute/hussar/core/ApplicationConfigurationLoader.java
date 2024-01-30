@@ -1,5 +1,8 @@
 package pl.netroute.hussar.core;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.yaml.snakeyaml.Yaml;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.helper.FileHelper;
@@ -8,23 +11,17 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ApplicationConfigurationLoader {
+
+    @NonNull
     private final ApplicationConfigurationFlattener configurationFlattener;
 
-    ApplicationConfigurationLoader(ApplicationConfigurationFlattener configurationFlattener) {
-        Objects.requireNonNull(configurationFlattener, "configurationFlattener is required");
-
-        this.configurationFlattener = configurationFlattener;
-    }
-
-    Map<String, Object> load(Application application) {
-        Objects.requireNonNull(application, "application is required");
-
+    Map<String, Object> load(@NonNull Application application) {
         return application
                 .getConfigurationFile()
                 .map(this::loadConfigurationFile)

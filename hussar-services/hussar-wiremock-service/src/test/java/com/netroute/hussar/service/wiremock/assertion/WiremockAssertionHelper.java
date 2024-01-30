@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class WiremockAssertionHelper {
     private static final int SINGLE = 1;
 
+    @NonNull
     private final Service wiremock;
 
     public void assertSingleEndpoint() {

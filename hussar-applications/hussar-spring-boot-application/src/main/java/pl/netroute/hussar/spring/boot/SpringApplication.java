@@ -1,5 +1,6 @@
 package pl.netroute.hussar.spring.boot;
 
+import lombok.NonNull;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import pl.netroute.hussar.core.Endpoint;
@@ -11,7 +12,6 @@ import pl.netroute.hussar.core.lock.LockedAction;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class SpringApplication implements Application {
@@ -23,9 +23,8 @@ public class SpringApplication implements Application {
 
     private ConfigurableApplicationContext applicationContext;
 
-    private SpringApplication(Class<?> applicationClass, Path configurationFile) {
-        Objects.requireNonNull(applicationClass, "applicationClass is required");
-
+    private SpringApplication(@NonNull Class<?> applicationClass,
+                              Path configurationFile) {
         if(!isConfigurationFilePresent(configurationFile)) {
             configurationFile = null;
         }
@@ -99,14 +98,14 @@ public class SpringApplication implements Application {
     }
 
     private ConfigurableApplicationContext initializeApplication(ApplicationStartupContext startupContext) {
-        var properties = PropertiesFactory.createWithDynamicPort(startupContext.getProperties());
+        var properties = PropertiesFactory.createWithDynamicPort(startupContext.properties());
 
         return new SpringApplicationBuilder(applicationClass)
                 .initializers(context -> new PropertySourceConfigurer().configure(properties, context))
                 .run();
     }
 
-    public static SpringApplication newApplication(Class<?> applicationClass) {
+    public static SpringApplication newApplication(@NonNull Class<?> applicationClass) {
         var configurationFile = new ConfigurationFileResolver()
                 .resolveDefault(applicationClass)
                 .orElse(null);
@@ -114,7 +113,8 @@ public class SpringApplication implements Application {
         return new SpringApplication(applicationClass, configurationFile);
     }
 
-    public static SpringApplication newApplication(Class<?> applicationClass, Path configurationFile) {
+    public static SpringApplication newApplication(@NonNull Class<?> applicationClass,
+                                                   @NonNull Path configurationFile) {
         return new SpringApplication(applicationClass, configurationFile);
     }
 

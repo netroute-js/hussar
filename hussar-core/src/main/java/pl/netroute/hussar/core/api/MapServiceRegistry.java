@@ -1,30 +1,25 @@
 package pl.netroute.hussar.core.api;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.helper.StringHelper;
-import pl.netroute.hussar.core.helper.ValidatorHelper;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class MapServiceRegistry implements ServiceRegistry {
+
+    @NonNull
     private final Set<Service> registeredServices;
 
     public MapServiceRegistry() {
-        this(Set.of());
-    }
-
-    public MapServiceRegistry(Set<Service> services) {
-        Objects.requireNonNull(services, "services is required");
-
-        this.registeredServices = new HashSet<>(services);
+        this(new HashSet<>());
     }
 
     @Override
-    public void register(Service service) {
-        Objects.requireNonNull(service, "service is required");
-
+    public void register(@NonNull Service service) {
         validateIfServiceCanBeRegistered(service);
 
         registeredServices.add(service);
@@ -36,9 +31,7 @@ public class MapServiceRegistry implements ServiceRegistry {
     }
 
     @Override
-    public Optional<Service> findEntryByName(String name) {
-        ValidatorHelper.requireNonEmpty(name, "name is required");
-
+    public Optional<Service> findEntryByName(@NonNull String name) {
         return registeredServices
                 .stream()
                 .filter(service -> name.equals(service.getName()))
@@ -46,9 +39,7 @@ public class MapServiceRegistry implements ServiceRegistry {
     }
 
     @Override
-    public Optional<Service> findEntryByType(Class<? extends Service> type) {
-        Objects.requireNonNull(type, "type is required");
-
+    public Optional<Service> findEntryByType(@NonNull Class<? extends Service> type) {
         return registeredServices
                 .stream()
                 .filter(service -> type.equals(service.getClass()))

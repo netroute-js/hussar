@@ -11,6 +11,8 @@ import java.util.Optional;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class DatabaseCredentialsRegisterer {
+
+    @NonNull
     private final ConfigurationRegistry configurationRegistry;
 
     void registerUsernameUnderProperty(@NonNull DatabaseCredentials credentials,

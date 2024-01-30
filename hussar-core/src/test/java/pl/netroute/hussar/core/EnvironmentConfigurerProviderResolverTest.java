@@ -6,6 +6,7 @@ import pl.netroute.hussar.core.annotation.HussarEnvironment;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.api.Service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,14 +64,15 @@ public class EnvironmentConfigurerProviderResolverTest {
         }
 
         @Override
-        public EnvironmentConfigurer provide() {
-            return EnvironmentConfigurer
-                    .newConfigurer()
+        public LocalEnvironmentConfigurer provide() {
+            return LocalEnvironmentConfigurer
+                    .newInstance()
+                    .withProperty(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
+                    .withEnvironmentVariable(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1))
                     .withApplication(application)
-                    .withStandaloneService(standaloneServiceA)
-                    .withStandaloneService(standaloneServiceB)
-                    .withStaticConfigurationEntry(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
-                    .withStaticConfigurationEntry(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1));
+                    .withService(standaloneServiceA)
+                    .withService(standaloneServiceB)
+                    .done();
         }
 
     }

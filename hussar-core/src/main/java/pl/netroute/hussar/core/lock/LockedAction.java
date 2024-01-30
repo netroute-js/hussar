@@ -1,7 +1,8 @@
 package pl.netroute.hussar.core.lock;
 
+import lombok.NonNull;
+
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
@@ -15,21 +16,15 @@ public class LockedAction {
         this.lock = new ReentrantReadWriteLock();
     }
 
-    public void exclusiveAction(Runnable action) {
-        Objects.requireNonNull(action, "action is required");
-
+    public void exclusiveAction(@NonNull Runnable action) {
         lockedAction(toSupplier(action), true);
     }
 
-    public void sharedAction(Runnable action) {
-        Objects.requireNonNull(action, "action is required");
-
+    public void sharedAction(@NonNull Runnable action) {
         lockedAction(toSupplier(action), false);
     }
 
-    public <T> T sharedAction(Supplier<T> action) {
-        Objects.requireNonNull(action, "action is required");
-
+    public <T> T sharedAction(@NonNull Supplier<T> action) {
         return lockedAction(action, false);
     }
 

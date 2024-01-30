@@ -43,7 +43,7 @@ public class ServiceNameResolverTest {
     }
 
     private void assertResolvedDefaultName(String resolvedName, String serviceName) {
-        var defaultNameRegex = String.format(DEFAULT_SERVICE_NAME_TEMPLATE, serviceName, UUID_REGEX);
+        var defaultNameRegex = DEFAULT_SERVICE_NAME_TEMPLATE.formatted(serviceName, UUID_REGEX);
 
         assertThat(resolvedName).matches(defaultNameRegex);
     }

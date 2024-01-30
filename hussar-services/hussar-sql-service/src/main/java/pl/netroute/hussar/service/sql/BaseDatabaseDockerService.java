@@ -15,7 +15,8 @@ abstract class BaseDatabaseDockerService<C extends BaseDatabaseDockerServiceConf
     private final DatabaseCredentials credentials;
     private final DatabaseCredentialsRegisterer credentialsRegisterer;
 
-    BaseDatabaseDockerService(@NonNull C config, @NonNull DatabaseCredentials credentials) {
+    BaseDatabaseDockerService(@NonNull C config,
+                              @NonNull DatabaseCredentials credentials) {
         super(config);
 
         this.credentials = credentials;
