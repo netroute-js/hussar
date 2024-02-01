@@ -5,18 +5,18 @@ import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
-public class MySqlDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<MySqlDockerService> {
-    private static final String DOCKER_IMAGE = "mysql";
-    private static final String SERVICE = "mysql_service";
-    private static final String JDBC_SCHEME = "jdbc:mysql://";
+public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<MariaDBDockerService> {
+    private static final String DOCKER_IMAGE = "mariadb";
+    private static final String SERVICE = "mariadb_service";
+    private static final String JDBC_SCHEME = "jdbc:mariadb://";
 
-    public MySqlDockerService configure() {
+    public MariaDBDockerService configure() {
         var config = createConfig();
 
-        return new MySqlDockerService(config);
+        return new MariaDBDockerService(config);
     }
 
-    private MySqlDockerServiceConfig createConfig() {
+    private SQLDatabaseDockerServiceConfig createConfig() {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, getName());
         var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, getDockerImageVersion());
         var databaseSchemas = getDatabaseSchemas();
@@ -27,7 +27,7 @@ public class MySqlDockerServiceConfigurer extends BaseDatabaseDockerServiceConfi
         var registerPasswordUnderProperty = getRegisterPasswordUnderProperty();
         var registerPasswordUnderEnvVariable = getRegisterPasswordUnderEnvironmentVariable();
 
-        return MySqlDockerServiceConfig
+        return SQLDatabaseDockerServiceConfig
                 .builder()
                 .name(resolvedName)
                 .dockerImage(resolvedDockerImage)

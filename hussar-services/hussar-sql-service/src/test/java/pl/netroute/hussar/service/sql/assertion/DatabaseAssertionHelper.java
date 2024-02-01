@@ -37,14 +37,14 @@ public class DatabaseAssertionHelper {
 
     public void asserDatabaseAccessible(@NonNull String schema) {
         var template = createTemplate(schema);
-        var databaseName = RandomStringUtils.random(DATABASE_CHARS_COUNT);
+        var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
         var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
 
         assertThat(executeCommand(command, template)).isEmpty();
     }
 
     public void assertDatabaseNotAccessible(@NonNull String schema, @NonNull Endpoint endpoint) {
-        var databaseName = RandomStringUtils.random(DATABASE_CHARS_COUNT);
+        var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
         var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
 
         try {

@@ -3,5 +3,5 @@ package pl.netroute.hussar.service.sql;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
-class MySqlDockerServiceConfig extends BaseDatabaseDockerServiceConfig {
+class SQLDatabaseDockerServiceConfig extends BaseDatabaseDockerServiceConfig {
 }

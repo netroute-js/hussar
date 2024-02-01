@@ -6,6 +6,7 @@ dependencies {
 	implementation libs.flyway.core
 	implementation libs.flyway.mysql
 	implementation libs.mysql.connector
+	implementation libs.mariadb.connector
 
 	testImplementation libs.logback.classic
 	testImplementation libs.spring.jdbc

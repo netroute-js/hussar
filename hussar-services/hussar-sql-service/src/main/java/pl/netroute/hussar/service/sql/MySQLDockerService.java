@@ -3,7 +3,7 @@ package pl.netroute.hussar.service.sql;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 
-public class MySqlDockerService extends BaseDatabaseDockerService<MySqlDockerServiceConfig> {
+public class MySQLDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 3306;
 
     private static final String MYSQL_ROOT_PASSWORD_ENV = "MYSQL_ROOT_PASSWORD";
@@ -11,7 +11,7 @@ public class MySqlDockerService extends BaseDatabaseDockerService<MySqlDockerSer
     private static final String MYSQL_ROOT_USERNAME = "root";
     private static final String MYSQL_ROOT_PASSWORD = "test";
 
-    MySqlDockerService(@NonNull MySqlDockerServiceConfig config) {
+    MySQLDockerService(@NonNull SQLDatabaseDockerServiceConfig config) {
         super(config, defaultCredentials());
     }
 

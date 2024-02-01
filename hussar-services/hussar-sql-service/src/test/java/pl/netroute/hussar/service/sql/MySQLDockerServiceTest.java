@@ -10,35 +10,35 @@ import pl.netroute.hussar.service.sql.assertion.DatabaseAssertionHelper;
 import java.util.List;
 import java.util.Optional;
 
-public class MySqlDockerServiceTest {
+public class MySQLDockerServiceTest {
     private static final List<String> TABLES = List.of("TableA", "TableB");
 
-    private MySqlDockerService mysqlService;
+    private MySQLDockerService databaseService;
 
     @AfterEach
     public void cleanup() {
         Optional
-                .ofNullable(mysqlService)
-                .ifPresent(MySqlDockerService::shutdown);
+                .ofNullable(databaseService)
+                .ifPresent(MySQLDockerService::shutdown);
     }
 
     @Test
-    public void shouldStartMysqlService() {
+    public void shouldStartDatabaseService() {
         // given
         var schemaName = "HussarDB";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
-        mysqlService = MySqlDockerServiceConfigurer
+        databaseService = MySQLDockerServiceConfigurer
                 .newInstance()
                 .databaseSchema(databaseSchema)
                 .done()
                 .configure();
 
         // when
-        mysqlService.start(ServiceStartupContext.empty());
+        databaseService.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new DatabaseAssertionHelper(mysqlService);
+        var databaseAssertion = new DatabaseAssertionHelper(databaseService);
         databaseAssertion.assertSingleEndpoint();
         databaseAssertion.asserDatabaseAccessible(schemaName);
         databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
@@ -46,7 +46,7 @@ public class MySqlDockerServiceTest {
     }
 
     @Test
-    public void shouldStartMysqlServiceWithFullConfiguration() {
+    public void shouldStartDatabaseServiceWithFullConfiguration() {
         // given
         var name = "mysql-instance";
         var dockerVersion = "8.2.0";
@@ -64,7 +64,7 @@ public class MySqlDockerServiceTest {
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new DatabaseSchema(schemaName, scriptsLocation);
 
-        mysqlService = MySqlDockerServiceConfigurer
+        databaseService = MySQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -79,10 +79,10 @@ public class MySqlDockerServiceTest {
                 .configure();
 
         // when
-        mysqlService.start(ServiceStartupContext.empty());
+        databaseService.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new DatabaseAssertionHelper(mysqlService);
+        var databaseAssertion = new DatabaseAssertionHelper(databaseService);
         databaseAssertion.assertSingleEndpoint();
         databaseAssertion.asserDatabaseAccessible(schemaName);
         databaseAssertion.assertTablesCreated(schemaName, TABLES);
@@ -95,14 +95,14 @@ public class MySqlDockerServiceTest {
     }
 
     @Test
-    public void shouldShutdownMysqlService() {
+    public void shouldShutdownDatabaseService() {
         var name = "mysql-instance";
         var dockerVersion = "8.2.0";
 
         var schemaName = "HussarDB";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
-        mysqlService = MySqlDockerServiceConfigurer
+        databaseService = MySQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .databaseSchema(databaseSchema)
@@ -111,14 +111,14 @@ public class MySqlDockerServiceTest {
                 .configure();
 
         // when
-        mysqlService.start(ServiceStartupContext.empty());
+        databaseService.start(ServiceStartupContext.empty());
 
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(mysqlService);
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
 
-        mysqlService.shutdown();
+        databaseService.shutdown();
 
         // then
-        var databaseAssertion = new DatabaseAssertionHelper(mysqlService);
+        var databaseAssertion = new DatabaseAssertionHelper(databaseService);
         databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
     }
 }
