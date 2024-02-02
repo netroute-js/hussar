@@ -10,16 +10,16 @@ import pl.netroute.hussar.service.sql.assertion.DatabaseAssertionHelper;
 import java.util.List;
 import java.util.Optional;
 
-public class MariaDBDockerServiceTest {
+public class PostgresSQLDockerServiceTest {
     private static final List<String> TABLES = List.of("table_a", "table_b");
 
-    private MariaDBDockerService databaseService;
+    private PostgresSQLDockerService databaseService;
 
     @AfterEach
     public void cleanup() {
         Optional
                 .ofNullable(databaseService)
-                .ifPresent(MariaDBDockerService::shutdown);
+                .ifPresent(PostgresSQLDockerService::shutdown);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class MariaDBDockerServiceTest {
         var schemaName = "hussardb";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
-        databaseService = MariaDBDockerServiceConfigurer
+        databaseService = PostgresSQLDockerServiceConfigurer
                 .newInstance()
                 .databaseSchema(databaseSchema)
                 .done()
@@ -48,23 +48,23 @@ public class MariaDBDockerServiceTest {
     @Test
     public void shouldStartDatabaseServiceWithFullConfiguration() {
         // given
-        var name = "mariadb-instance";
-        var dockerVersion = "10.5.23";
+        var name = "postgres-instance";
+        var dockerVersion = "16";
 
-        var endpointProperty = "mariadb.url";
-        var endpointEnvVariable = "MARIADB_URL";
+        var endpointProperty = "postgres.url";
+        var endpointEnvVariable = "POSTGRES_URL";
 
-        var usernameProperty = "mariadb.username";
-        var usernameEnvVariable = "MARIADB_USERNAME";
+        var usernameProperty = "postgres.username";
+        var usernameEnvVariable = "POSTGRES_USERNAME";
 
-        var passwordProperty = "mariadb.password";
-        var passwordEnvVariable = "MARIADB_PASSWORD";
+        var passwordProperty = "postgres.password";
+        var passwordEnvVariable = "POSTGRES_PASSWORD";
 
         var schemaName = "hussardb";
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new DatabaseSchema(schemaName, scriptsLocation);
 
-        databaseService = MariaDBDockerServiceConfigurer
+        databaseService = PostgresSQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -96,13 +96,13 @@ public class MariaDBDockerServiceTest {
 
     @Test
     public void shouldShutdownDatabaseService() {
-        var name = "mariadb-instance";
-        var dockerVersion = "10.5.12";
+        var name = "postgres-instance";
+        var dockerVersion = "16";
 
         var schemaName = "hussardb";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
-        databaseService = MariaDBDockerServiceConfigurer
+        databaseService = PostgresSQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .databaseSchema(databaseSchema)

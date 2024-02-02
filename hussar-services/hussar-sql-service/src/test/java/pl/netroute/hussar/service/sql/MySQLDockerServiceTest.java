@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MySQLDockerServiceTest {
-    private static final List<String> TABLES = List.of("TableA", "TableB");
+    private static final List<String> TABLES = List.of("table_a", "table_b");
 
     private MySQLDockerService databaseService;
 
@@ -25,7 +25,7 @@ public class MySQLDockerServiceTest {
     @Test
     public void shouldStartDatabaseService() {
         // given
-        var schemaName = "HussarDB";
+        var schemaName = "hussardb";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
         databaseService = MySQLDockerServiceConfigurer
@@ -60,7 +60,7 @@ public class MySQLDockerServiceTest {
         var passwordProperty = "mysql.password";
         var passwordEnvVariable = "MYSQL_PASSWORD";
 
-        var schemaName = "HussarDB";
+        var schemaName = "hussardb";
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new DatabaseSchema(schemaName, scriptsLocation);
 
@@ -99,7 +99,7 @@ public class MySQLDockerServiceTest {
         var name = "mysql-instance";
         var dockerVersion = "8.2.0";
 
-        var schemaName = "HussarDB";
+        var schemaName = "hussardb";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
         databaseService = MySQLDockerServiceConfigurer

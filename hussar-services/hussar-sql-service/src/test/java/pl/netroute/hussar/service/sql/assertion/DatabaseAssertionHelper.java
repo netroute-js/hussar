@@ -25,7 +25,7 @@ public class DatabaseAssertionHelper {
 
     private static final String PATH_SEPARATOR = "/";
 
-    private static final String SELECT_ALL_QUERY_TEMPLATE = "SELECT * FROM %s";
+    private static final String SELECT_ALL_QUERY_TEMPLATE = "SELECT * FROM %s.%s";
     private static final String CREATE_DATABASE_QUERY_TEMPLATE = "CREATE DATABASE %s";
 
     @NonNull
@@ -62,7 +62,7 @@ public class DatabaseAssertionHelper {
         var template = createTemplate(schema);
 
         var failures = tables.stream()
-                .map(SELECT_ALL_QUERY_TEMPLATE::formatted)
+                .map(table -> SELECT_ALL_QUERY_TEMPLATE.formatted(schema, table))
                 .map(query -> executeCommand(query, template))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -75,7 +75,7 @@ public class DatabaseAssertionHelper {
         var template = createTemplate(schema);
 
         var failures = tables.stream()
-                .map(SELECT_ALL_QUERY_TEMPLATE::formatted)
+                .map(table -> SELECT_ALL_QUERY_TEMPLATE.formatted(schema, table))
                 .map(query -> executeCommand(query, template))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

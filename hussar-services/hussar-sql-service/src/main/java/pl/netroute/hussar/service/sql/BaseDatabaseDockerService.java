@@ -1,16 +1,15 @@
 package pl.netroute.hussar.service.sql;
 
 import lombok.NonNull;
-import org.flywaydb.core.internal.jdbc.DriverDataSource;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.BaseDockerService;
 
-import javax.sql.DataSource;
 import java.util.Optional;
 
 abstract class BaseDatabaseDockerService<C extends BaseDatabaseDockerServiceConfig> extends BaseDockerService<C> implements DatabaseDockerService {
     private static final String UNKNOWN_DRIVER = null;
+    private static final String SLASH = "/";
 
     private final DatabaseCredentials credentials;
     private final DatabaseCredentialsRegisterer credentialsRegisterer;
@@ -27,12 +26,10 @@ abstract class BaseDatabaseDockerService<C extends BaseDatabaseDockerServiceConf
     protected void doAfterServiceStartup(ServiceStartupContext context) {
         super.doAfterServiceStartup(context);
 
-        var dataSource = createDataSource();
-
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
 
-        initializeDatabaseSchemas(dataSource);
+        initializeDatabaseSchemas();
     }
 
     @Override
@@ -60,24 +57,12 @@ abstract class BaseDatabaseDockerService<C extends BaseDatabaseDockerServiceConf
                 .ifPresent(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
     }
 
-    private void initializeDatabaseSchemas(DataSource dataSource) {
-        var databaseSchemaInitializer = new DatabaseSchemaInitializer(dataSource);
+    private void initializeDatabaseSchemas() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(this);
+        var databaseSchemaInitializer = new DatabaseSchemaInitializer(endpoint, credentials);
 
         config.getDatabaseSchemas()
               .forEach(databaseSchemaInitializer::initialize);
-    }
-
-    private DataSource createDataSource() {
-        var classLoader = Thread.currentThread().getContextClassLoader();
-
-        var jdbcURL = EndpointHelper
-                .getAnyEndpointOrFail(this)
-                .getAddress();
-
-        var username = credentials.username();
-        var password = credentials.password();
-
-        return new DriverDataSource(classLoader, UNKNOWN_DRIVER, jdbcURL, username, password);
     }
 
 }

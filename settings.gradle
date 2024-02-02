@@ -13,9 +13,10 @@ dependencyResolutionManagement {
             def springBootVersion = version("springBoot", "2.7.10")
             def springJdbcVersion = version("springJdbc", "6.1.2")
             def springCloudVersion = version("springCloud", "3.1.6")
-            def flywayVersion = version("flyway", "10.1.0")
+            def flywayVersion = version("flyway", "10.7.1")
             def mysqlConnectorVersion = version("mysqlConnector", "8.3.0")
             def mariadbConnectorVersion = version("mariadbConnector", "3.3.2")
+            def postgresConnectorVersion = version("postgresConnector", "42.7.1")
             def okHttpVersion = version("okHttp", "4.10.0")
             def feignVersion = version("feign", "12.3")
             def snakeYamlVersion = version("snakeYaml", "2.1")
@@ -37,9 +38,11 @@ dependencyResolutionManagement {
 
             library("flyway-core", "org.flywaydb", "flyway-core").versionRef(flywayVersion)
             library("flyway-mysql", "org.flywaydb", "flyway-mysql").versionRef(flywayVersion)
+            library("flyway-postgres", "org.flywaydb", "flyway-database-postgresql").versionRef(flywayVersion)
 
             library("mysql-connector", "com.mysql", "mysql-connector-j").versionRef(mysqlConnectorVersion)
             library("mariadb-connector", "org.mariadb.jdbc", "mariadb-java-client").versionRef(mariadbConnectorVersion)
+            library("postgres-connector", "org.postgresql", "postgresql").versionRef(postgresConnectorVersion)
 
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4jVersion)
             library("logback-classic", "ch.qos.logback", "logback-classic").versionRef(logbackVersion)

@@ -5,8 +5,10 @@ dependencies {
 	implementation libs.testcontainers
 	implementation libs.flyway.core
 	implementation libs.flyway.mysql
+	implementation libs.flyway.postgres
 	implementation libs.mysql.connector
 	implementation libs.mariadb.connector
+	implementation libs.postgres.connector
 
 	testImplementation libs.logback.classic
 	testImplementation libs.spring.jdbc
