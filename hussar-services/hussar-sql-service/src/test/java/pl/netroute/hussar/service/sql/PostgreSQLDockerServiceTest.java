@@ -10,16 +10,16 @@ import pl.netroute.hussar.service.sql.assertion.DatabaseAssertionHelper;
 import java.util.List;
 import java.util.Optional;
 
-public class PostgresSQLDockerServiceTest {
+public class PostgreSQLDockerServiceTest {
     private static final List<String> TABLES = List.of("table_a", "table_b");
 
-    private PostgresSQLDockerService databaseService;
+    private PostgreSQLDockerService databaseService;
 
     @AfterEach
     public void cleanup() {
         Optional
                 .ofNullable(databaseService)
-                .ifPresent(PostgresSQLDockerService::shutdown);
+                .ifPresent(PostgreSQLDockerService::shutdown);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class PostgresSQLDockerServiceTest {
         var schemaName = "hussardb";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
-        databaseService = PostgresSQLDockerServiceConfigurer
+        databaseService = PostgreSQLDockerServiceConfigurer
                 .newInstance()
                 .databaseSchema(databaseSchema)
                 .done()
@@ -64,7 +64,7 @@ public class PostgresSQLDockerServiceTest {
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new DatabaseSchema(schemaName, scriptsLocation);
 
-        databaseService = PostgresSQLDockerServiceConfigurer
+        databaseService = PostgreSQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -102,7 +102,7 @@ public class PostgresSQLDockerServiceTest {
         var schemaName = "hussardb";
         var databaseSchema = DatabaseSchema.scriptLess(schemaName);
 
-        databaseService = PostgresSQLDockerServiceConfigurer
+        databaseService = PostgreSQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .databaseSchema(databaseSchema)

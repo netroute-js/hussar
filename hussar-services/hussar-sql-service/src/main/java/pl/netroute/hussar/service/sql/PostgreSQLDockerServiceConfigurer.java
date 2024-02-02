@@ -5,15 +5,15 @@ import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
-public class PostgresSQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<PostgresSQLDockerService> {
+public class PostgreSQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<PostgreSQLDockerService> {
     private static final String DOCKER_IMAGE = "postgres";
     private static final String SERVICE = "postgres_service";
     private static final String JDBC_SCHEME = "jdbc:postgresql://";
 
-    public PostgresSQLDockerService configure() {
+    public PostgreSQLDockerService configure() {
         var config = createConfig();
 
-        return new PostgresSQLDockerService(config);
+        return new PostgreSQLDockerService(config);
     }
 
     private SQLDatabaseDockerServiceConfig createConfig() {
