@@ -1,23 +1,40 @@
-package pl.netroute.hussar.service.sql;
+package pl.netroute.hussar.service.nosql.mongodb;
 
 import lombok.NonNull;
+import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.BaseDockerService;
-import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
+import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
 import java.util.Optional;
 
-abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfig> extends BaseDockerService<C> implements SQLDatabaseDockerService {
-    private final SQLDatabaseCredentials credentials;
+public class MongoDBDockerService extends BaseDockerService<MongoDBDockerServiceConfig> {
+    private static final int LISTENING_PORT = 27017;
+
+    private static final String MONGO_DB_USERNAME_ENV = "MONGO_INITDB_ROOT_USERNAME";
+    private static final String MONGO_DB_PASSWORD_ENV = "MONGO_INITDB_ROOT_PASSWORD";
+
+    private static final String MONGO_DB_USERNAME = "mongo";
+    private static final String MONGO_DB_PASSWORD = "test";
+
+    private final MongoDBCredentials credentials;
     private final DatabaseCredentialsRegisterer credentialsRegisterer;
 
-    BaseDatabaseDockerService(@NonNull C config,
-                              @NonNull SQLDatabaseCredentials credentials) {
+    MongoDBDockerService(@NonNull MongoDBDockerServiceConfig config) {
         super(config);
 
-        this.credentials = credentials;
+        this.credentials = new MongoDBCredentials(MONGO_DB_USERNAME, MONGO_DB_PASSWORD);
         this.credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
+    }
+
+    @Override
+    protected void configureContainer(GenericContainer<?> container) {
+        super.configureContainer(container);
+
+        container
+                .withExposedPorts(LISTENING_PORT)
+                .withEnv(MONGO_DB_USERNAME_ENV, MONGO_DB_USERNAME)
+                .withEnv(MONGO_DB_PASSWORD_ENV, MONGO_DB_PASSWORD);
     }
 
     @Override
@@ -26,12 +43,9 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
 
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
-
-        initializeDatabaseSchemas();
     }
 
-    @Override
-    public SQLDatabaseCredentials getCredentials() {
+    public MongoDBCredentials getCredentials() {
         return credentials;
     }
 
@@ -54,13 +68,4 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
                 .ofNullable(config.getRegisterPasswordUnderEnvironmentVariable())
                 .ifPresent(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
     }
-
-    private void initializeDatabaseSchemas() {
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(this);
-        var databaseSchemaInitializer = new DatabaseSchemaInitializer(endpoint, credentials);
-
-        config.getDatabaseSchemas()
-              .forEach(databaseSchemaInitializer::initialize);
-    }
-
 }

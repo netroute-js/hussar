@@ -4,8 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.sql.api.DatabaseSchema;
-import pl.netroute.hussar.service.sql.assertion.DatabaseAssertionHelper;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
+import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,7 @@ public class MySQLDockerServiceTest {
     public void shouldStartDatabaseService() {
         // given
         var schemaName = "hussardb";
-        var databaseSchema = DatabaseSchema.scriptLess(schemaName);
+        var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
         databaseService = MySQLDockerServiceConfigurer
                 .newInstance()
@@ -38,7 +38,7 @@ public class MySQLDockerServiceTest {
         databaseService.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new DatabaseAssertionHelper(databaseService);
+        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
         databaseAssertion.assertSingleEndpoint();
         databaseAssertion.asserDatabaseAccessible(schemaName);
         databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
@@ -62,7 +62,7 @@ public class MySQLDockerServiceTest {
 
         var schemaName = "hussardb";
         var scriptsLocation = "/flyway/scripts";
-        var databaseSchema = new DatabaseSchema(schemaName, scriptsLocation);
+        var databaseSchema = new SQLDatabaseSchema(schemaName, scriptsLocation);
 
         databaseService = MySQLDockerServiceConfigurer
                 .newInstance()
@@ -82,7 +82,7 @@ public class MySQLDockerServiceTest {
         databaseService.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new DatabaseAssertionHelper(databaseService);
+        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
         databaseAssertion.assertSingleEndpoint();
         databaseAssertion.asserDatabaseAccessible(schemaName);
         databaseAssertion.assertTablesCreated(schemaName, TABLES);
@@ -100,7 +100,7 @@ public class MySQLDockerServiceTest {
         var dockerVersion = "8.2.0";
 
         var schemaName = "hussardb";
-        var databaseSchema = DatabaseSchema.scriptLess(schemaName);
+        var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
         databaseService = MySQLDockerServiceConfigurer
                 .newInstance()
@@ -118,7 +118,7 @@ public class MySQLDockerServiceTest {
         databaseService.shutdown();
 
         // then
-        var databaseAssertion = new DatabaseAssertionHelper(databaseService);
+        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
         databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
     }
 }

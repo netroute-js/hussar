@@ -1,0 +1,10 @@
+dependencies {
+	implementation project(":hussar-core")
+	implementation project(":hussar-services:hussar-core-service")
+	implementation libs.slf4j.api
+	implementation libs.testcontainers
+
+	testImplementation libs.logback.classic
+	testImplementation libs.bundles.testing
+	testImplementation libs.mongodb.connector
+}

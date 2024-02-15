@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.sql;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 5432;
@@ -24,8 +25,8 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
                 .withEnv(POSTGRE_SQL_PASSWORD_ENV, POSTGRE_SQL_PASSWORD);
     }
 
-    private static DatabaseCredentials defaultCredentials() {
-        return new DatabaseCredentials(POSTGRE_SQL_USERNAME, POSTGRE_SQL_PASSWORD);
+    private static SQLDatabaseCredentials defaultCredentials() {
+        return new SQLDatabaseCredentials(POSTGRE_SQL_USERNAME, POSTGRE_SQL_PASSWORD);
     }
 
 }

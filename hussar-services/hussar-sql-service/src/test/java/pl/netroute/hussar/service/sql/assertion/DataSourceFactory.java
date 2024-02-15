@@ -1,6 +1,6 @@
 package pl.netroute.hussar.service.sql.assertion;
 
-import pl.netroute.hussar.service.sql.DatabaseCredentials;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -13,7 +13,7 @@ class DataSourceFactory {
     private static final String UNKNOWN_DRIVER = null;
 
     static DataSource create(@NonNull String url,
-                             @NonNull DatabaseCredentials credentials) {
+                             @NonNull SQLDatabaseCredentials credentials) {
         var classLoader = Thread.currentThread().getContextClassLoader();
 
         var username = credentials.username();

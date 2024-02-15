@@ -7,7 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import pl.netroute.hussar.core.Endpoint;
-import pl.netroute.hussar.service.sql.api.DatabaseSchema;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
 import java.sql.SQLException;
 
@@ -20,10 +21,10 @@ class DatabaseSchemaInitializer {
     private final Endpoint databaseEndpoint;
 
     @NonNull
-    private final DatabaseCredentials databaseCredentials;
+    private final SQLDatabaseCredentials databaseCredentials;
 
-    void initialize(@NonNull DatabaseSchema database) {
-        var schema = database.schema();
+    void initialize(@NonNull SQLDatabaseSchema database) {
+        var schema = database.name();
         var scriptsLocation = database.scriptsLocation();
 
         createSchema(schema);

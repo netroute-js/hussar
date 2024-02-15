@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.sql;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 public class MariaDBDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 3306;
@@ -24,8 +25,8 @@ public class MariaDBDockerService extends BaseDatabaseDockerService<SQLDatabaseD
                 .withEnv(MARIA_DB_ROOT_PASSWORD_ENV, MARIA_DB_ROOT_PASSWORD);
     }
 
-    private static DatabaseCredentials defaultCredentials() {
-        return new DatabaseCredentials(MARIA_DB_ROOT_USERNAME, MARIA_DB_ROOT_PASSWORD);
+    private static SQLDatabaseCredentials defaultCredentials() {
+        return new SQLDatabaseCredentials(MARIA_DB_ROOT_USERNAME, MARIA_DB_ROOT_PASSWORD);
     }
 
 }

@@ -1,36 +1,28 @@
-package pl.netroute.hussar.service.sql;
+package pl.netroute.hussar.service.nosql.mongodb;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
-import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
+import pl.netroute.hussar.service.nosql.assertion.MongoDBAssertionHelper;
 
-import java.util.List;
 import java.util.Optional;
 
-public class PostgreSQLDockerServiceTest {
-    private static final List<String> TABLES = List.of("table_a", "table_b");
-
-    private PostgreSQLDockerService databaseService;
+public class MongoDBDockerServiceTest {
+    private MongoDBDockerService databaseService;
 
     @AfterEach
     public void cleanup() {
         Optional
                 .ofNullable(databaseService)
-                .ifPresent(PostgreSQLDockerService::shutdown);
+                .ifPresent(MongoDBDockerService::shutdown);
     }
 
     @Test
     public void shouldStartDatabaseService() {
         // given
-        var schemaName = "hussardb";
-        var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
-
-        databaseService = PostgreSQLDockerServiceConfigurer
+        databaseService = MongoDBDockerServiceConfigurer
                 .newInstance()
-                .databaseSchema(databaseSchema)
                 .done()
                 .configure();
 
@@ -38,37 +30,31 @@ public class PostgreSQLDockerServiceTest {
         databaseService.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
+        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
         databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
+        databaseAssertion.asserDatabaseAccessible();
         databaseAssertion.assertNoEntriesRegistered();
     }
 
     @Test
     public void shouldStartDatabaseServiceWithFullConfiguration() {
         // given
-        var name = "postgres-instance";
-        var dockerVersion = "16";
+        var name = "mongodb-instance";
+        var dockerVersion = "6.0.13";
 
-        var endpointProperty = "postgres.url";
-        var endpointEnvVariable = "POSTGRES_URL";
+        var endpointProperty = "mongodb.url";
+        var endpointEnvVariable = "MONGODB_URL";
 
-        var usernameProperty = "postgres.username";
-        var usernameEnvVariable = "POSTGRES_USERNAME";
+        var usernameProperty = "mongodb.username";
+        var usernameEnvVariable = "MONGODB_USERNAME";
 
-        var passwordProperty = "postgres.password";
-        var passwordEnvVariable = "POSTGRES_PASSWORD";
+        var passwordProperty = "mongodb.password";
+        var passwordEnvVariable = "MONGODB_PASSWORD";
 
-        var schemaName = "hussardb";
-        var scriptsLocation = "/flyway/scripts";
-        var databaseSchema = new SQLDatabaseSchema(schemaName, scriptsLocation);
-
-        databaseService = PostgreSQLDockerServiceConfigurer
+        databaseService = MongoDBDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
-                .databaseSchema(databaseSchema)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .registerUsernameUnderProperty(usernameProperty)
@@ -82,10 +68,9 @@ public class PostgreSQLDockerServiceTest {
         databaseService.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
+        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
         databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesCreated(schemaName, TABLES);
+        databaseAssertion.asserDatabaseAccessible();
         databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
         databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
         databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
@@ -96,16 +81,12 @@ public class PostgreSQLDockerServiceTest {
 
     @Test
     public void shouldShutdownDatabaseService() {
-        var name = "postgres-instance";
-        var dockerVersion = "16";
+        var name = "mongodb-instance";
+        var dockerVersion = "6.0.13";
 
-        var schemaName = "hussardb";
-        var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
-
-        databaseService = PostgreSQLDockerServiceConfigurer
+        databaseService = MongoDBDockerServiceConfigurer
                 .newInstance()
                 .name(name)
-                .databaseSchema(databaseSchema)
                 .dockerImageVersion(dockerVersion)
                 .done()
                 .configure();
@@ -118,7 +99,7 @@ public class PostgreSQLDockerServiceTest {
         databaseService.shutdown();
 
         // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
+        databaseAssertion.assertDatabaseNotAccessible(endpoint);
     }
 }

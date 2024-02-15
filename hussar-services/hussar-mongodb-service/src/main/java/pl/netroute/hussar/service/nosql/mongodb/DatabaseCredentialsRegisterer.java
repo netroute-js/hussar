@@ -1,4 +1,4 @@
-package pl.netroute.hussar.service.sql;
+package pl.netroute.hussar.service.nosql.mongodb;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
-import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
+import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ class DatabaseCredentialsRegisterer {
     @NonNull
     private final ConfigurationRegistry configurationRegistry;
 
-    void registerUsernameUnderProperty(@NonNull SQLDatabaseCredentials credentials,
+    void registerUsernameUnderProperty(@NonNull MongoDBCredentials credentials,
                                        @NonNull String usernameProperty) {
         Optional
                 .of(usernameProperty)
@@ -24,7 +24,7 @@ class DatabaseCredentialsRegisterer {
                 .ifPresent(configurationRegistry::register);
     }
 
-    void registerPasswordUnderProperty(@NonNull SQLDatabaseCredentials credentials,
+    void registerPasswordUnderProperty(@NonNull MongoDBCredentials credentials,
                                        @NonNull String passwordProperty) {
         Optional
                 .ofNullable(passwordProperty)
@@ -32,7 +32,7 @@ class DatabaseCredentialsRegisterer {
                 .ifPresent(configurationRegistry::register);
     }
 
-    void registerUsernameUnderEnvironmentVariable(@NonNull SQLDatabaseCredentials credentials,
+    void registerUsernameUnderEnvironmentVariable(@NonNull MongoDBCredentials credentials,
                                                   @NonNull String usernameEnvVariable) {
         Optional
                 .of(usernameEnvVariable)
@@ -40,7 +40,7 @@ class DatabaseCredentialsRegisterer {
                 .ifPresent(configurationRegistry::register);
     }
 
-    void registerPasswordUnderEnvironmentVariable(@NonNull SQLDatabaseCredentials credentials,
+    void registerPasswordUnderEnvironmentVariable(@NonNull MongoDBCredentials credentials,
                                                   @NonNull String passwordEnvVariable) {
         Optional
                 .ofNullable(passwordEnvVariable)

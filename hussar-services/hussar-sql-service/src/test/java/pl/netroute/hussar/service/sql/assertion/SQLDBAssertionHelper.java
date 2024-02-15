@@ -11,7 +11,7 @@ import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.sql.DatabaseDockerService;
+import pl.netroute.hussar.service.sql.SQLDatabaseDockerService;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-public class DatabaseAssertionHelper {
+public class SQLDBAssertionHelper {
     private static final int SINGLE = 1;
     private static final int DATABASE_CHARS_COUNT = 15;
 
@@ -29,7 +29,7 @@ public class DatabaseAssertionHelper {
     private static final String CREATE_DATABASE_QUERY_TEMPLATE = "CREATE DATABASE %s";
 
     @NonNull
-    private final DatabaseDockerService database;
+    private final SQLDatabaseDockerService database;
 
     public void assertSingleEndpoint() {
         assertThat(database.getEndpoints()).hasSize(SINGLE);

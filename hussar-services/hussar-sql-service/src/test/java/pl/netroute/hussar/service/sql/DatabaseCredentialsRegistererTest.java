@@ -7,6 +7,7 @@ import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class DatabaseCredentialsRegistererTest {
         // given
         var username = "some-user";
         var password = "some-password";
-        var credentials = new DatabaseCredentials(username, password);
+        var credentials = new SQLDatabaseCredentials(username, password);
 
         var usernameProperty = "a.property";
 
@@ -47,7 +48,7 @@ public class DatabaseCredentialsRegistererTest {
         // given
         var username = "some-user";
         var password = "some-password";
-        var credentials = new DatabaseCredentials(username, password);
+        var credentials = new SQLDatabaseCredentials(username, password);
 
         var usernameEnvVariable = "a.property";
 
@@ -66,7 +67,7 @@ public class DatabaseCredentialsRegistererTest {
         // given
         var username = "some-user";
         var password = "some-password";
-        var credentials = new DatabaseCredentials(username, password);
+        var credentials = new SQLDatabaseCredentials(username, password);
 
         var passwordProperty = "a.password";
 
@@ -85,7 +86,7 @@ public class DatabaseCredentialsRegistererTest {
         // given
         var username = "some-user";
         var password = "some-password";
-        var credentials = new DatabaseCredentials(username, password);
+        var credentials = new SQLDatabaseCredentials(username, password);
 
         var passwordEnvVariable = "a.property";
 

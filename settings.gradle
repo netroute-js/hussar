@@ -6,6 +6,7 @@ include "hussar-applications:hussar-spring-boot-application"
 include "hussar-services:hussar-core-service"
 include "hussar-services:hussar-wiremock-service"
 include "hussar-services:hussar-sql-service"
+include "hussar-services:hussar-mongodb-service"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -17,6 +18,7 @@ dependencyResolutionManagement {
             def mysqlConnectorVersion = version("mysqlConnector", "8.3.0")
             def mariadbConnectorVersion = version("mariadbConnector", "3.3.2")
             def postgresConnectorVersion = version("postgresConnector", "42.7.1")
+            def mongodbConnectorVersion = version("mongodbConnector", "4.11.1")
             def okHttpVersion = version("okHttp", "4.10.0")
             def feignVersion = version("feign", "12.3")
             def snakeYamlVersion = version("snakeYaml", "2.1")
@@ -43,6 +45,8 @@ dependencyResolutionManagement {
             library("mysql-connector", "com.mysql", "mysql-connector-j").versionRef(mysqlConnectorVersion)
             library("mariadb-connector", "org.mariadb.jdbc", "mariadb-java-client").versionRef(mariadbConnectorVersion)
             library("postgres-connector", "org.postgresql", "postgresql").versionRef(postgresConnectorVersion)
+
+            library("mongodb-connector", "org.mongodb", "mongodb-driver-sync").versionRef(mongodbConnectorVersion)
 
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4jVersion)
             library("logback-classic", "ch.qos.logback", "logback-classic").versionRef(logbackVersion)

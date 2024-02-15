@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 import javax.sql.DataSource;
 import java.util.Optional;
@@ -14,11 +15,11 @@ class DataSourceFactory {
     private static final String UNKNOWN_DRIVER = null;
     private static final String SLASH = "/";
 
-    static DataSource create(@NonNull Endpoint endpoint, @NonNull DatabaseCredentials credentials) {
+    static DataSource create(@NonNull Endpoint endpoint, @NonNull SQLDatabaseCredentials credentials) {
         return create(endpoint, credentials, null);
     }
 
-    static DataSource create(@NonNull Endpoint endpoint, @NonNull DatabaseCredentials credentials, String schema) {
+    static DataSource create(@NonNull Endpoint endpoint, @NonNull SQLDatabaseCredentials credentials, String schema) {
         var classLoader = Thread.currentThread().getContextClassLoader();
 
         var jdbcURL = Optional
