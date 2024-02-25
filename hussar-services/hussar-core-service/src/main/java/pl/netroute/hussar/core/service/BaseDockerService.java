@@ -3,6 +3,7 @@ package pl.netroute.hussar.core.service;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
@@ -50,10 +51,15 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
 
     protected void configureContainer(GenericContainer<?> container) {
         configureLogging(container);
+        configureWaitStrategy(container);
     }
 
-    private void configureLogging(GenericContainer<?> container) {
+    protected void configureLogging(GenericContainer<?> container) {
         container.withLogConsumer(new Slf4jLogConsumer(log));
+    }
+
+    protected void configureWaitStrategy(GenericContainer<?> container) {
+        container.waitingFor(Wait.forListeningPort());
     }
 
 }

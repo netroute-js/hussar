@@ -11,7 +11,6 @@ import com.mongodb.connection.ServerDescription;
 import com.mongodb.connection.SocketSettings;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
@@ -23,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 @RequiredArgsConstructor
 public class MongoDBAssertionHelper {
     private static final int SINGLE = 1;

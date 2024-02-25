@@ -17,15 +17,8 @@ public class PostgreSQLDockerServiceConfigurer extends BaseDatabaseDockerService
     }
 
     private SQLDatabaseDockerServiceConfig createConfig() {
-        var resolvedName = ServiceNameResolver.resolve(SERVICE, getName());
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, getDockerImageVersion());
-        var databaseSchemas = getDatabaseSchemas();
-        var registerEndpointUnderProperties = getRegisterEndpointUnderProperties();
-        var registerEndpointUnderEnvVariables = getRegisterEndpointUnderEnvironmentVariables();
-        var registerUsernameUnderProperty = getRegisterUsernameUnderProperty();
-        var registerUsernameUnderEnvVariable = getRegisterUsernameUnderEnvironmentVariable();
-        var registerPasswordUnderProperty = getRegisterPasswordUnderProperty();
-        var registerPasswordUnderEnvVariable = getRegisterPasswordUnderEnvironmentVariable();
+        var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
+        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
 
         return SQLDatabaseDockerServiceConfig
                 .builder()
@@ -33,12 +26,12 @@ public class PostgreSQLDockerServiceConfigurer extends BaseDatabaseDockerService
                 .dockerImage(resolvedDockerImage)
                 .scheme(JDBC_SCHEME)
                 .databaseSchemas(databaseSchemas)
-                .registerUsernameUnderProperty(registerUsernameUnderProperty)
-                .registerUsernameUnderEnvironmentVariable(registerUsernameUnderEnvVariable)
-                .registerPasswordUnderProperty(registerPasswordUnderProperty)
-                .registerPasswordUnderEnvironmentVariable(registerPasswordUnderEnvVariable)
+                .registerUsernameUnderProperties(registerUsernameUnderProperties)
+                .registerUsernameUnderEnvironmentVariables(registerUsernameUnderEnvironmentVariables)
+                .registerPasswordUnderProperties(registerPasswordUnderProperties)
+                .registerPasswordUnderEnvironmentVariables(registerPasswordUnderEnvironmentVariables)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
-                .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvVariables)
+                .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)
                 .build();
     }
 

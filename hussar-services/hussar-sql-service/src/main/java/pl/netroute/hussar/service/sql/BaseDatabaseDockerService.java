@@ -2,11 +2,10 @@ package pl.netroute.hussar.service.sql;
 
 import lombok.NonNull;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.helper.CollectionHelper;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
-
-import java.util.Optional;
 
 abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfig> extends BaseDockerService<C> implements SQLDatabaseDockerService {
     private final SQLDatabaseCredentials credentials;
@@ -36,23 +35,23 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
     }
 
     private void registerCredentialsUnderProperties() {
-        Optional
-                .ofNullable(config.getRegisterUsernameUnderProperty())
-                .ifPresent(usernameProperty -> credentialsRegisterer.registerUsernameUnderProperty(credentials, usernameProperty));
+        CollectionHelper
+                .getSetOrEmpty(config.getRegisterUsernameUnderProperties())
+                .forEach(usernameProperty -> credentialsRegisterer.registerUsernameUnderProperty(credentials, usernameProperty));
 
-        Optional
-                .ofNullable(config.getRegisterUsernameUnderEnvironmentVariable())
-                .ifPresent(usernameEnvVariable -> credentialsRegisterer.registerUsernameUnderEnvironmentVariable(credentials, usernameEnvVariable));
+        CollectionHelper
+                .getSetOrEmpty(config.getRegisterPasswordUnderProperties())
+                .forEach(passwordProperty -> credentialsRegisterer.registerPasswordUnderProperty(credentials, passwordProperty));
     }
 
     private void registerCredentialsUnderEnvironmentVariables() {
-        Optional
-                .ofNullable(config.getRegisterPasswordUnderProperty())
-                .ifPresent(passwordProperty -> credentialsRegisterer.registerPasswordUnderProperty(credentials, passwordProperty));
+        CollectionHelper
+                .getSetOrEmpty(config.getRegisterUsernameUnderEnvironmentVariables())
+                .forEach(usernameEnvVariable -> credentialsRegisterer.registerUsernameUnderEnvironmentVariable(credentials, usernameEnvVariable));
 
-        Optional
-                .ofNullable(config.getRegisterPasswordUnderEnvironmentVariable())
-                .ifPresent(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
+        CollectionHelper
+                .getSetOrEmpty(config.getRegisterPasswordUnderEnvironmentVariables())
+                .forEach(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
     }
 
     private void initializeDatabaseSchemas() {

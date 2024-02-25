@@ -11,7 +11,7 @@ import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 import java.util.Optional;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-class DatabaseCredentialsRegisterer {
+class MongoDBCredentialsRegisterer {
 
     @NonNull
     private final ConfigurationRegistry configurationRegistry;
@@ -27,7 +27,7 @@ class DatabaseCredentialsRegisterer {
     void registerPasswordUnderProperty(@NonNull MongoDBCredentials credentials,
                                        @NonNull String passwordProperty) {
         Optional
-                .ofNullable(passwordProperty)
+                .of(passwordProperty)
                 .map(property -> new PropertyConfigurationEntry(property, credentials.password()))
                 .ifPresent(configurationRegistry::register);
     }
@@ -43,7 +43,7 @@ class DatabaseCredentialsRegisterer {
     void registerPasswordUnderEnvironmentVariable(@NonNull MongoDBCredentials credentials,
                                                   @NonNull String passwordEnvVariable) {
         Optional
-                .ofNullable(passwordEnvVariable)
+                .of(passwordEnvVariable)
                 .map(property -> new EnvVariableConfigurationEntry(property, credentials.password()))
                 .ifPresent(configurationRegistry::register);
     }

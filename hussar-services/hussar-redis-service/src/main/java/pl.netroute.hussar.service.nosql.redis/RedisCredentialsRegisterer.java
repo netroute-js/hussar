@@ -1,4 +1,4 @@
-package pl.netroute.hussar.service.sql;
+package pl.netroute.hussar.service.nosql.redis;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -6,17 +6,17 @@ import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
-import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
+import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 
 import java.util.Optional;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-class DatabaseCredentialsRegisterer {
+class RedisCredentialsRegisterer {
 
     @NonNull
     private final ConfigurationRegistry configurationRegistry;
 
-    void registerUsernameUnderProperty(@NonNull SQLDatabaseCredentials credentials,
+    void registerUsernameUnderProperty(@NonNull RedisCredentials credentials,
                                        @NonNull String usernameProperty) {
         Optional
                 .of(usernameProperty)
@@ -24,7 +24,7 @@ class DatabaseCredentialsRegisterer {
                 .ifPresent(configurationRegistry::register);
     }
 
-    void registerPasswordUnderProperty(@NonNull SQLDatabaseCredentials credentials,
+    void registerPasswordUnderProperty(@NonNull RedisCredentials credentials,
                                        @NonNull String passwordProperty) {
         Optional
                 .of(passwordProperty)
@@ -32,7 +32,7 @@ class DatabaseCredentialsRegisterer {
                 .ifPresent(configurationRegistry::register);
     }
 
-    void registerUsernameUnderEnvironmentVariable(@NonNull SQLDatabaseCredentials credentials,
+    void registerUsernameUnderEnvironmentVariable(@NonNull RedisCredentials credentials,
                                                   @NonNull String usernameEnvVariable) {
         Optional
                 .of(usernameEnvVariable)
@@ -40,7 +40,7 @@ class DatabaseCredentialsRegisterer {
                 .ifPresent(configurationRegistry::register);
     }
 
-    void registerPasswordUnderEnvironmentVariable(@NonNull SQLDatabaseCredentials credentials,
+    void registerPasswordUnderEnvironmentVariable(@NonNull RedisCredentials credentials,
                                                   @NonNull String passwordEnvVariable) {
         Optional
                 .of(passwordEnvVariable)

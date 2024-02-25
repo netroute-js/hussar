@@ -19,11 +19,9 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
     }
 
     private WiremockDockerServiceConfig createConfig() {
-        var resolvedName = ServiceNameResolver.resolve(SERVICE, getName());
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, getDockerImageVersion());
+        var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
+        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
         var scheme = SchemesHelper.HTTP_SCHEME;
-        var registerEndpointUnderProperties = getRegisterEndpointUnderProperties();
-        var registerEndpointUnderEnvVariables = getRegisterEndpointUnderEnvironmentVariables();
 
         return WiremockDockerServiceConfig
                 .builder()
@@ -31,7 +29,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
                 .dockerImage(resolvedDockerImage)
                 .scheme(scheme)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
-                .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvVariables)
+                .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)
                 .build();
     }
 

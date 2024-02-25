@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @RequiredArgsConstructor
 public class SQLDBAssertionHelper {
@@ -47,15 +48,9 @@ public class SQLDBAssertionHelper {
         var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
         var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
 
-        try {
-            createTemplate(schema, endpoint).execute(command);
-
-            throw new AssertionError("Expected database to be not accessible");
-        } catch (Exception ex) {
-            assertThat(ex)
-                    .isInstanceOf(CannotGetJdbcConnectionException.class)
-                    .hasMessage("Failed to obtain JDBC Connection");
-        }
+        assertThatThrownBy(() -> createTemplate(schema, endpoint).execute(command))
+                .isInstanceOf(CannotGetJdbcConnectionException.class)
+                .hasMessage("Failed to obtain JDBC Connection");
     }
 
     public void assertTablesCreated(@NonNull String schema, @NonNull List<String> tables) {

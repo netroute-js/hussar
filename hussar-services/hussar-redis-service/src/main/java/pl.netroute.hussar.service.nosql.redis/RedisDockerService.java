@@ -1,29 +1,31 @@
-package pl.netroute.hussar.service.nosql.mongodb;
+package pl.netroute.hussar.service.nosql.redis;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.CollectionHelper;
 import pl.netroute.hussar.core.service.BaseDockerService;
-import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
+import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 
-public class MongoDBDockerService extends BaseDockerService<MongoDBDockerServiceConfig> {
-    private static final int LISTENING_PORT = 27017;
+public class RedisDockerService extends BaseDockerService<RedisDockerServiceConfig> {
+    private static final int LISTENING_PORT = 6379;
 
-    private static final String MONGO_DB_USERNAME_ENV = "MONGO_INITDB_ROOT_USERNAME";
-    private static final String MONGO_DB_PASSWORD_ENV = "MONGO_INITDB_ROOT_PASSWORD";
+    private static final String REDIS_USERNAME = "default";
+    private static final String REDIS_PASSWORD = "test";
 
-    private static final String MONGO_DB_USERNAME = "mongo";
-    private static final String MONGO_DB_PASSWORD = "test";
+    private final RedisCredentials credentials;
+    private final RedisCredentialsRegisterer credentialsRegisterer;
 
-    private final MongoDBCredentials credentials;
-    private final MongoDBCredentialsRegisterer credentialsRegisterer;
-
-    MongoDBDockerService(@NonNull MongoDBDockerServiceConfig config) {
+    RedisDockerService(@NonNull RedisDockerServiceConfig config) {
         super(config);
 
-        this.credentials = new MongoDBCredentials(MONGO_DB_USERNAME, MONGO_DB_PASSWORD);
-        this.credentialsRegisterer = new MongoDBCredentialsRegisterer(configurationRegistry);
+        if(isPasswordEnabled()) {
+            this.credentials = new RedisCredentials(REDIS_USERNAME, REDIS_PASSWORD);
+        } else {
+            this.credentials = RedisCredentials.passwordLess(REDIS_USERNAME);
+        }
+
+        this.credentialsRegisterer = new RedisCredentialsRegisterer(configurationRegistry);
     }
 
     @Override
@@ -31,21 +33,27 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
         super.configureContainer(container);
 
         container
-                .withExposedPorts(LISTENING_PORT)
-                .withEnv(MONGO_DB_USERNAME_ENV, MONGO_DB_USERNAME)
-                .withEnv(MONGO_DB_PASSWORD_ENV, MONGO_DB_PASSWORD);
+                .withExposedPorts(LISTENING_PORT);
     }
 
     @Override
     protected void doAfterServiceStartup(ServiceStartupContext context) {
         super.doAfterServiceStartup(context);
 
+        if(isPasswordEnabled()) {
+            new RedisPasswordConfigurer(container).configure(credentials);
+        }
+
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
     }
 
-    public MongoDBCredentials getCredentials() {
+    public RedisCredentials getCredentials() {
         return credentials;
+    }
+
+    private boolean isPasswordEnabled() {
+        return config.isEnablePassword();
     }
 
     private void registerCredentialsUnderProperties() {
@@ -67,4 +75,5 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
                 .getSetOrEmpty(config.getRegisterPasswordUnderEnvironmentVariables())
                 .forEach(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
     }
+
 }

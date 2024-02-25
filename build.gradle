@@ -1,6 +1,6 @@
 plugins {
     id "java" apply true
-    id "io.freefair.lombok" version "8.4" apply true
+    id "io.freefair.lombok" version "8.6" apply true
 }
 
 allprojects {
