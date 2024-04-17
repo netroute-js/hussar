@@ -1,45 +1,25 @@
 package pl.netroute.hussar.core;
 
+import lombok.NonNull;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 
-import java.util.Objects;
-
-public class Endpoint {
+public record Endpoint(@NonNull String scheme,
+                       @NonNull String host,
+                       int port) {
     private static final String ADDRESS_FORMAT = "%s%s:%d";
 
-    private final String address;
-    private final String host;
-    private final int port;
-
-    private Endpoint(String scheme,
-                     String host,
-                     int port) {
-        Objects.requireNonNull(scheme, "scheme cannot be null");
-        Objects.requireNonNull(host, "host cannot be null");
-
+    public Endpoint {
         if(port <= 0) {
             throw new IllegalArgumentException("Expected a valid port");
         }
-
-        this.host = host;
-        this.port = port;
-        this.address = String.format(ADDRESS_FORMAT, scheme, host, port);
     }
 
-    public String getAddress() {
-        return address;
+    public String address() {
+        return ADDRESS_FORMAT.formatted(scheme, host, port);
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public static Endpoint of(String host,
-                              int port) {
+    public static Endpoint schemeLess(String host,
+                                      int port) {
         return new Endpoint(SchemesHelper.EMPTY_SCHEME, host, port);
     }
 

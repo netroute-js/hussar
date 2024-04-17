@@ -1,124 +1,224 @@
 package pl.netroute.hussar.service.sql;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
-import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
+import pl.netroute.hussar.service.sql.registerer.DatabaseCredentialsRegisterer;
+import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
+
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertNoSchemaInitialized;
+import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemaInitialized;
 
 public class MySQLDockerServiceTest {
-    private static final List<String> TABLES = List.of("table_a", "table_b");
+    private static final String MYSQL_HOST = "localhost";
+    private static final int MYSQL_LISTENING_PORT = 3306;
+    private static final int MYSQL_MAPPED_PORT = 30120;
 
-    private MySQLDockerService databaseService;
+    private static final String MYSQL_SERVICE_NAME = "mysql-service";
+    private static final String MYSQL_SERVICE_IMAGE = "mysql";
 
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(databaseService)
-                .ifPresent(MySQLDockerService::shutdown);
-    }
+    private static final String MYSQL_SCHEME = "jdbc:mysql://";
+
+    private static final String MYSQL_PASSWORD_ENV = "MYSQL_ROOT_PASSWORD";
+
+    private static final String MYSQL_USERNAME = "root";
+    private static final String MYSQL_PASSWORD = "test";
+    private static final SQLDatabaseCredentials MYSQL_CREDENTIALS = new SQLDatabaseCredentials(MYSQL_USERNAME, MYSQL_PASSWORD);
 
     @Test
-    public void shouldStartDatabaseService() {
+    public void shouldStartMinimalService() {
         // given
-        var schemaName = "hussardb";
-        var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
+        var config = SQLDatabaseDockerServiceConfig
+                .builder()
+                .name(MYSQL_SERVICE_NAME)
+                .dockerImage(MYSQL_SERVICE_IMAGE)
+                .scheme(MYSQL_SCHEME)
+                .databaseSchemas(Set.of())
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
 
-        databaseService = MySQLDockerServiceConfigurer
-                .newInstance()
-                .databaseSchema(databaseSchema)
-                .done()
-                .configure();
+        var container = createStubContainer();
+        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
+        var service = createDatabaseService(config, container, schemaInitializer);
+
+        givenContainerAccessible(container);
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
-        databaseAssertion.assertNoEntriesRegistered();
+        var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
+        var envVariables = Map.of(MYSQL_PASSWORD_ENV, MYSQL_PASSWORD);
+
+        assertContainerStarted(container);
+        assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
+        assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerLoggingConfigured(container);
+        assertContainerEnvVariablesConfigured(container, envVariables);
+        assertName(service, MYSQL_SERVICE_NAME);
+        assertSingleEndpoint(service, endpoint);
+        assertNoSchemaInitialized(schemaInitializer);
+        assertNoEntriesRegistered(service);
     }
 
     @Test
-    public void shouldStartDatabaseServiceWithFullConfiguration() {
+    public void shouldStartExtendedService() {
         // given
-        var name = "mysql-instance";
-        var dockerVersion = "8.2.0";
+        var schemaA = SQLDatabaseSchema.scriptLess("schemaA");
+        var schemaB = new SQLDatabaseSchema("schemaB", "/some/location");
+        var schemas = Set.of(schemaA, schemaB);
 
-        var endpointProperty = "mysql.url";
-        var endpointEnvVariable = "MYSQL_URL";
+        var endpointProperty = "endpoint.url";
+        var endpointEnvVariable = "ENDPOINT_URL";
 
         var usernameProperty = "mysql.username";
         var usernameEnvVariable = "MYSQL_USERNAME";
 
-        var passwordProperty = "mysql.password";
+        var passwordProperty = "redis.password";
         var passwordEnvVariable = "MYSQL_PASSWORD";
 
-        var schemaName = "hussardb";
-        var scriptsLocation = "/flyway/scripts";
-        var databaseSchema = new SQLDatabaseSchema(schemaName, scriptsLocation);
+        var config = SQLDatabaseDockerServiceConfig
+                .builder()
+                .name(MYSQL_SERVICE_NAME)
+                .dockerImage(MYSQL_SERVICE_IMAGE)
+                .scheme(MYSQL_SCHEME)
+                .databaseSchemas(schemas)
+                .registerEndpointUnderProperties(Set.of(endpointProperty))
+                .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
+                .registerUsernameUnderProperties(Set.of(usernameProperty))
+                .registerUsernameUnderEnvironmentVariables(Set.of(usernameEnvVariable))
+                .registerPasswordUnderProperties(Set.of(passwordProperty))
+                .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
+                .build();
 
-        databaseService = MySQLDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .databaseSchema(databaseSchema)
-                .registerEndpointUnderProperty(endpointProperty)
-                .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
-                .registerUsernameUnderProperty(usernameProperty)
-                .registerUsernameUnderEnvironmentVariable(usernameEnvVariable)
-                .registerPasswordUnderProperty(passwordProperty)
-                .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
-                .done()
-                .configure();
+        var container = createStubContainer();
+        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
+        var service = createDatabaseService(config, container, schemaInitializer);
+
+        givenContainerAccessible(container);
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesCreated(schemaName, TABLES);
-        databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
+        var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
+        var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
+
+        var usernamePropertyEntry = ConfigurationEntry.property(usernameProperty, MYSQL_USERNAME);
+        var usernameEnvVariableEntry = ConfigurationEntry.envVariable(usernameEnvVariable, MYSQL_USERNAME);
+
+        var passwordPropertyEntry = ConfigurationEntry.property(passwordProperty, MYSQL_PASSWORD);
+        var passwordEnvVariableEntry = ConfigurationEntry.envVariable(passwordEnvVariable, MYSQL_PASSWORD);
+
+        var registeredEntries = List.<ConfigurationEntry>of(
+                endpointPropertyEntry,
+                endpointEnvVariableEntry,
+                usernamePropertyEntry,
+                usernameEnvVariableEntry,
+                passwordPropertyEntry,
+                passwordEnvVariableEntry
+        );
+
+        var envVariables = Map.of(
+                MYSQL_PASSWORD_ENV, MYSQL_PASSWORD
+        );
+
+        assertContainerStarted(container);
+        assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
+        assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerLoggingConfigured(container);
+        assertContainerEnvVariablesConfigured(container, envVariables);
+        assertName(service, MYSQL_SERVICE_NAME);
+        assertSingleEndpoint(service, endpoint);
+        assertSchemaInitialized(schemaInitializer, service, MYSQL_CREDENTIALS, schemas);
+        assertEntriesRegistered(service, registeredEntries);
     }
 
     @Test
-    public void shouldShutdownDatabaseService() {
-        var name = "mysql-instance";
-        var dockerVersion = "8.2.0";
+    public void shouldShutdownService() {
+        // given
+        var config = SQLDatabaseDockerServiceConfig
+                .builder()
+                .name(MYSQL_SERVICE_NAME)
+                .dockerImage(MYSQL_SERVICE_IMAGE)
+                .scheme(MYSQL_SCHEME)
+                .databaseSchemas(Set.of())
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
 
-        var schemaName = "hussardb";
-        var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
+        var container = createStubContainer();
+        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
+        var service = createDatabaseService(config, container, schemaInitializer);
 
-        databaseService = MySQLDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .databaseSchema(databaseSchema)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure();
+        givenContainerAccessible(container);
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
-
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
-
-        databaseService.shutdown();
+        service.shutdown();
 
         // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        assertContainerStopped(container);
     }
+
+    private GenericContainer<?> createStubContainer() {
+        return mock(GenericContainer.class, RETURNS_DEEP_STUBS);
+    }
+
+    private void givenContainerAccessible(GenericContainer<?> container) {
+        when(container.getHost()).thenReturn(MYSQL_HOST);
+        when(container.getExposedPorts()).thenReturn(List.of(MYSQL_LISTENING_PORT));
+        when(container.getMappedPort(MYSQL_LISTENING_PORT)).thenReturn(MYSQL_MAPPED_PORT);
+    }
+
+    private MySQLDockerService createDatabaseService(SQLDatabaseDockerServiceConfig config,
+                                                       GenericContainer<?> container,
+                                                       DatabaseSchemaInitializer schemaInitializer) {
+        var configurationRegistry = new MapConfigurationRegistry();
+        var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
+        var credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
+
+        return new MySQLDockerService(
+                container,
+                config,
+                configurationRegistry,
+                endpointRegisterer,
+                credentialsRegisterer,
+                schemaInitializer
+        );
+    }
+
 }

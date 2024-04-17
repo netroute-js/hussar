@@ -1,28 +1,28 @@
 package pl.netroute.hussar.core.service;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.Service;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
+@RequiredArgsConstructor
 public abstract class BaseService<C extends BaseServiceConfig> implements Service {
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
+    @NonNull
     protected final C config;
+
+    @NonNull
     protected final ConfigurationRegistry configurationRegistry;
 
-    private final EndpointRegisterer endpointRegisterer;
-
-    public BaseService(@NonNull C config) {
-        this.config = config;
-        this.configurationRegistry = new MapConfigurationRegistry();
-        this.endpointRegisterer = new EndpointRegisterer(configurationRegistry);
-    }
+    @NonNull
+    protected final EndpointRegisterer endpointRegisterer;
 
     @Override
     public final void start(@NonNull ServiceStartupContext context) {

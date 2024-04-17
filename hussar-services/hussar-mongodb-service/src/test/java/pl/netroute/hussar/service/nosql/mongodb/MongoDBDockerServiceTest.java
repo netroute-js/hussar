@@ -1,105 +1,201 @@
 package pl.netroute.hussar.service.nosql.mongodb;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.nosql.assertion.MongoDBAssertionHelper;
+import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.service.nosql.mongodb.registerer.MongoDBCredentialsRegisterer;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 
 public class MongoDBDockerServiceTest {
-    private MongoDBDockerService databaseService;
+    private static final String MONGO_DB_HOST = "localhost";
+    private static final int MONGO_DB_LISTENING_PORT = 27017;
+    private static final int MONGO_DB_MAPPED_PORT = 27000;
 
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(databaseService)
-                .ifPresent(MongoDBDockerService::shutdown);
-    }
+    private static final String MONGO_DB_SERVICE_NAME = "mongodb-service";
+    private static final String MONGO_DB_SERVICE_IMAGE = "mongo";
+
+    private static final String MONGO_DB_SCHEME = "mongodb://";
+
+    private static final String MONGO_DB_USERNAME_ENV = "MONGO_INITDB_ROOT_USERNAME";
+    private static final String MONGO_DB_PASSWORD_ENV = "MONGO_INITDB_ROOT_PASSWORD";
+
+    private static final String MONGO_DB_USERNAME = "mongo";
+    private static final String MONGO_DB_PASSWORD = "test";
 
     @Test
-    public void shouldStartDatabaseService() {
+    public void shouldStartMinimalService() {
         // given
-        databaseService = MongoDBDockerServiceConfigurer
-                .newInstance()
-                .done()
-                .configure();
+        var config = MongoDBDockerServiceConfig
+                .builder()
+                .name(MONGO_DB_SERVICE_NAME)
+                .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .scheme(MONGO_DB_SCHEME)
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
+
+        var container = createStubContainer();
+        var service = createMongoDBService(config, container);
+
+        givenContainerAccessible(container);
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible();
-        databaseAssertion.assertNoEntriesRegistered();
+        var endpoint = Endpoint.of(MONGO_DB_SCHEME, MONGO_DB_HOST, MONGO_DB_MAPPED_PORT);
+        var envVariables = Map.of(
+            MONGO_DB_USERNAME_ENV, MONGO_DB_USERNAME,
+            MONGO_DB_PASSWORD_ENV, MONGO_DB_PASSWORD
+        );
+
+        assertContainerStarted(container);
+        assertContainerExposedPortConfigured(container, MONGO_DB_LISTENING_PORT);
+        assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerLoggingConfigured(container);
+        assertContainerEnvVariablesConfigured(container, envVariables);
+        assertName(service, MONGO_DB_SERVICE_NAME);
+        assertSingleEndpoint(service, endpoint);
+        assertNoEntriesRegistered(service);
     }
 
     @Test
-    public void shouldStartDatabaseServiceWithFullConfiguration() {
+    public void shouldStartExtendedService() {
         // given
-        var name = "mongodb-instance";
-        var dockerVersion = "6.0.13";
+        var endpointProperty = "endpoint.url";
+        var endpointEnvVariable = "ENDPOINT_URL";
 
-        var endpointProperty = "mongodb.url";
-        var endpointEnvVariable = "MONGODB_URL";
+        var usernameProperty = "mongo.username";
+        var usernameEnvVariable = "MONGO_USERNAME";
 
-        var usernameProperty = "mongodb.username";
-        var usernameEnvVariable = "MONGODB_USERNAME";
+        var passwordProperty = "mongo.password";
+        var passwordEnvVariable = "MONGO_PASSWORD";
 
-        var passwordProperty = "mongodb.password";
-        var passwordEnvVariable = "MONGODB_PASSWORD";
+        var config = MongoDBDockerServiceConfig
+                .builder()
+                .name(MONGO_DB_SERVICE_NAME)
+                .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .scheme(MONGO_DB_SCHEME)
+                .registerEndpointUnderProperties(Set.of(endpointProperty))
+                .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
+                .registerUsernameUnderProperties(Set.of(usernameProperty))
+                .registerUsernameUnderEnvironmentVariables(Set.of(usernameEnvVariable))
+                .registerPasswordUnderProperties(Set.of(passwordProperty))
+                .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
+                .build();
 
-        databaseService = MongoDBDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .registerEndpointUnderProperty(endpointProperty)
-                .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
-                .registerUsernameUnderProperty(usernameProperty)
-                .registerUsernameUnderEnvironmentVariable(usernameEnvVariable)
-                .registerPasswordUnderProperty(passwordProperty)
-                .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
-                .done()
-                .configure();
+        var container = createStubContainer();
+        var service = createMongoDBService(config, container);
+
+        givenContainerAccessible(container);
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.empty());
 
         // then
-        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible();
-        databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        var endpoint = Endpoint.of(MONGO_DB_SCHEME, MONGO_DB_HOST, MONGO_DB_MAPPED_PORT);
+        var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
+        var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
+
+        var usernamePropertyEntry = ConfigurationEntry.property(usernameProperty, MONGO_DB_USERNAME);
+        var usernameEnvVariableEntry = ConfigurationEntry.envVariable(usernameEnvVariable, MONGO_DB_USERNAME);
+
+        var passwordPropertyEntry = ConfigurationEntry.property(passwordProperty, MONGO_DB_PASSWORD);
+        var passwordEnvVariableEntry = ConfigurationEntry.envVariable(passwordEnvVariable, MONGO_DB_PASSWORD);
+
+        var registeredEntries = List.<ConfigurationEntry>of(
+                endpointPropertyEntry,
+                endpointEnvVariableEntry,
+                usernamePropertyEntry,
+                usernameEnvVariableEntry,
+                passwordPropertyEntry,
+                passwordEnvVariableEntry
+        );
+
+        var envVariables = Map.of(
+                MONGO_DB_USERNAME_ENV, MONGO_DB_USERNAME,
+                MONGO_DB_PASSWORD_ENV, MONGO_DB_PASSWORD
+        );
+
+        assertContainerStarted(container);
+        assertContainerExposedPortConfigured(container, MONGO_DB_LISTENING_PORT);
+        assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerLoggingConfigured(container);
+        assertContainerEnvVariablesConfigured(container, envVariables);
+        assertName(service, MONGO_DB_SERVICE_NAME);
+        assertSingleEndpoint(service, endpoint);
+        assertEntriesRegistered(service, registeredEntries);
     }
 
     @Test
-    public void shouldShutdownDatabaseService() {
-        var name = "mongodb-instance";
-        var dockerVersion = "6.0.13";
+    public void shouldShutdownService() {
+        // given
+        var config = MongoDBDockerServiceConfig
+                .builder()
+                .name(MONGO_DB_SERVICE_NAME)
+                .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .scheme(SchemesHelper.HTTP_SCHEME)
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
 
-        databaseService = MongoDBDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure();
+        var container = createStubContainer();
+        var service = createMongoDBService(config, container);
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
-
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
-
-        databaseService.shutdown();
+        service.shutdown();
 
         // then
-        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(endpoint);
+        assertContainerStopped(container);
+    }
+
+    private MongoDBDockerService createMongoDBService(MongoDBDockerServiceConfig config,
+                                                      GenericContainer<?> container) {
+        var configurationRegistry = new MapConfigurationRegistry();
+        var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
+        var credentialsRegisterer = new MongoDBCredentialsRegisterer(configurationRegistry);
+
+        return new MongoDBDockerService(container, config, configurationRegistry, endpointRegisterer, credentialsRegisterer);
+    }
+
+    private GenericContainer<?> createStubContainer() {
+        return mock(GenericContainer.class, RETURNS_DEEP_STUBS);
+    }
+
+    private void givenContainerAccessible(GenericContainer<?> container) {
+        when(container.getHost()).thenReturn(MONGO_DB_HOST);
+        when(container.getExposedPorts()).thenReturn(List.of(MONGO_DB_LISTENING_PORT));
+        when(container.getMappedPort(MONGO_DB_LISTENING_PORT)).thenReturn(MONGO_DB_MAPPED_PORT);
     }
 }

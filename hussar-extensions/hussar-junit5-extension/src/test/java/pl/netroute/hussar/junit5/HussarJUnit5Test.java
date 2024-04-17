@@ -1,6 +1,6 @@
 package pl.netroute.hussar.junit5;
 
-import com.netroute.hussar.service.wiremock.WiremockDockerService;
+import pl.netroute.hussar.service.wiremock.WiremockDockerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import pl.netroute.hussar.core.annotation.HussarApplication;
@@ -34,8 +34,8 @@ public class HussarJUnit5Test {
         var wiremockEndpointA = wiremockServiceA.getEndpoints().get(0);
         var wiremockEndpointB = wiremockServiceB.getEndpoints().get(0);
 
-        var wiremockClientA = new WiremockClient(wiremockEndpointA.getAddress());
-        var wiremockClientB = new WiremockClient(wiremockEndpointB.getAddress());
+        var wiremockClientA = new WiremockClient(wiremockEndpointA.address());
+        var wiremockClientB = new WiremockClient(wiremockEndpointB.address());
 
         var applicationClient = applicationClient(application);
 
@@ -48,8 +48,8 @@ public class HussarJUnit5Test {
         assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.PROPERTY_A, TestEnvironmentConfigurerProvider.PROPERTY_A_VALUE);
         assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.PROPERTY_B, TestEnvironmentConfigurerProvider.PROPERTY_B_VALUE);
         assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.SUB_PROPERTY_A, TestEnvironmentConfigurerProvider.ENV_VARIABLE_A_VALUE);
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.WIREMOCK_INSTANCE_A_URL_PROPERTY, wiremockEndpointA.getAddress());
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.WIREMOCK_INSTANCE_B_URL_PROPERTY, wiremockEndpointB.getAddress());
+        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.WIREMOCK_INSTANCE_A_URL_PROPERTY, wiremockEndpointA.address());
+        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.WIREMOCK_INSTANCE_B_URL_PROPERTY, wiremockEndpointB.address());
     }
 
     private void assertWiremockReachable(WiremockClient wiremock) {

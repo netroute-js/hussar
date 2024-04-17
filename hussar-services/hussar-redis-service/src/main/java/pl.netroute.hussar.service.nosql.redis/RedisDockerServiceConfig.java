@@ -1,7 +1,7 @@
 package pl.netroute.hussar.service.nosql.redis;
 
 import lombok.EqualsAndHashCode;
-import lombok.Singular;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.SuperBuilder;
 import pl.netroute.hussar.core.helper.CollectionHelper;
@@ -15,16 +15,16 @@ import java.util.Set;
 class RedisDockerServiceConfig extends BaseDockerServiceConfig {
     boolean enablePassword;
 
-    @Singular
+    @NonNull
     Set<String> registerUsernameUnderProperties;
 
-    @Singular
+    @NonNull
     Set<String> registerUsernameUnderEnvironmentVariables;
 
-    @Singular
+    @NonNull
     Set<String> registerPasswordUnderProperties;
 
-    @Singular
+    @NonNull
     Set<String> registerPasswordUnderEnvironmentVariables;
 
     protected RedisDockerServiceConfig(RedisDockerServiceConfig.RedisDockerServiceConfigBuilder<?, ?> builder) {
@@ -35,10 +35,10 @@ class RedisDockerServiceConfig extends BaseDockerServiceConfig {
         }
 
         this.enablePassword = builder.enablePassword;
-        this.registerUsernameUnderProperties = CollectionHelper.getSetOrEmpty(builder.registerUsernameUnderProperties);
-        this.registerUsernameUnderEnvironmentVariables = CollectionHelper.getSetOrEmpty(builder.registerUsernameUnderEnvironmentVariables);
-        this.registerPasswordUnderProperties = CollectionHelper.getSetOrEmpty(builder.registerPasswordUnderProperties);
-        this.registerPasswordUnderEnvironmentVariables = CollectionHelper.getSetOrEmpty(builder.registerPasswordUnderEnvironmentVariables);
+        this.registerUsernameUnderProperties = builder.registerUsernameUnderProperties;
+        this.registerUsernameUnderEnvironmentVariables = builder.registerUsernameUnderEnvironmentVariables;
+        this.registerPasswordUnderProperties = builder.registerPasswordUnderProperties;
+        this.registerPasswordUnderEnvironmentVariables = builder.registerPasswordUnderEnvironmentVariables;
     }
 
     private boolean isPasswordConfigurationValid(RedisDockerServiceConfig.RedisDockerServiceConfigBuilder<?, ?> builder) {

@@ -22,7 +22,7 @@ public class ClientFactory {
     public static <T> T create(@NonNull Endpoint endpoint,
                                @NonNull Class<T> type) {
 
-        var url = endpoint.getAddress();
+        var url = endpoint.address();
 
         var clientBuilder = Feign.builder()
                 .encoder(new SpringEncoder(HttpMessageConverters::new))

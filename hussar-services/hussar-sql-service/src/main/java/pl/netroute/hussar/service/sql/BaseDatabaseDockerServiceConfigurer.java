@@ -11,15 +11,19 @@ import java.util.Set;
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 abstract class BaseDatabaseDockerServiceConfigurer<S extends SQLDatabaseDockerService> extends BaseDockerServiceConfigurer<S> {
 
+    @NonNull
     @Singular
     protected final Set<String> registerUsernameUnderProperties;
 
+    @NonNull
     @Singular
     protected final Set<String> registerUsernameUnderEnvironmentVariables;
 
+    @NonNull
     @Singular
     protected final Set<String> registerPasswordUnderProperties;
 
+    @NonNull
     @Singular
     protected final Set<String> registerPasswordUnderEnvironmentVariables;
 

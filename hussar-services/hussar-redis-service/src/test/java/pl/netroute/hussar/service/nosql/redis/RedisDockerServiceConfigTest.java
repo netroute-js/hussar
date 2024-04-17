@@ -23,7 +23,10 @@ public class RedisDockerServiceConfigTest {
                     .enablePassword(false)
                     .registerEndpointUnderProperties(Set.of())
                     .registerEndpointUnderEnvironmentVariables(Set.of())
-                    .registerPasswordUnderProperty(passwordProperty)
+                    .registerUsernameUnderProperties(Set.of())
+                    .registerUsernameUnderEnvironmentVariables(Set.of())
+                    .registerPasswordUnderProperties(Set.of(passwordProperty))
+                    .registerPasswordUnderEnvironmentVariables(Set.of())
                     .build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Redis password is disabled but password registration is required");
@@ -45,7 +48,10 @@ public class RedisDockerServiceConfigTest {
                         .enablePassword(false)
                         .registerEndpointUnderProperties(Set.of())
                         .registerEndpointUnderEnvironmentVariables(Set.of())
-                        .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
+                        .registerUsernameUnderProperties(Set.of())
+                        .registerUsernameUnderEnvironmentVariables(Set.of())
+                        .registerPasswordUnderProperties(Set.of())
+                        .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                         .build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Redis password is disabled but password registration is required");

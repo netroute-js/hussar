@@ -67,8 +67,9 @@ dependencyResolutionManagement {
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef(junit5Version)
             library("assertj-core", "org.assertj", "assertj-core").versionRef(assertjVersion)
             library("mockito-core", "org.mockito", "mockito-core").versionRef(mockitoVersion)
+            library("mockito-inline", "org.mockito", "mockito-inline").versionRef(mockitoVersion)
 
-            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core'])
+            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core', 'mockito-inline'])
         }
     }
 }

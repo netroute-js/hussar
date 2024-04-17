@@ -13,14 +13,14 @@ public class EndpointTest {
         var port = 50000;
 
         // when
-        var endpoint = Endpoint.of(host, port);
+        var endpoint = Endpoint.schemeLess(host, port);
 
         // then
         var expectedAddress = String.format("%s:%d", host, port);
 
-        assertThat(endpoint.getHost()).isEqualTo(host);
-        assertThat(endpoint.getPort()).isEqualTo(port);
-        assertThat(endpoint.getAddress()).isEqualTo(expectedAddress);
+        assertThat(endpoint.host()).isEqualTo(host);
+        assertThat(endpoint.port()).isEqualTo(port);
+        assertThat(endpoint.address()).isEqualTo(expectedAddress);
     }
 
     @Test
@@ -36,9 +36,9 @@ public class EndpointTest {
         // then
         var expectedAddress = String.format("%s%s:%d", scheme, host, port);
 
-        assertThat(endpoint.getHost()).isEqualTo(host);
-        assertThat(endpoint.getPort()).isEqualTo(port);
-        assertThat(endpoint.getAddress()).isEqualTo(expectedAddress);
+        assertThat(endpoint.host()).isEqualTo(host);
+        assertThat(endpoint.port()).isEqualTo(port);
+        assertThat(endpoint.address()).isEqualTo(expectedAddress);
     }
 
 }

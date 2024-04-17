@@ -2,9 +2,13 @@ package pl.netroute.hussar.service.nosql.mongodb;
 
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
+import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
+import pl.netroute.hussar.core.service.container.GenericContainerFactory;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
+import pl.netroute.hussar.service.nosql.mongodb.registerer.MongoDBCredentialsRegisterer;
 
 import java.util.Set;
 
@@ -28,8 +32,18 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
 
     public MongoDBDockerService configure() {
         var config = createConfig();
+        var container = GenericContainerFactory.create(config);
+        var configurationRegistry = new MapConfigurationRegistry();
+        var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
+        var credentialsRegisterer = new MongoDBCredentialsRegisterer(configurationRegistry);
 
-        return new MongoDBDockerService(config);
+        return new MongoDBDockerService(
+                container,
+                config,
+                configurationRegistry,
+                endpointRegisterer,
+                credentialsRegisterer
+        );
     }
 
     private MongoDBDockerServiceConfig createConfig() {

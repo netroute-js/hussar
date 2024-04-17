@@ -5,20 +5,24 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public abstract class BaseDockerService<C extends BaseDockerServiceConfig> extends BaseService<C> {
     protected final GenericContainer<?> container;
 
-    public BaseDockerService(@NonNull C config) {
-        super(config);
+    public BaseDockerService(@NonNull GenericContainer<?> container,
+                             @NonNull C config,
+                             @NonNull ConfigurationRegistry configurationRegistry,
+                             @NonNull EndpointRegisterer endpointRegisterer) {
+        super(config, configurationRegistry, endpointRegisterer);
 
-        this.container = new GenericContainer<>(config.getDockerImage());
+        this.container = container;
     }
 
     @Override
@@ -33,7 +37,7 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
                 .stream()
                 .map(container::getMappedPort)
                 .map(mappedPort -> Endpoint.of(scheme, host, mappedPort))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     @Override

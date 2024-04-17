@@ -1,7 +1,15 @@
+plugins {
+	id 'java-test-fixtures'
+}
+
 dependencies {
 	implementation project(":hussar-core")
 	implementation libs.slf4j.api
 	implementation libs.testcontainers
 
 	testImplementation libs.bundles.testing
+
+	testFixturesImplementation libs.bundles.testing
+	testFixturesImplementation libs.testcontainers
+	testFixturesImplementation project(":hussar-core")
 }

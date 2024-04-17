@@ -180,9 +180,9 @@ public class SpringApplicationTest {
         assertThat(endpoints).hasSize(1);
 
         var endpoint = endpoints.get(0);
-        assertThat(endpoint.getHost()).isEqualTo(LOCALHOST);
-        assertThat(endpoint.getPort()).isBetween(PORT_RANGE_START, PORT_RANGE_END);
-        assertThat(endpoint.getAddress()).matches(ENDPOINT_REGEX);
+        assertThat(endpoint.host()).isEqualTo(LOCALHOST);
+        assertThat(endpoint.port()).isBetween(PORT_RANGE_START, PORT_RANGE_END);
+        assertThat(endpoint.address()).matches(ENDPOINT_REGEX);
     }
 
     private void assertPingEndpointAccessible(SimpleApplicationClient client) {

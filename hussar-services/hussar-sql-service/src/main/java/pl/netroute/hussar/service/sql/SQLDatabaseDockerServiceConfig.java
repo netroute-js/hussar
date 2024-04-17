@@ -13,10 +13,17 @@ import java.util.Set;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 class SQLDatabaseDockerServiceConfig extends BaseDockerServiceConfig {
+
+    @NonNull
     Set<String> registerUsernameUnderProperties;
+
+    @NonNull
     Set<String> registerUsernameUnderEnvironmentVariables;
 
+    @NonNull
     Set<String> registerPasswordUnderProperties;
+
+    @NonNull
     Set<String> registerPasswordUnderEnvironmentVariables;
 
     @NonNull

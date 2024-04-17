@@ -1,6 +1,6 @@
 package pl.netroute.hussar.junit5.config;
 
-import com.netroute.hussar.service.wiremock.WiremockDockerServiceConfigurer;
+import pl.netroute.hussar.service.wiremock.WiremockDockerServiceConfigurer;
 import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;

@@ -1,8 +1,13 @@
 package pl.netroute.hussar.service.sql;
 
 import lombok.experimental.SuperBuilder;
+import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.service.container.GenericContainerFactory;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
+import pl.netroute.hussar.service.sql.registerer.DatabaseCredentialsRegisterer;
+import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<MariaDBDockerService> {
@@ -12,8 +17,20 @@ public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceCon
 
     public MariaDBDockerService configure() {
         var config = createConfig();
+        var container = GenericContainerFactory.create(config);
+        var configurationRegistry = new MapConfigurationRegistry();
+        var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
+        var credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
+        var schemaInitializer = new DatabaseSchemaInitializer();
 
-        return new MariaDBDockerService(config);
+        return new MariaDBDockerService(
+                container,
+                config,
+                configurationRegistry,
+                endpointRegisterer,
+                credentialsRegisterer,
+                schemaInitializer
+        );
     }
 
     private SQLDatabaseDockerServiceConfig createConfig() {
