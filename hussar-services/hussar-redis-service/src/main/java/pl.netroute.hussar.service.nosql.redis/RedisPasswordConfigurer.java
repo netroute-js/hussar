@@ -12,16 +12,16 @@ class RedisPasswordConfigurer {
     private static final String CONFIGURE_PASSWORD_COMMAND = "redis-cli -h %s -p %d config set requirepass %s";
     private static final String COMMAND_SPLITTER = " ";
 
-    @NonNull
-    private final GenericContainer<?> container;
-
-    void configure(@NonNull RedisCredentials credentials) {
+    void configure(@NonNull RedisCredentials credentials,
+                   @NonNull GenericContainer<?> container) {
         container
                 .getExposedPorts()
-                .forEach(port -> configureInstancePassword(port, credentials));
+                .forEach(port -> configureInstancePassword(port, credentials, container));
     }
 
-    private void configureInstancePassword(int port, RedisCredentials credentials) {
+    private void configureInstancePassword(int port,
+                                           RedisCredentials credentials,
+                                           GenericContainer<?> container) {
         log.info("Configuring Redis[{}] credentials - {}", port, credentials);
 
         var host = container.getHost();

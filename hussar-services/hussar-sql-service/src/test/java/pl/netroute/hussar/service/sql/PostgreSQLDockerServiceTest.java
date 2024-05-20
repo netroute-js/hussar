@@ -31,7 +31,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertNoSchemaInitialized;
-import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemaInitialized;
+import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemasInitialized;
 
 public class PostgreSQLDockerServiceTest {
     private static final String POSTGRE_SQL_HOST = "localhost";
@@ -160,7 +160,7 @@ public class PostgreSQLDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, POSTGRE_SQL_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
-        assertSchemaInitialized(schemaInitializer, service, MYSQL_CREDENTIALS, schemas);
+        assertSchemasInitialized(schemaInitializer, service, MYSQL_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);
     }
 

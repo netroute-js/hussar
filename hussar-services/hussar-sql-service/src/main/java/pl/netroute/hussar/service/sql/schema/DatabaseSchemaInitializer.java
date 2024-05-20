@@ -15,8 +15,8 @@ public class DatabaseSchemaInitializer {
     private static final String CREATE_DATABASE_SQL_TEMPLATE = "CREATE DATABASE %s";
 
     public void initialize(@NonNull Endpoint endpoint,
-                    @NonNull SQLDatabaseCredentials credentials,
-                    @NonNull SQLDatabaseSchema database) {
+                           @NonNull SQLDatabaseCredentials credentials,
+                           @NonNull SQLDatabaseSchema database) {
         var schema = database.name();
         var scriptsLocation = database.scriptsLocation();
 

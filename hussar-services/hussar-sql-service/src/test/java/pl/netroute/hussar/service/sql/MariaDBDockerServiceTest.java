@@ -31,7 +31,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertNoSchemaInitialized;
-import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemaInitialized;
+import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemasInitialized;
 
 public class MariaDBDockerServiceTest  {
     private static final String MARIA_DB_HOST = "localhost";
@@ -160,7 +160,7 @@ public class MariaDBDockerServiceTest  {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MARIA_DB_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
-        assertSchemaInitialized(schemaInitializer, service, MARIA_DB_CREDENTIALS, schemas);
+        assertSchemasInitialized(schemaInitializer, service, MARIA_DB_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);
     }
 

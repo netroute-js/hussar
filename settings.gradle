@@ -8,6 +8,7 @@ include "hussar-services:hussar-wiremock-service"
 include "hussar-services:hussar-sql-service"
 include "hussar-services:hussar-mongodb-service"
 include "hussar-services:hussar-redis-service"
+include "hussar-services:hussar-kafka-service"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -24,9 +25,10 @@ dependencyResolutionManagement {
             def okHttpVersion = version("okHttp", "4.10.0")
             def feignVersion = version("feign", "12.3")
             def snakeYamlVersion = version("snakeYaml", "2.1")
+            def kafkaClientsVersion = version("kafkaClients", "3.7.0")
             def slf4jVersion = version("slf4j", "1.7.36")
             def logbackVersion = version("logback", "1.2.11")
-            def testcontainersVersion = version("testcontainers", "1.19.1")
+            def testcontainersVersion = version("testcontainers", "1.19.7")
             def wiremockVersion = version("wiremock", "3.3.1")
             def mockitoVersion = version("mockito", "4.6.1")
             def assertjVersion = version("assertj", "3.22.0")
@@ -60,7 +62,10 @@ dependencyResolutionManagement {
 
             library("snakeyaml", "org.yaml", "snakeyaml").versionRef(snakeYamlVersion)
 
+            library("kafka-clients", "org.apache.kafka", "kafka-clients").versionRef(kafkaClientsVersion)
+
             library("testcontainers", "org.testcontainers", "testcontainers").versionRef(testcontainersVersion)
+            library("kafka-testcontainers", "org.testcontainers", "kafka").versionRef(testcontainersVersion)
 
             library("wiremock", "org.wiremock", "wiremock").versionRef(wiremockVersion)
 

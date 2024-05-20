@@ -49,7 +49,7 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
         super.doAfterServiceStartup(context);
 
         if(isPasswordEnabled()) {
-            passwordConfigurer.configure(credentials);
+            passwordConfigurer.configure(credentials, container);
         }
 
         registerCredentialsUnderProperties();

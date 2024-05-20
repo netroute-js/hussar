@@ -39,7 +39,7 @@ class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigurer<Red
         var configurationRegistry = new MapConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new RedisCredentialsRegisterer(configurationRegistry);
-        var passwordConfigurer = new RedisPasswordConfigurer(container);
+        var passwordConfigurer = new RedisPasswordConfigurer();
 
         return new RedisDockerService(
                 container,

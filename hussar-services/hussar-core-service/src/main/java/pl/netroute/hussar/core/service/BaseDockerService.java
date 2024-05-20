@@ -26,7 +26,7 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
     }
 
     @Override
-    public final List<Endpoint> getEndpoints() {
+    public List<Endpoint> getEndpoints() {
         var host = container.getHost();
         var scheme = Optional
                 .ofNullable(config.getScheme())

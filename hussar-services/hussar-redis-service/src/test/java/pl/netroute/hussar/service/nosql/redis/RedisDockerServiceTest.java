@@ -212,7 +212,7 @@ public class RedisDockerServiceTest {
         var configurationRegistry = new MapConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new RedisCredentialsRegisterer(configurationRegistry);
-        var passwordConfigurer = new RedisPasswordConfigurer(container);
+        var passwordConfigurer = new RedisPasswordConfigurer();
 
         return new RedisDockerService(container, config, configurationRegistry, endpointRegisterer, credentialsRegisterer, passwordConfigurer);
     }
