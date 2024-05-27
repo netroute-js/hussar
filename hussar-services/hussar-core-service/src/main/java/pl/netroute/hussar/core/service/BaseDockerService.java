@@ -4,7 +4,7 @@ import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;

@@ -5,7 +5,6 @@ import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
-import pl.netroute.hussar.service.sql.registerer.DatabaseCredentialsRegisterer;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {

@@ -7,7 +7,6 @@ import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
-import pl.netroute.hussar.service.nosql.mongodb.registerer.MongoDBCredentialsRegisterer;
 
 public class MongoDBDockerService extends BaseDockerService<MongoDBDockerServiceConfig> {
     private static final int LISTENING_PORT = 27017;

@@ -6,7 +6,6 @@ import pl.netroute.hussar.core.service.container.GenericContainerFactory;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
-import pl.netroute.hussar.service.sql.registerer.DatabaseCredentialsRegisterer;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")

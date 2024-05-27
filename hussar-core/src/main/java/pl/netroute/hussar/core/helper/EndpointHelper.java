@@ -3,7 +3,7 @@ package pl.netroute.hussar.core.helper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.Service;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

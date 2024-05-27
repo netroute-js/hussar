@@ -2,7 +2,7 @@ package pl.netroute.hussar.spring.boot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
 import pl.netroute.hussar.spring.boot.client.ClientFactory;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;

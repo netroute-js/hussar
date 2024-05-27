@@ -6,7 +6,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;

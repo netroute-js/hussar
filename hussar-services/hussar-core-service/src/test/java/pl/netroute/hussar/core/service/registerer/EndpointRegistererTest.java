@@ -2,13 +2,12 @@ package pl.netroute.hussar.core.service.registerer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
-import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.Set;
 

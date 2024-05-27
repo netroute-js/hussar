@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 import javax.sql.DataSource;

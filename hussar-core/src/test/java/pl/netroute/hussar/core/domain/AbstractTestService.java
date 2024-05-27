@@ -1,7 +1,7 @@
 package pl.netroute.hussar.core.domain;
 
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.Endpoint;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.Service;

@@ -9,7 +9,6 @@ import pl.netroute.hussar.core.service.container.GenericContainerFactory;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
-import pl.netroute.hussar.service.nosql.redis.registerer.RedisCredentialsRegisterer;
 
 import java.util.Set;
 

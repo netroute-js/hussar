@@ -28,8 +28,8 @@ public class GenericContainerAssertionHelper {
     }
 
     public static void assertContainerExposedPortConfigured(@NonNull GenericContainer<?> container,
-                                                            int exposedPort) {
-        verify(container).withExposedPorts(exposedPort);
+                                                            @NonNull Integer... exposedPorts) {
+        verify(container).withExposedPorts(exposedPorts);
     }
 
     public static void assertContainerWaitStrategyConfigured(@NonNull GenericContainer<?> container,

@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.Endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

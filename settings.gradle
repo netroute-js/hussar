@@ -9,6 +9,7 @@ include "hussar-services:hussar-sql-service"
 include "hussar-services:hussar-mongodb-service"
 include "hussar-services:hussar-redis-service"
 include "hussar-services:hussar-kafka-service"
+include "hussar-services:hussar-rabbitmq-service"
 
 dependencyResolutionManagement {
     versionCatalogs {
@@ -22,9 +23,12 @@ dependencyResolutionManagement {
             def postgresConnectorVersion = version("postgresConnector", "42.7.1")
             def mongodbConnectorVersion = version("mongodbConnector", "4.11.1")
             def jedisConnectorVersion = version("jedisConnector", "5.1.0")
+            def rabbitmqConnectorVersion = version("rabbitmqConnector", "5.21.0")
+            def rabbitmqHttpClientVersion = version("rabbitmqHttpClient", "5.2.0")
             def okHttpVersion = version("okHttp", "4.10.0")
             def feignVersion = version("feign", "12.3")
             def snakeYamlVersion = version("snakeYaml", "2.1")
+            def fasterXmlVersion = version("fasterXml", "2.17.1")
             def kafkaClientsVersion = version("kafkaClients", "3.7.0")
             def slf4jVersion = version("slf4j", "1.7.36")
             def logbackVersion = version("logback", "1.2.11")
@@ -51,8 +55,10 @@ dependencyResolutionManagement {
             library("postgres-connector", "org.postgresql", "postgresql").versionRef(postgresConnectorVersion)
 
             library("mongodb-connector", "org.mongodb", "mongodb-driver-sync").versionRef(mongodbConnectorVersion)
-
             library("jedis-connector", "redis.clients", "jedis").versionRef(jedisConnectorVersion)
+
+            library("rabbitmq-connector", "com.rabbitmq", "amqp-client").versionRef(rabbitmqConnectorVersion)
+            library("rabbitmq-http-client", "com.rabbitmq", "http-client").versionRef(rabbitmqHttpClientVersion)
 
             library("slf4j-api", "org.slf4j", "slf4j-api").versionRef(slf4jVersion)
             library("logback-classic", "ch.qos.logback", "logback-classic").versionRef(logbackVersion)
@@ -61,6 +67,7 @@ dependencyResolutionManagement {
             library("feign-core", "io.github.openfeign", "feign-core").versionRef(feignVersion)
 
             library("snakeyaml", "org.yaml", "snakeyaml").versionRef(snakeYamlVersion)
+            library("fasterxml", "com.fasterxml.jackson.core", "jackson-databind").versionRef(fasterXmlVersion)
 
             library("kafka-clients", "org.apache.kafka", "kafka-clients").versionRef(kafkaClientsVersion)
 

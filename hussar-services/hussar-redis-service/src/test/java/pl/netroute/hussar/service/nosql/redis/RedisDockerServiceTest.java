@@ -5,23 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.service.nosql.redis.registerer.RedisCredentialsRegisterer;
+import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerCommandExecuted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
@@ -29,6 +26,10 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
 
 public class RedisDockerServiceTest {
     private static final String REDIS_HOST = "localhost";
@@ -195,16 +196,76 @@ public class RedisDockerServiceTest {
                 .scheme(REDIS_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
+
+        var container = createStubContainer();
+        var service = createRedisService(config, container);
+
+        givenContainerAccessible(container);
+
+        // when
+        service.start(ServiceStartupContext.empty());
+        service.shutdown();
+
+        // then
+        assertContainerStopped(container);
+    }
+
+    @Test
+    public void shouldGetPasswordLessCredentials() {
+        // given
+        var config = RedisDockerServiceConfig
+                .builder()
+                .name(REDIS_SERVICE_NAME)
+                .dockerImage(REDIS_SERVICE_IMAGE)
+                .scheme(REDIS_SCHEME)
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
         var container = createStubContainer();
         var service = createRedisService(config, container);
 
         // when
-        service.shutdown();
+        var credentials = service.getCredentials();
 
         // then
-        assertContainerStopped(container);
+        assertPasswordLessCredentials(credentials);
+    }
+
+    @Test
+    public void shouldGetPasswordAwareCredentials() {
+        // given
+        var config = RedisDockerServiceConfig
+                .builder()
+                .name(REDIS_SERVICE_NAME)
+                .dockerImage(REDIS_SERVICE_IMAGE)
+                .scheme(REDIS_SCHEME)
+                .enablePassword(true)
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
+
+        var container = createStubContainer();
+        var service = createRedisService(config, container);
+
+        // when
+        var credentials = service.getCredentials();
+
+        // then
+        assertPasswordAwareCredentials(credentials);
     }
 
     private RedisDockerService createRedisService(RedisDockerServiceConfig config,
@@ -239,4 +300,13 @@ public class RedisDockerServiceTest {
 
     }
 
+    private void assertPasswordLessCredentials(RedisCredentials credentials) {
+        assertThat(credentials.username()).isEqualTo(REDIS_USERNAME);
+        assertThat(credentials.password()).isNull();
+    }
+
+    private void assertPasswordAwareCredentials(RedisCredentials credentials) {
+        assertThat(credentials.username()).isEqualTo(REDIS_USERNAME);
+        assertThat(credentials.password()).isEqualTo(REDIS_PASSWORD);
+    }
 }

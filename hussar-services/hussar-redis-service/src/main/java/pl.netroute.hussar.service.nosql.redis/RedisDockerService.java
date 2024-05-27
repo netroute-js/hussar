@@ -7,7 +7,6 @@ import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
-import pl.netroute.hussar.service.nosql.redis.registerer.RedisCredentialsRegisterer;
 
 public class RedisDockerService extends BaseDockerService<RedisDockerServiceConfig> {
     private static final int LISTENING_PORT = 6379;

@@ -3,31 +3,32 @@ package pl.netroute.hussar.service.nosql.mongodb;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.MapConfigurationRegistry;
 import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.service.nosql.mongodb.registerer.MongoDBCredentialsRegisterer;
+import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 
 public class MongoDBDockerServiceTest {
     private static final String MONGO_DB_HOST = "localhost";
@@ -173,11 +174,40 @@ public class MongoDBDockerServiceTest {
         var container = createStubContainer();
         var service = createMongoDBService(config, container);
 
+        givenContainerAccessible(container);
+
         // when
+        service.start(ServiceStartupContext.empty());
         service.shutdown();
 
         // then
         assertContainerStopped(container);
+    }
+
+    @Test
+    public void shouldGetCredentials() {
+        // given
+        var config = MongoDBDockerServiceConfig
+                .builder()
+                .name(MONGO_DB_SERVICE_NAME)
+                .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .scheme(SchemesHelper.HTTP_SCHEME)
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
+
+        var container = createStubContainer();
+        var service = createMongoDBService(config, container);
+
+        // when
+        var credentials = service.getCredentials();
+
+        // then
+        assertCredentials(credentials);
     }
 
     private MongoDBDockerService createMongoDBService(MongoDBDockerServiceConfig config,
@@ -197,5 +227,10 @@ public class MongoDBDockerServiceTest {
         when(container.getHost()).thenReturn(MONGO_DB_HOST);
         when(container.getExposedPorts()).thenReturn(List.of(MONGO_DB_LISTENING_PORT));
         when(container.getMappedPort(MONGO_DB_LISTENING_PORT)).thenReturn(MONGO_DB_MAPPED_PORT);
+    }
+
+    private void assertCredentials(MongoDBCredentials credentials) {
+        assertThat(credentials.username()).isEqualTo(MONGO_DB_USERNAME);
+        assertThat(credentials.password()).isEqualTo(MONGO_DB_PASSWORD);
     }
 }
