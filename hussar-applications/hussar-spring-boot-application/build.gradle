@@ -1,11 +1,10 @@
 dependencies {
 	implementation project(":hussar-core")
-	implementation libs.spring.boot.test
+	implementation libs.spring.boot.starter
 	implementation libs.slf4j.api
 
 	testImplementation libs.bundles.testing
-	testImplementation libs.spring.boot.autoconfigure
-	testImplementation libs.spring.boot.web
+	testImplementation libs.spring.boot.starter.web
 	testImplementation libs.spring.cloud.openfeign.core
 	testImplementation libs.feign.core
 	testImplementation libs.okhttp

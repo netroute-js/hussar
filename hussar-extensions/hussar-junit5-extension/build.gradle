@@ -1,16 +1,31 @@
 dependencies {
 	implementation project(":hussar-core")
-	implementation project(":hussar-applications:hussar-spring-boot-application")
 	implementation libs.slf4j.api
 	implementation libs.junit.jupiter
 
+	testImplementation project(":hussar-applications:hussar-spring-boot-application")
 	testImplementation project(":hussar-services:hussar-core-service")
 	testImplementation project(":hussar-services:hussar-wiremock-service")
-	testImplementation libs.spring.boot.autoconfigure
-	testImplementation libs.spring.boot.web
+	testImplementation project(":hussar-services:hussar-kafka-service")
+	testImplementation project(":hussar-services:hussar-redis-service")
+	testImplementation project(":hussar-services:hussar-rabbitmq-service")
+	testImplementation project(":hussar-services:hussar-mongodb-service")
+	testImplementation project(":hussar-services:hussar-sql-service")
+	testImplementation libs.bundles.testing
+	testImplementation libs.logback.classic
+	testImplementation libs.spring.jdbc
+	testImplementation libs.spring.boot.starter.web
 	testImplementation libs.spring.cloud.openfeign.core
 	testImplementation libs.feign.core
 	testImplementation libs.okhttp
-	testImplementation libs.logback.classic
-	testImplementation libs.bundles.testing
+	testImplementation libs.mongodb.connector
+	testImplementation libs.jedis.connector
+	testImplementation libs.mysql.connector
+	testImplementation libs.mariadb.connector
+	testImplementation libs.postgres.connector
+	testImplementation libs.flyway.core
+	testImplementation libs.flyway.mysql
+	testImplementation libs.flyway.postgres
+	testImplementation libs.rabbitmq.http.client
+	testImplementation libs.kafka.clients
 }

@@ -3,14 +3,12 @@ package pl.netroute.hussar.spring.boot;
 import lombok.NonNull;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,25 +16,16 @@ public class SpringApplication implements Application {
     private static final String HOSTNAME = "localhost";
 
     private final Class<?> applicationClass;
-    private final Path configurationFile;
+    private final PropertySourceConfigurer propertySourceConfigurer;
     private final LockedAction lockedAction;
 
     private ConfigurableApplicationContext applicationContext;
 
     private SpringApplication(@NonNull Class<?> applicationClass,
-                              Path configurationFile) {
-        if(!isConfigurationFilePresent(configurationFile)) {
-            configurationFile = null;
-        }
-
+                              @NonNull PropertySourceConfigurer propertySourceConfigurer) {
         this.applicationClass = applicationClass;
-        this.configurationFile = configurationFile;
+        this.propertySourceConfigurer = propertySourceConfigurer;
         this.lockedAction = new LockedAction();
-    }
-
-    @Override
-    public Optional<Path> getConfigurationFile() {
-        return Optional.ofNullable(configurationFile);
     }
 
     @Override
@@ -81,41 +70,27 @@ public class SpringApplication implements Application {
         );
     }
 
-    private boolean isConfigurationFilePresent(Path configurationFile) {
-        return Optional
-                .ofNullable(configurationFile)
-                .map(Path::toFile)
-                .map(File::exists)
-                .orElse(Boolean.FALSE);
-    }
-
     private Endpoint resolveEndpoint() {
         var port = applicationContext
                 .getEnvironment()
-                .getProperty(PropertiesFactory.SERVER_PORT, Integer.class);
+                .getProperty(DynamicConfigurationConfigurer.SERVER_PORT, Integer.class);
 
         return Endpoint.of(SchemesHelper.HTTP_SCHEME, HOSTNAME, port);
     }
 
     private ConfigurableApplicationContext initializeApplication(ApplicationStartupContext startupContext) {
-        var properties = PropertiesFactory.createWithDynamicPort(startupContext.properties());
+        var externalConfigurations = DynamicConfigurationConfigurer.configure(startupContext.externalConfigurations());
 
         return new SpringApplicationBuilder(applicationClass)
-                .initializers(context -> new PropertySourceConfigurer().configure(properties, context))
+                .initializers(context -> propertySourceConfigurer.configure(externalConfigurations, context))
                 .run();
     }
 
     public static SpringApplication newApplication(@NonNull Class<?> applicationClass) {
-        var configurationFile = new ConfigurationFileResolver()
-                .resolveDefault(applicationClass)
-                .orElse(null);
+        var configurationResolver = new ConfigurationResolver();
+        var propertySourceConfigurer = new PropertySourceConfigurer(configurationResolver);
 
-        return new SpringApplication(applicationClass, configurationFile);
-    }
-
-    public static SpringApplication newApplication(@NonNull Class<?> applicationClass,
-                                                   @NonNull Path configurationFile) {
-        return new SpringApplication(applicationClass, configurationFile);
+        return new SpringApplication(applicationClass, propertySourceConfigurer);
     }
 
 }

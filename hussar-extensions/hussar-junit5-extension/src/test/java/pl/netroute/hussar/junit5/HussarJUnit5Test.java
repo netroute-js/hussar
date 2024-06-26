@@ -1,6 +1,5 @@
 package pl.netroute.hussar.junit5;
 
-import pl.netroute.hussar.service.wiremock.WiremockDockerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import pl.netroute.hussar.core.annotation.HussarApplication;
@@ -9,10 +8,40 @@ import pl.netroute.hussar.core.annotation.HussarService;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.junit5.client.ClientFactory;
 import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
-import pl.netroute.hussar.junit5.client.WiremockClient;
 import pl.netroute.hussar.junit5.config.TestEnvironmentConfigurerProvider;
+import pl.netroute.hussar.service.kafka.KafkaDockerService;
+import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
+import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
+import pl.netroute.hussar.service.rabbitmq.RabbitMQDockerService;
+import pl.netroute.hussar.service.sql.MariaDBDockerService;
+import pl.netroute.hussar.service.sql.MySQLDockerService;
+import pl.netroute.hussar.service.sql.PostgreSQLDockerService;
+import pl.netroute.hussar.service.wiremock.WiremockDockerService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.KafkaAssertionHelper.assertKafkaBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.MariaDBAssertionHelper.assertMariaDBBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.MongoDBAssertionHelper.assertMongoDBBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.MySQLAssertionHelper.assertMySQLBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.PostgreSQLAssertionHelper.assertPostgreSQLBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.RabbitMQAssertionHelper.assertRabbitMQBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.RedisAssertionHelper.assertRedisBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.WiremockAssertionHelper.assertWiremockBootstrapped;
+import static pl.netroute.hussar.junit5.config.ApplicationProperties.METRICS_URL_PROPERTY;
+import static pl.netroute.hussar.junit5.config.ApplicationProperties.METRICS_URL_PROPERTY_VALUE;
+import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_AUTH_PROPERTY;
+import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_AUTH_PROPERTY_VALUE;
+import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_NAME_PROPERTY;
+import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_NAME_PROPERTY_VALUE;
+import static pl.netroute.hussar.junit5.factory.KafkaServiceFactory.KAFKA_NAME;
+import static pl.netroute.hussar.junit5.factory.MariaDBServiceFactory.MARIA_DB_NAME;
+import static pl.netroute.hussar.junit5.factory.MongoDBServiceFactory.MONGODB_NAME;
+import static pl.netroute.hussar.junit5.factory.MySQLServiceFactory.MYSQL_NAME;
+import static pl.netroute.hussar.junit5.factory.PostgreSQLServiceFactory.POSTGRESQL_NAME;
+import static pl.netroute.hussar.junit5.factory.RabbitMQServiceFactory.RABBITMQ_NAME;
+import static pl.netroute.hussar.junit5.factory.RedisServiceFactory.REDIS_NAME;
+import static pl.netroute.hussar.junit5.factory.WiremockServiceFactory.WIREMOCK_NAME;
 
 @ExtendWith(HussarJUnit5Extension.class)
 @HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class)
@@ -22,44 +51,50 @@ public class HussarJUnit5Test {
     @HussarApplication
     Application application;
 
-    @HussarService(name = TestEnvironmentConfigurerProvider.WIREMOCK_A)
-    WiremockDockerService wiremockServiceA;
+    @HussarService(name = WIREMOCK_NAME)
+    WiremockDockerService wiremockService;
 
-    @HussarService(name = TestEnvironmentConfigurerProvider.WIREMOCK_B)
-    WiremockDockerService wiremockServiceB;
+    @HussarService(name = REDIS_NAME)
+    RedisDockerService redisService;
+
+    @HussarService(name = RABBITMQ_NAME)
+    RabbitMQDockerService rabbitMQService;
+
+    @HussarService(name = KAFKA_NAME)
+    KafkaDockerService kafkaService;
+
+    @HussarService(name = MONGODB_NAME)
+    MongoDBDockerService mongoDBService;
+
+    @HussarService(name = MYSQL_NAME)
+    MySQLDockerService mySQLService;
+
+    @HussarService(name = MARIA_DB_NAME)
+    MariaDBDockerService mariaDBService;
+
+    @HussarService(name = POSTGRESQL_NAME)
+    PostgreSQLDockerService postgreSQLService;
 
     @Test
     public void shouldStartupEnvironment() {
         // given
-        var wiremockEndpointA = wiremockServiceA.getEndpoints().get(0);
-        var wiremockEndpointB = wiremockServiceB.getEndpoints().get(0);
-
-        var wiremockClientA = new WiremockClient(wiremockEndpointA.address());
-        var wiremockClientB = new WiremockClient(wiremockEndpointB.address());
-
         var applicationClient = applicationClient(application);
 
         // when
         // then
-        assertWiremockReachable(wiremockClientA);
-        assertWiremockReachable(wiremockClientB);
-
         assertPingEndpointAccessible(applicationClient);
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.PROPERTY_A, TestEnvironmentConfigurerProvider.PROPERTY_A_VALUE);
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.PROPERTY_B, TestEnvironmentConfigurerProvider.PROPERTY_B_VALUE);
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.SUB_PROPERTY_A, TestEnvironmentConfigurerProvider.ENV_VARIABLE_A_VALUE);
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.WIREMOCK_INSTANCE_A_URL_PROPERTY, wiremockEndpointA.address());
-        assertPropertyConfigured(applicationClient, TestEnvironmentConfigurerProvider.WIREMOCK_INSTANCE_B_URL_PROPERTY, wiremockEndpointB.address());
-    }
+        assertPropertyConfigured(SERVER_NAME_PROPERTY, SERVER_NAME_PROPERTY_VALUE, applicationClient);
+        assertPropertyConfigured(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE, applicationClient);
+        assertPropertyConfigured(METRICS_URL_PROPERTY, METRICS_URL_PROPERTY_VALUE, applicationClient);
 
-    private void assertWiremockReachable(WiremockClient wiremock) {
-        assertThat(wiremock.isReachable()).isTrue();
-    }
-
-    private void assertPropertyConfigured(SimpleApplicationClient client, String property, String expectedValue) {
-        var foundProperty = client.getProperty(property);
-
-        assertThat(foundProperty).hasValue(expectedValue);
+        assertWiremockBootstrapped(wiremockService, applicationClient);
+        assertRedisBootstrapped(redisService, applicationClient);
+        assertRabbitMQBootstrapped(rabbitMQService, applicationClient);
+        assertKafkaBootstrapped(kafkaService, applicationClient);
+        assertMongoDBBootstrapped(mongoDBService, applicationClient);
+        assertMySQLBootstrapped(mySQLService, applicationClient);
+        assertMariaDBBootstrapped(mariaDBService, applicationClient);
+        assertPostgreSQLBootstrapped(postgreSQLService, applicationClient);
     }
 
     private void assertPingEndpointAccessible(SimpleApplicationClient client) {

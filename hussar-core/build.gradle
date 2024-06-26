@@ -1,6 +1,5 @@
 dependencies {
 	implementation libs.slf4j.api
-	implementation libs.snakeyaml
 
 	testImplementation libs.logback.classic
 	testImplementation libs.bundles.testing

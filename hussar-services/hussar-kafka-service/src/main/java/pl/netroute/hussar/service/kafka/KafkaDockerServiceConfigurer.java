@@ -26,7 +26,7 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
     protected final Set<KafkaTopic> topics;
 
     @Override
-    protected KafkaDockerService configure() {
+    public KafkaDockerService configure() {
         var config = createConfig();
         var container = createContainer(config);
         var configurationRegistry = new MapConfigurationRegistry();

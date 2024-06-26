@@ -4,10 +4,13 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
 
 @Builder(builderMethodName = "newInstance", buildMethodName = "done", setterPrefix = "with")
 public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
@@ -19,10 +22,10 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
     private final Set<Service> services;
 
     @Singular
-    private final List<PropertyConfigurationEntry> properties;
+    private final Map<String, String> properties;
 
     @Singular
-    private final List<EnvVariableConfigurationEntry> environmentVariables;
+    private final Map<String, String> environmentVariables;
 
     @Override
     public Environment configure() {
@@ -38,10 +41,21 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
         );
     }
 
-
     private Set<ConfigurationEntry> mergeConfigurations() {
+        var propertiesEntries = properties
+                .entrySet()
+                .stream()
+                .map(entry -> property(entry.getKey(), entry.getValue()))
+                .toList();
+
+        var environmentVariablesEntries = environmentVariables
+                .entrySet()
+                .stream()
+                .map(entry -> envVariable(entry.getKey(), entry.getValue()))
+                .toList();
+
         return Stream
-                .concat(properties.stream(), environmentVariables.stream())
+                .concat(propertiesEntries.stream(), environmentVariablesEntries.stream())
                 .collect(Collectors.toUnmodifiableSet());
     }
 

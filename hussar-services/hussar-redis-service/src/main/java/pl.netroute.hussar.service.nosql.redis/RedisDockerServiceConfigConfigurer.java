@@ -13,7 +13,7 @@ import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 import java.util.Set;
 
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
-class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigurer<RedisDockerService> {
+public class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigurer<RedisDockerService> {
     private static final String DOCKER_IMAGE = "redis";
     private static final String SERVICE = "redis_service";
     private static final String REDIS_SCHEME = "redis://";
@@ -32,6 +32,7 @@ class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigurer<Red
     @Singular
     protected final Set<String> registerPasswordUnderEnvironmentVariables;
 
+    @Override
     public RedisDockerService configure() {
         var config = createConfig();
         var container = GenericContainerFactory.create(config);

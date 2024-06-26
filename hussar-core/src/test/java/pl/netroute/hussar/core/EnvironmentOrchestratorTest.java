@@ -13,7 +13,7 @@ import pl.netroute.hussar.core.api.ServiceStartupContext;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -23,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
 
 public class EnvironmentOrchestratorTest {
     private EnvironmentOrchestrator orchestrator;
@@ -33,14 +35,9 @@ public class EnvironmentOrchestratorTest {
         var servicesStarter = new ServiceStarter(executor);
         var servicesStopper = new ServiceStopper(executor);
 
-        var applicationConfigurationFlattener = new ApplicationConfigurationFlattener();
-        var applicationConfigurationLoader = new ApplicationConfigurationLoader(applicationConfigurationFlattener);
-        var applicationConfigurationResolver = new ApplicationConfigurationResolver(applicationConfigurationLoader, applicationConfigurationFlattener);
-
         orchestrator = new EnvironmentOrchestrator(
                 servicesStarter,
-                servicesStopper,
-                applicationConfigurationResolver
+                servicesStopper
         );
     }
 
@@ -90,11 +87,11 @@ public class EnvironmentOrchestratorTest {
     }
 
     private void assertApplicationStarted(Application application) {
-        var configurationMap = Map.<String, Object>of(
-                TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1
-        );
+        var property = property(TestEnvironmentConfigurerProvider.PROPERTY_1, TestEnvironmentConfigurerProvider.PROPERTY_VALUE_1);
+        var envVariable = envVariable(TestEnvironmentConfigurerProvider.ENV_VARIABLE_1, TestEnvironmentConfigurerProvider.ENV_VARIABLE_VALUE_1);
+        var externalConfigurations = Set.<ConfigurationEntry>of(property, envVariable);
 
-        var context = new ApplicationStartupContext(configurationMap);
+        var context = new ApplicationStartupContext(externalConfigurations);
 
         verify(application).start(context);
     }
@@ -118,8 +115,8 @@ public class EnvironmentOrchestratorTest {
         public LocalEnvironmentConfigurer provide() {
             return LocalEnvironmentConfigurer
                     .newInstance()
-                    .withProperty(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
-                    .withEnvironmentVariable(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1))
+                    .withProperty(PROPERTY_1, PROPERTY_VALUE_1)
+                    .withEnvironmentVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1)
                     .withApplication(application)
                     .withService(standaloneServiceA)
                     .withService(standaloneServiceB)

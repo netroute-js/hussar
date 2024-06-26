@@ -34,8 +34,8 @@ public class EnvironmentConfigurerTest {
         // when
         var environment = LocalEnvironmentConfigurer
                 .newInstance()
-                .withProperty(ConfigurationEntry.property(propertyA, propertyValueA))
-                .withEnvironmentVariable(ConfigurationEntry.envVariable(envVariableB, envVariableValueB))
+                .withProperty(propertyA, propertyValueA)
+                .withEnvironmentVariable(envVariableB, envVariableValueB)
                 .withService(standaloneServiceA)
                 .withService(standaloneServiceB)
                 .withApplication(application)

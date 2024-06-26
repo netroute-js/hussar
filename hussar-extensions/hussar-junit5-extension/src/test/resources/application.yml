@@ -1,5 +1,51 @@
-propertyA: default-valueA
-propertyB: default-valueB
-subA: ${SOME_ENV_VARIABLE_A}
-wiremockA.url: https://dev.local
-wiremockB.url: ${WIREMOCK_B_URL}
+server.name: husar-junit5
+server.auth: oauth2
+metrics.url: ${METRICS_URL}
+
+application.wiremock.url: ${WIREMOCK_URL}
+application.wiremock.alternative.url: https://husar.wiremock.dev
+
+application.redis.url: ${REDIS_URL}
+application.redis.alternative.url: redis://hussar.redis.dev
+application.redis.username: ${REDIS_USERNAME}
+application.redis.alternative.username:
+application.redis.password: ${REDIS_PASSWORD}
+application.redis.alternative.password: test-password
+
+application.rabbitmq.url: ${RABBITMQ_URL}
+application.rabbitmq.alternative.url: hussar.rabbitmq.dev
+application.rabbitmq.username: ${RABBITMQ_USERNAME}
+application.rabbitmq.alternative.username:
+application.rabbitmq.password: ${RABBITMQ_PASSWORD}
+application.rabbitmq.alternative.password: test-password
+
+application.mongodb.url: ${MONGODB_URL}
+application.mongodb.alternative.url: mongodb://hussar.mongodb.dev
+application.mongodb.username: ${MONGODB_USERNAME}
+application.mongodb.alternative.username:
+application.mongodb.password: ${MONGODB_PASSWORD}
+application.mongodb.alternative.password: test-password
+
+application.mysql.url: ${MYSQL_URL}
+application.mysql.alternative.url: jdbc:mysql://hussar.mysql.dev
+application.mysql.username: ${MYSQL_USERNAME}
+application.mysql.alternative.username:
+application.mysql.password: ${MYSQL_PASSWORD}
+application.mysql.alternative.password: test-password
+
+application.mariadb.url: ${MARIADB_URL}
+application.mariadb.alternative.url: jdbc:mariadb://hussar.mariadb.dev
+application.mariadb.username: ${MARIADB_USERNAME}
+application.mariadb.alternative.username:
+application.mariadb.password: ${MARIADB_PASSWORD}
+application.mariadb.alternative.password: test-password
+
+application.postgresql.url: ${POSTGRESQL_URL}
+application.postgresql.alternative.url: jdbc:postgresql://hussar.postgresql.dev
+application.postgresql.username: ${POSTGRESQL_USERNAME}
+application.postgresql.alternative.username:
+application.postgresql.password: ${POSTGRESQL_PASSWORD}
+application.postgresql.alternative.password: test-password
+
+application.kafka.url: ${KAFKA_URL}
+application.kafka.alternative.url: hussar.kafka.dev

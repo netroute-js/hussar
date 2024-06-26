@@ -14,8 +14,8 @@ include "hussar-services:hussar-rabbitmq-service"
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            def springBootVersion = version("springBoot", "2.7.10")
-            def springJdbcVersion = version("springJdbc", "6.1.2")
+            def springVersion = version("springVersion", "5.3.31")
+            def springBootVersion = version("springBoot", "2.7.18")
             def springCloudVersion = version("springCloud", "3.1.6")
             def flywayVersion = version("flyway", "10.7.1")
             def mysqlConnectorVersion = version("mysqlConnector", "8.3.0")
@@ -27,7 +27,6 @@ dependencyResolutionManagement {
             def rabbitmqHttpClientVersion = version("rabbitmqHttpClient", "5.2.0")
             def okHttpVersion = version("okHttp", "4.10.0")
             def feignVersion = version("feign", "12.3")
-            def snakeYamlVersion = version("snakeYaml", "2.1")
             def fasterXmlVersion = version("fasterXml", "2.17.1")
             def kafkaClientsVersion = version("kafkaClients", "3.7.0")
             def slf4jVersion = version("slf4j", "1.7.36")
@@ -38,12 +37,9 @@ dependencyResolutionManagement {
             def assertjVersion = version("assertj", "3.22.0")
             def junit5Version = version("junit", "5.8.2")
 
-            library("spring-boot-test", "org.springframework.boot", "spring-boot-test").versionRef(springBootVersion)
-            library("spring-boot-autoconfigure", "org.springframework.boot", "spring-boot-autoconfigure").versionRef(springBootVersion)
-            library("spring-boot-web", "org.springframework.boot", "spring-boot-starter-web").versionRef(springBootVersion)
-
-            library("spring-jdbc", "org.springframework", "spring-jdbc").versionRef(springJdbcVersion)
-
+            library("spring-boot-starter", "org.springframework.boot", "spring-boot-starter").versionRef(springBootVersion)
+            library("spring-boot-starter-web", "org.springframework.boot", "spring-boot-starter-web").versionRef(springBootVersion)
+            library("spring-jdbc", "org.springframework", "spring-jdbc").versionRef(springVersion)
             library("spring-cloud-openfeign-core", "org.springframework.cloud", "spring-cloud-openfeign-core").versionRef(springCloudVersion)
 
             library("flyway-core", "org.flywaydb", "flyway-core").versionRef(flywayVersion)
@@ -66,7 +62,6 @@ dependencyResolutionManagement {
             library("okhttp", "com.squareup.okhttp3", "okhttp").versionRef(okHttpVersion)
             library("feign-core", "io.github.openfeign", "feign-core").versionRef(feignVersion)
 
-            library("snakeyaml", "org.yaml", "snakeyaml").versionRef(snakeYamlVersion)
             library("fasterxml", "com.fasterxml.jackson.core", "jackson-databind").versionRef(fasterXmlVersion)
 
             library("kafka-clients", "org.apache.kafka", "kafka-clients").versionRef(kafkaClientsVersion)

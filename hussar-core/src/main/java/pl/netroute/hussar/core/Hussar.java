@@ -46,13 +46,9 @@ public class Hussar {
     public static Hussar newInstance() {
         var configurerResolver = new EnvironmentConfigurerProviderResolver();
 
-        var applicationConfigurationFlattener = new ApplicationConfigurationFlattener();
-        var applicationConfigurationLoader = new ApplicationConfigurationLoader(applicationConfigurationFlattener);
-
         var orchestrator = new EnvironmentOrchestrator(
                 new ServiceStarter(ForkJoinPool.commonPool()),
-                new ServiceStopper(ForkJoinPool.commonPool()),
-                new ApplicationConfigurationResolver(applicationConfigurationLoader, applicationConfigurationFlattener)
+                new ServiceStopper(ForkJoinPool.commonPool())
         );
 
         return new Hussar(configurerResolver, orchestrator);

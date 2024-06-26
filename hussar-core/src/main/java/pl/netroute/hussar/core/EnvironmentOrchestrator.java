@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Environment;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
@@ -14,10 +15,12 @@ import pl.netroute.hussar.core.api.ServiceRegistry;
 import pl.netroute.hussar.core.helper.CollectionHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -28,9 +31,6 @@ class EnvironmentOrchestrator {
 
     @NonNull
     private final ServiceStopper serviceStopper;
-
-    @NonNull
-    private final ApplicationConfigurationResolver applicationConfigurationResolver;
 
     private final LockedAction lockedAction = new LockedAction();
     private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments = new ConcurrentHashMap<>();
@@ -86,26 +86,29 @@ class EnvironmentOrchestrator {
     }
 
     private void startApplication(Application application, Environment environment) {
-        var externalConfiguration = extractExternalConfiguration(environment);
-        var applicationConfiguration = applicationConfigurationResolver.resolve(application, externalConfiguration);
-        var startupContext = new ApplicationStartupContext(applicationConfiguration);
+        var externalConfigurations = extractExternalConfiguration(environment);
+        var startupContext = new ApplicationStartupContext(externalConfigurations);
 
-        log.info("Starting application {}. Configuration {}", application.getClass().getCanonicalName(), startupContext.properties());
+        log.info("Starting application {}. Configuration {}", application.getClass().getCanonicalName(), startupContext.externalConfigurations());
         application.start(startupContext);
     }
 
-    private List<ConfigurationRegistry> extractExternalConfiguration(Environment environment) {
-        var staticConfiguration = List.of(environment.configurationRegistry());
+    private Set<ConfigurationEntry> extractExternalConfiguration(Environment environment) {
+        var staticConfigurations = environment
+                .configurationRegistry()
+                .getEntries();
 
-        var servicesConfiguration = environment
+        var servicesConfigurations = environment
                 .serviceRegistry()
                 .getEntries()
                 .stream()
                 .map(Service::getConfigurationRegistry)
                 .filter(Objects::nonNull)
-                .toList();
+                .map(ConfigurationRegistry::getEntries)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toUnmodifiableSet());
 
-        return CollectionHelper.mergeLists(staticConfiguration, servicesConfiguration);
+        return CollectionHelper.mergeSets(staticConfigurations, servicesConfigurations);
     }
 
     private void shutdownApplication(Application application) {

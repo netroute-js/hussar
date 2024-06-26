@@ -1,32 +1,18 @@
 package pl.netroute.hussar.core.domain;
 
-import pl.netroute.hussar.core.api.Endpoint;
+import lombok.NoArgsConstructor;
 import pl.netroute.hussar.core.api.Application;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.Endpoint;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
+@NoArgsConstructor
 public class TestApplication implements Application {
-    private final Path configurationFile;
-
-    public TestApplication() {
-        this(null);
-    }
-
-    public TestApplication(Path configurationFile) {
-        this.configurationFile = configurationFile;
-    }
 
     @Override
     public List<Endpoint> getEndpoints() {
         return List.of();
-    }
-
-    @Override
-    public Optional<Path> getConfigurationFile() {
-        return Optional.ofNullable(configurationFile);
     }
 
     @Override

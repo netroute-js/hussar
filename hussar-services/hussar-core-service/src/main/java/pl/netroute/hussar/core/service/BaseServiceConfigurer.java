@@ -20,6 +20,6 @@ public abstract class BaseServiceConfigurer<S extends Service> {
     @Singular
     protected final Set<String> registerEndpointUnderEnvironmentVariables;
 
-    protected abstract S configure();
+    public abstract S configure();
 
 }

@@ -6,6 +6,8 @@ import lombok.NonNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,6 +22,13 @@ public class CollectionHelper {
         return Stream
                 .concat(firstList.stream(), secondList.stream())
                 .toList();
+    }
+
+    public static <T> Set<T> mergeSets(@NonNull Set<T> firstSet,
+                                       @NonNull Set<T> secondSet) {
+        return Stream
+                .concat(firstSet.stream(), secondSet.stream())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
 }

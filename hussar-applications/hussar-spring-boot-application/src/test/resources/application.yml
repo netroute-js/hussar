@@ -1,1 +1,12 @@
-my.propertyB: some-valueB
+server:
+  name: husar-junit5
+  auth: oauth2
+
+metrics:
+  url: ${METRICS_URL}
+
+application:
+  wiremock:
+    url: https://husar.wiremock.dev
+    alternative:
+      url: https://husar.wiremock.alt.dev

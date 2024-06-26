@@ -3,7 +3,6 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.annotation.HussarEnvironment;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.domain.ServiceTestA;
@@ -29,12 +28,8 @@ public class HussarTest {
 
         var serviceStarter = new ServiceStarter(Executors.newSingleThreadExecutor());
         var servicesStopper = new ServiceStopper(Executors.newSingleThreadExecutor());
-        var configurationFlattener = new ApplicationConfigurationFlattener();
-        var configurationResolver = new ApplicationConfigurationResolver(
-                new ApplicationConfigurationLoader(configurationFlattener),
-                configurationFlattener
-        );
-        environmentOrchestrator = spy(new EnvironmentOrchestrator(serviceStarter, servicesStopper, configurationResolver));
+
+        environmentOrchestrator = spy(new EnvironmentOrchestrator(serviceStarter, servicesStopper));
 
         hussar = new Hussar(configurerProviderResolver, environmentOrchestrator);
     }
@@ -110,8 +105,8 @@ public class HussarTest {
 
             return LocalEnvironmentConfigurer
                     .newInstance()
-                    .withProperty(ConfigurationEntry.property(PROPERTY_1, PROPERTY_VALUE_1))
-                    .withEnvironmentVariable(ConfigurationEntry.envVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1))
+                    .withProperty(PROPERTY_1, PROPERTY_VALUE_1)
+                    .withEnvironmentVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1)
                     .withApplication(application)
                     .withService(standaloneServiceA)
                     .withService(standaloneServiceB)

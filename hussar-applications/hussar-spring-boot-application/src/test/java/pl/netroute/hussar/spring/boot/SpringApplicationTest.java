@@ -2,17 +2,18 @@ package pl.netroute.hussar.spring.boot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.spring.boot.client.ClientFactory;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
 
 public class SpringApplicationTest {
     private static final int PORT_RANGE_START = 30000;
@@ -23,12 +24,19 @@ public class SpringApplicationTest {
 
     private static final String PING_RESPONSE = "pong";
 
-    private static final String MY_PROPERTY_A = "my.propertyA";
-    private static final String MY_PROPERTY_B = "my.propertyB";
+    private static final String SERVER_NAME_PROPERTY = "server.name";
+    private static final String SERVER_AUTH_PROPERTY = "server.auth";
+    private static final String SERVER_NAME_PROPERTY_VALUE = "husar-junit5";
+    private static final String SERVER_AUTH_PROPERTY_VALUE = "credentials";
 
-    private static final String MY_PROPERTY_VALUE_B = "some-valueB";
+    private static final String APPLICATION_WIREMOCK_PROPERTY = "application.wiremock";
+    private static final String APPLICATION_WIREMOCK_URL_PROPERTY = "application.wiremock.url";
+    private static final String APPLICATION_WIREMOCK_ALTERNATIVE_URL_PROPERTY = "application.wiremock.alternative.url";
+    private static final String APPLICATION_WIREMOCK_PROPERTY_VALUE = "wiremock-instance";
 
-    private static final String APPLICATION_CUSTOM_YML = "application-custom.yml";
+    private static final String METRICS_URL_PROPERTY = "metrics.url";
+    private static final String METRICS_URL_ENV_VARIABLE = "METRICS_URL";
+    private static final String METRICS_URL_ENV_VARIABLE_VALUE = "https://husar.dev/metrics";
 
     private SpringApplication application;
 
@@ -40,7 +48,16 @@ public class SpringApplicationTest {
     @Test
     public void shouldStartApplication() {
         // given
-        var startupContext = new ApplicationStartupContext(Map.of(MY_PROPERTY_B, MY_PROPERTY_VALUE_B));
+        var serverAuthProperty = property(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
+        var metricsUrlEnvVariable = envVariable(METRICS_URL_ENV_VARIABLE, METRICS_URL_ENV_VARIABLE_VALUE);
+        var wiremockProperty = property(APPLICATION_WIREMOCK_PROPERTY, APPLICATION_WIREMOCK_PROPERTY_VALUE);
+        var externalConfigurations = Set.<ConfigurationEntry>of(
+                serverAuthProperty,
+                metricsUrlEnvVariable,
+                wiremockProperty
+        );
+
+        var startupContext = new ApplicationStartupContext(externalConfigurations);
 
         // when
         application.start(startupContext);
@@ -61,7 +78,16 @@ public class SpringApplicationTest {
     @Test
     public void shouldSkipStartingApplicationWhenAlreadyStarted() {
         // given
-        var startupContext = new ApplicationStartupContext(Map.of(MY_PROPERTY_B, MY_PROPERTY_VALUE_B));
+        var serverAuthProperty = property(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
+        var metricsUrlEnvVariable = envVariable(METRICS_URL_ENV_VARIABLE, METRICS_URL_ENV_VARIABLE_VALUE);
+        var wiremockProperty = property(APPLICATION_WIREMOCK_PROPERTY, APPLICATION_WIREMOCK_PROPERTY_VALUE);
+        var externalConfigurations = Set.<ConfigurationEntry>of(
+                serverAuthProperty,
+                metricsUrlEnvVariable,
+                wiremockProperty
+        );
+
+        var startupContext = new ApplicationStartupContext(externalConfigurations);
 
         // when
         application.start(startupContext);
@@ -83,7 +109,7 @@ public class SpringApplicationTest {
     @Test
     public void shouldShutdownApplication() {
         // given
-        var startupContext = new ApplicationStartupContext(Map.of());
+        var startupContext = new ApplicationStartupContext(Set.of());
 
         application.start(startupContext);
 
@@ -126,44 +152,6 @@ public class SpringApplicationTest {
         assertNoEndpointExists(endpoints);
     }
 
-    @Test
-    public void shouldResolveDefaultConfigurationFile() {
-        // given
-        // when
-        var maybeConfigurationFile = application.getConfigurationFile();
-
-        // then
-        var expectedConfigurationFile = FileLoader.fromClasspath(ConfigurationFileResolver.APPLICATION_YML);
-
-        assertConfigurationFilePresent(maybeConfigurationFile, expectedConfigurationFile);
-    }
-
-    @Test
-    public void shouldResolveConfigurationFile() {
-        // given
-        var configurationFile = FileLoader.fromClasspath(APPLICATION_CUSTOM_YML);
-
-        application = SpringApplication.newApplication(SimpleSpringApplication.class, configurationFile);
-
-        // when
-        var maybeConfigurationFile = application.getConfigurationFile();
-
-        // then
-        assertConfigurationFilePresent(maybeConfigurationFile, configurationFile);
-    }
-
-    @Test
-    public void shouldNotResolveConfigurationFileWhenNonExistingConfigurationFile() {
-        // given
-        application = SpringApplication.newApplication(SimpleSpringApplication.class, Path.of("application.properties"));
-
-        // when
-        var maybeConfigurationFile = application.getConfigurationFile();
-
-        // then
-        assertConfigurationFileNotPresent(maybeConfigurationFile);
-    }
-
     private void assertInitialized(boolean initialized) {
         assertThat(initialized).isTrue();
     }
@@ -192,12 +180,16 @@ public class SpringApplicationTest {
     }
 
     private void assertConfiguredProperties(SimpleApplicationClient client) {
-        assertPropertyConfigured(client, PropertiesFactory.SERVER_PORT);
-        assertPropertyConfigured(client, MY_PROPERTY_B, MY_PROPERTY_VALUE_B);
+        assertPropertyConfigured(client, DynamicConfigurationConfigurer.SERVER_PORT);
+        assertPropertyConfigured(client, SERVER_NAME_PROPERTY, SERVER_NAME_PROPERTY_VALUE);
+        assertPropertyConfigured(client, SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
+        assertPropertyConfigured(client, METRICS_URL_PROPERTY, METRICS_URL_ENV_VARIABLE_VALUE);
+        assertPropertyConfigured(client, APPLICATION_WIREMOCK_PROPERTY, APPLICATION_WIREMOCK_PROPERTY_VALUE);
     }
 
     private void assertNotConfiguredProperties(SimpleApplicationClient client) {
-        assertPropertyNotConfigured(client, MY_PROPERTY_A);
+        assertPropertyNotConfigured(client, APPLICATION_WIREMOCK_URL_PROPERTY);
+        assertPropertyNotConfigured(client, APPLICATION_WIREMOCK_ALTERNATIVE_URL_PROPERTY);
     }
 
     private void assertPropertyNotConfigured(SimpleApplicationClient client, String property) {
@@ -216,14 +208,6 @@ public class SpringApplicationTest {
         var foundProperty = client.getProperty(property);
 
         assertThat(foundProperty).isPresent();
-    }
-
-    private void assertConfigurationFilePresent(Optional<Path> maybeConfigurationFile, Path expectedConfigurationFile) {
-        assertThat(maybeConfigurationFile).hasValue(expectedConfigurationFile);
-    }
-
-    private void assertConfigurationFileNotPresent(Optional<Path> maybeConfigurationFile) {
-        assertThat(maybeConfigurationFile).isEmpty();
     }
 
     private SimpleApplicationClient applicationClient(List<Endpoint> endpoints) {

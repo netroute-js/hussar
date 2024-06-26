@@ -1,36 +1,68 @@
 package pl.netroute.hussar.spring.boot;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
+import pl.netroute.hussar.core.api.ConfigurationEntry;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class PropertySourceConfigurer {
-    static final String PROPERTY_SOURCE_NAME = "hussar-spring-boot-application-property-source";
+    private static final Set<String> IGNORE_MAP_PROPERTY_SOURCES = Set.of("systemProperties", "systemEnvironment");
 
-    void configure(@NonNull Map<String, Object> properties,
+    private final ConfigurationResolver configurationResolver;
+
+    void configure(@NonNull Set<ConfigurationEntry> externalConfigurations,
                    @NonNull ConfigurableApplicationContext context) {
-        var propertySources = context
+        var mutablePropertySources = context
                 .getEnvironment()
                 .getPropertySources();
 
-        removeAllPropertySources(propertySources);
-        configureMapPropertySource(properties, propertySources);
+        var enhancedPropertySources = mutablePropertySources
+                .stream()
+                .map(propertySource -> enhancePropertySource(propertySource, externalConfigurations))
+                .toList();
+
+        removeAllPropertySources(mutablePropertySources);
+        configurePropertySource(enhancedPropertySources, mutablePropertySources);
+    }
+
+    private PropertySource<?> enhancePropertySource(PropertySource<?> propertySource,
+                                                    Set<ConfigurationEntry> externalConfigurations) {
+        if(propertySource instanceof MapPropertySource mapPropertySource && shallEnhancePropertySource(propertySource)) {
+            return enhanceMapPropertySource(mapPropertySource, externalConfigurations);
+        }
+
+        return propertySource;
+    }
+
+    private PropertySource<?> enhanceMapPropertySource(MapPropertySource mapPropertySource,
+                                                       Set<ConfigurationEntry> externalConfigurations) {
+        var name = mapPropertySource.getName();
+        var propertiesMap = mapPropertySource.getSource();
+        var reconfiguredPropertiesMap = configurationResolver.resolve(propertiesMap, externalConfigurations);
+
+        return new MapPropertySource(name, reconfiguredPropertiesMap);
+    }
+
+    private boolean shallEnhancePropertySource(PropertySource<?> propertySource) {
+        var name = propertySource.getName();
+
+        return !IGNORE_MAP_PROPERTY_SOURCES.contains(name);
     }
 
     private void removeAllPropertySources(MutablePropertySources propertySources) {
         propertySources.forEach(source -> propertySources.remove(source.getName()));
     }
 
-    private void configureMapPropertySource(Map<String, Object> properties, MutablePropertySources propertySources) {
-        var source = new MapPropertySource(PROPERTY_SOURCE_NAME, properties);
-
-        propertySources.addFirst(source);
+    private void configurePropertySource(List<? extends PropertySource<?>> propertySources, MutablePropertySources mutablePropertySources) {
+        propertySources.forEach(mutablePropertySources::addLast);
     }
 
 }

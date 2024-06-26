@@ -34,7 +34,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
     protected final Set<String> registerPasswordUnderEnvironmentVariables;
 
     @Override
-    protected RabbitMQDockerService configure() {
+    public RabbitMQDockerService configure() {
         var config = createConfig();
         var container = GenericContainerFactory.create(config);
         var configurationRegistry = new MapConfigurationRegistry();

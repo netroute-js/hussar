@@ -2,7 +2,7 @@ package pl.netroute.hussar.core.api;
 
 import lombok.NonNull;
 
-import java.util.Map;
+import java.util.Set;
 
-public record ApplicationStartupContext(@NonNull Map<String, Object> properties) {
+public record ApplicationStartupContext(@NonNull Set<ConfigurationEntry> externalConfigurations) {
 }
