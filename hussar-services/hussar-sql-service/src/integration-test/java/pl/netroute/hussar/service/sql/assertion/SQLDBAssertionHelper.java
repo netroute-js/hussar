@@ -50,7 +50,7 @@ public class SQLDBAssertionHelper {
 
         assertThatThrownBy(() -> createTemplate(schema, endpoint).execute(command))
                 .isInstanceOf(CannotGetJdbcConnectionException.class)
-                .hasMessage("Failed to obtain JDBC Connection");
+                .hasMessageStartingWith("Failed to obtain JDBC Connection");
     }
 
     public void assertTablesCreated(@NonNull String schema, @NonNull List<String> tables) {

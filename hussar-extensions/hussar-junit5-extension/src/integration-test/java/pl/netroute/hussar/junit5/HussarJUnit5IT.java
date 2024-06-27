@@ -45,7 +45,7 @@ import static pl.netroute.hussar.junit5.factory.WiremockServiceFactory.WIREMOCK_
 
 @ExtendWith(HussarJUnit5Extension.class)
 @HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class)
-public class HussarJUnit5Test {
+public class HussarJUnit5IT {
     private static final String PING_RESPONSE = "pong";
 
     @HussarApplication
