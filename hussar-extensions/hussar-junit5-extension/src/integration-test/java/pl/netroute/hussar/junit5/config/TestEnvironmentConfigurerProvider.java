@@ -1,5 +1,6 @@
 package pl.netroute.hussar.junit5.config;
 
+import pl.netroute.hussar.core.api.EnvironmentConfigurer;
 import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.junit5.factory.KafkaServiceFactory;
@@ -20,7 +21,7 @@ import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_AUTH
 public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
 
     @Override
-    public LocalEnvironmentConfigurer provide() {
+    public EnvironmentConfigurer provide() {
         var application = SpringApplication.newApplication(SimpleSpringApplication.class);
 
         var wiremockService = WiremockServiceFactory.create();
