@@ -1,12 +1,6 @@
-<style>
-    .separator {
-        border: 1px solid lightgray;
-        margin: -10px 0;
-    }
-</style>
-
 # Hussar
-<hr class="separator">
+
+---
 
 **Hussar** is a **highly extensible integration testing framework** engineered to provide robust and flexible testing capabilities. It is designed to seamlessly integrate with a wide range of testing environments, offering the following key features:
 
@@ -32,7 +26,8 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
 
 
 ## Table of Contents
-<hr class="separator">
+
+---
 
 - [Vocabulary](#vocabulary)
 - [Architecture](#architecture)
@@ -73,7 +68,8 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
 
 <a id="vocabulary"></a>
 ### Vocabulary
-<hr class="separator">
+
+---
 
 This section presents the **key terminologies and concepts** that are fundamental for understanding and using the Hussar testing framework.
 
@@ -107,7 +103,8 @@ This section presents the **key terminologies and concepts** that are fundamenta
 
 <a id="architecture"></a>
 ### Architecture
-<hr class="separator">
+
+---
 
 This section provides a comprehensive overview of the **Hussar architecture**, presenting high-level insights into its structural design and component interactions. It outlines the key architectural elements, their interdependencies, and the overall system topology. This foundational information is critical for understanding how the Hussar system operates, enabling deeper exploration into specific components, data flows, and integration points throughout the platform.
 
@@ -144,7 +141,8 @@ This section offers a concise overview of the individual **Hussar components**, 
 
 <a id="applications-component"></a>
 #### Applications
-<hr class="separator">
+
+---
 
 This section provides an overview of all **supported Hussar applications** that are available out of the box. These pre-configured applications are designed to integrate seamlessly into the Hussar ecosystem, offering standardized functionality.
 
@@ -169,7 +167,8 @@ This section provides an overview of all **supported Hussar applications** that 
 
 <a id="extensions-component"></a>
 #### Extensions
-<hr class="separator">
+
+---
 
 This section provides an overview of all **supported Hussar test engine extensions** that are available out of the box. These extensions are designed to enhance the functionality of the core Hussar test engine, offering additional capabilities such as custom lifecycle management, specialized test execution strategies, and advanced integration features.
 
@@ -194,7 +193,8 @@ This section provides an overview of all **supported Hussar test engine extensio
 
 <a id="services"></a>
 #### Services
-<hr class="separator">
+
+---
 
 This section provides a detailed overview of all **supported Hussar services** that are available out of the box. These services are pre-configured to integrate seamlessly with the Hussar platform.
 
@@ -402,7 +402,8 @@ This section provides a detailed overview of all **supported Hussar services** t
 
 <a id="examples"></a>
 ### Examples
-<hr class="separator">
+
+---
 
 This section provides a comprehensive collection of **examples** demonstrating the application of various **Hussar components** to expedite the configuration of your testing environment. Each example is designed to illustrate best practices and effective strategies for integrating Hussar components into your testing workflow. By leveraging these examples, you can quickly establish a robust and functional testing environment, optimizing setup time and ensuring adherence to standardized testing protocols. Detailed usage scenarios and configuration snippets are provided to facilitate seamless implementation and integration.
 
@@ -1214,7 +1215,8 @@ This section provides a comprehensive collection of **examples** demonstrating t
 
 <a id="contributors"></a>
 ### Contributors
-<hr class="separator">
+
+---
 
 Sławomir Jachowicz - founder developer
 

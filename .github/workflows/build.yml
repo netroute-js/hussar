@@ -1,0 +1,22 @@
+name: Building Hussar
+on: [push]
+
+jobs:
+  build_hussar:
+    name: Building Hussar components
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out codebase
+        uses: actions/checkout@v4
+
+      - name: Configuring JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configuring Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Building with Gradle
+        run: ./gradlew build
