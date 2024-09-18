@@ -44,14 +44,14 @@ public class LockedActionTest {
     @Test
     public void shouldDoSharedAction() {
         var maybeMoreValuesProduced = IntStream
-                .range(0, 10)
+                .range(0, 50)
                 .mapToObj(index -> {
                     // given
                     List<String> values = new ArrayList<>();
 
                     // when
                     var exclusiveActionResults = IntStream
-                            .range(0, 10)
+                            .range(0, 2)
                             .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(new Producer(values))))
                             .collect(Collectors.toUnmodifiableList());
 
@@ -59,9 +59,9 @@ public class LockedActionTest {
                             .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
                             .join();
 
+                    assertAtLeastTwoValuesProduced(values);
                     // then
                     try {
-                        assertAtLeastTwoValuesProduced(values);
 
                         return true;
                     } catch(AssertionError ex) {
@@ -77,14 +77,14 @@ public class LockedActionTest {
     @Test
     public void shouldDoSharedActionAndReturn() {
         var maybeMoreValuesProduced = IntStream
-                .range(0, 10)
+                .range(0, 50)
                 .mapToObj(index -> {
                     // given
                     List<String> values = new ArrayList<>();
 
                     // when
                     var exclusiveActionResults = IntStream
-                            .range(0, 10)
+                            .range(0, 2)
                             .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(toSupplier(new Producer(values)))))
                             .collect(Collectors.toUnmodifiableList());
 
