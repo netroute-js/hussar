@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +30,7 @@ public class LockedActionTest {
         var exclusiveActionResults = IntStream
                 .range(0, 10)
                 .mapToObj(index -> CompletableFuture.runAsync(() -> lockedAction.exclusiveAction(new Producer(values))))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         CompletableFuture
                 .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
@@ -44,30 +43,31 @@ public class LockedActionTest {
     @Test
     public void shouldDoSharedAction() {
         var maybeMoreValuesProduced = IntStream
-                .range(0, 50)
+                .range(0, 100)
                 .mapToObj(index -> {
                     // given
                     List<String> values = new ArrayList<>();
 
                     // when
                     var exclusiveActionResults = IntStream
-                            .range(0, 2)
+                            .range(0, 10)
                             .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(new Producer(values))))
-                            .collect(Collectors.toUnmodifiableList());
+                            .toList();
 
                     CompletableFuture
                             .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
                             .join();
 
-                    assertAtLeastTwoValuesProduced(values);
                     // then
                     try {
+                        assertAtLeastTwoValuesProduced(values);
 
                         return true;
                     } catch(AssertionError ex) {
                         return false;
                     }
                 })
+                .peek(val -> System.out.println(val))
                 .filter(Boolean::booleanValue)
                 .findFirst();
 
@@ -77,16 +77,16 @@ public class LockedActionTest {
     @Test
     public void shouldDoSharedActionAndReturn() {
         var maybeMoreValuesProduced = IntStream
-                .range(0, 50)
+                .range(0, 100)
                 .mapToObj(index -> {
                     // given
                     List<String> values = new ArrayList<>();
 
                     // when
                     var exclusiveActionResults = IntStream
-                            .range(0, 2)
+                            .range(0, 10)
                             .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(toSupplier(new Producer(values)))))
-                            .collect(Collectors.toUnmodifiableList());
+                            .toList();
 
                     CompletableFuture
                             .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
