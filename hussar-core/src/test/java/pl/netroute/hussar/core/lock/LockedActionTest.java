@@ -67,7 +67,6 @@ public class LockedActionTest {
                         return false;
                     }
                 })
-                .peek(val -> System.out.println(val))
                 .filter(Boolean::booleanValue)
                 .findFirst();
 

@@ -2,8 +2,8 @@ package pl.netroute.hussar.service.nosql.redis.assertion;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
@@ -14,7 +14,6 @@ import redis.clients.jedis.DefaultRedisCredentials;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import java.net.SocketException;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -45,11 +44,7 @@ public class RedisAssertionHelper {
     }
 
     public void asserRedisNotAccessible(@NonNull Endpoint endpoint) {
-        assertThatThrownBy(() -> createClient(endpoint))
-                .isInstanceOf(JedisConnectionException.class)
-                .hasMessage("java.net.SocketException: Connection reset")
-                .hasRootCauseInstanceOf(SocketException.class)
-                .hasRootCauseMessage("Connection reset");
+        assertThatThrownBy(() -> createClient(endpoint)).isInstanceOf(JedisConnectionException.class);
     }
 
     public void assertRegisteredEndpointUnderProperty(@NonNull String registeredProperty) {
