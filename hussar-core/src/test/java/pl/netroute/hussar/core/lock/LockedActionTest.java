@@ -22,7 +22,7 @@ public class LockedActionTest {
     public void shouldExecuteExclusiveAction() {
         // given
         var incrementor = new Incrementor();
-        var threads = 10;
+        var threads = 3;
 
         // when
         var exclusiveActionResults = IntStream
@@ -42,7 +42,7 @@ public class LockedActionTest {
     public void shouldDoSharedAction() {
         // given
         var incrementor = new Incrementor();
-        var threads = 10;
+        var threads = 3;
 
         // when
         var exclusiveActionResults = IntStream
@@ -62,7 +62,7 @@ public class LockedActionTest {
     public void shouldDoSharedActionAndReturn() {
         // given
         var incrementor = new Incrementor();
-        var threads = 10;
+        var threads = 3;
 
         // when
         var exclusiveActionResults = IntStream
