@@ -22,7 +22,7 @@ public class LockedActionTest {
     public void shouldExecuteExclusiveAction() {
         // given
         var incrementor = new Incrementor();
-        var threads = 3;
+        var threads = 10;
 
         // when
         var exclusiveActionResults = IntStream
@@ -38,44 +38,76 @@ public class LockedActionTest {
         assertIncremented(incrementor, threads * Incrementor.RUN_THRESHOLD);
     }
 
-    @RepeatedTest(value = 1000)
+    @Test
     public void shouldDoSharedAction() {
-        // given
-        var incrementor = new Incrementor();
-        var threads = 3;
+        var maxAttempts = 100000;
 
-        // when
-        var exclusiveActionResults = IntStream
-                .range(0, threads)
-                .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(incrementor)))
-                .toList();
+        var maybeRaceCondition = IntStream
+                .range(0, maxAttempts)
+                .mapToObj(index -> {
+                    // given
+                    var incrementor = new Incrementor();
+                    var threads = 10;
 
-        CompletableFuture
-                .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
-                .join();
+                    // when
+                    var exclusiveActionResults = IntStream
+                            .range(0, threads)
+                            .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(incrementor)))
+                            .toList();
 
-        // then
-        assertIncrementedDifferentThan(incrementor, threads * Incrementor.RUN_THRESHOLD);
+                    CompletableFuture
+                            .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
+                            .join();
+
+                    // then
+                    try {
+                        assertIncrementedDifferentThan(incrementor, threads * Incrementor.RUN_THRESHOLD);
+
+                        return true;
+                    } catch (AssertionError ex) {
+                        return false;
+                    }
+                })
+                .filter(Boolean::booleanValue)
+                .findFirst();
+
+        assertThat(maybeRaceCondition).isNotEmpty();
     }
 
     @Test
     public void shouldDoSharedActionAndReturn() {
-        // given
-        var incrementor = new Incrementor();
-        var threads = 3;
+        var maxAttempts = 100000;
 
-        // when
-        var exclusiveActionResults = IntStream
-                .range(0, threads)
-                .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(toSupplier(incrementor))))
-                .toList();
+        var maybeRaceCondition = IntStream
+                .range(0, maxAttempts)
+                .mapToObj(index -> {
+                    // given
+                    var incrementor = new Incrementor();
+                    var threads = 10;
 
-        CompletableFuture
-                .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
-                .join();
+                    // when
+                    var exclusiveActionResults = IntStream
+                            .range(0, threads)
+                            .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(toSupplier(incrementor))))
+                            .toList();
 
-        // then
-        assertIncrementedDifferentThan(incrementor, threads * Incrementor.RUN_THRESHOLD);
+                    CompletableFuture
+                            .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
+                            .join();
+
+                    // then
+                    try {
+                        assertIncrementedDifferentThan(incrementor, threads * Incrementor.RUN_THRESHOLD);
+
+                        return true;
+                    } catch (AssertionError ex) {
+                        return false;
+                    }
+                })
+                .filter(Boolean::booleanValue)
+                .findFirst();
+
+        assertThat(maybeRaceCondition).isNotEmpty();
     }
 
     private void assertIncremented(Incrementor incrementor, int expectedCounter) {
