@@ -4,12 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,38 +18,42 @@ public class LockedActionTest {
         lockedAction = new LockedAction();
     }
 
-    @RepeatedTest(value = 10)
+    @RepeatedTest(value = 1000)
     public void shouldExecuteExclusiveAction() {
         // given
-        List<String> values = new ArrayList<>();
+        var incrementor = new Incrementor();
+        var threads = 10;
 
         // when
         var exclusiveActionResults = IntStream
-                .range(0, 10)
-                .mapToObj(index -> CompletableFuture.runAsync(() -> lockedAction.exclusiveAction(new Producer(values))))
-                .collect(Collectors.toUnmodifiableList());
+                .range(0, threads)
+                .mapToObj(index -> CompletableFuture.runAsync(() -> lockedAction.exclusiveAction(incrementor)))
+                .toList();
 
         CompletableFuture
                 .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
                 .join();
 
         // then
-        assertSingleValueProduced(values);
+        assertIncremented(incrementor, threads * Incrementor.RUN_THRESHOLD);
     }
 
     @Test
     public void shouldDoSharedAction() {
-        var maybeMoreValuesProduced = IntStream
-                .range(0, 10)
+        var maxAttempts = 100000;
+
+        var maybeRaceCondition = IntStream
+                .range(0, maxAttempts)
                 .mapToObj(index -> {
                     // given
-                    List<String> values = new ArrayList<>();
+                    var incrementor = new Incrementor();
+                    var threads = 10;
 
                     // when
                     var exclusiveActionResults = IntStream
-                            .range(0, 10)
-                            .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(new Producer(values))))
-                            .collect(Collectors.toUnmodifiableList());
+                            .range(0, threads)
+                            .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(incrementor)))
+                            .toList();
 
                     CompletableFuture
                             .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
@@ -61,32 +61,35 @@ public class LockedActionTest {
 
                     // then
                     try {
-                        assertAtLeastTwoValuesProduced(values);
+                        assertIncrementedDifferentThan(incrementor, threads * Incrementor.RUN_THRESHOLD);
 
                         return true;
-                    } catch(AssertionError ex) {
+                    } catch (AssertionError ex) {
                         return false;
                     }
                 })
                 .filter(Boolean::booleanValue)
                 .findFirst();
 
-        assertThat(maybeMoreValuesProduced).isNotEmpty();
+        assertThat(maybeRaceCondition).isNotEmpty();
     }
 
     @Test
     public void shouldDoSharedActionAndReturn() {
-        var maybeMoreValuesProduced = IntStream
-                .range(0, 10)
+        var maxAttempts = 100000;
+
+        var maybeRaceCondition = IntStream
+                .range(0, maxAttempts)
                 .mapToObj(index -> {
                     // given
-                    List<String> values = new ArrayList<>();
+                    var incrementor = new Incrementor();
+                    var threads = 10;
 
                     // when
                     var exclusiveActionResults = IntStream
-                            .range(0, 10)
-                            .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(toSupplier(new Producer(values)))))
-                            .collect(Collectors.toUnmodifiableList());
+                            .range(0, threads)
+                            .mapToObj(actionIndex -> CompletableFuture.runAsync(() -> lockedAction.sharedAction(toSupplier(incrementor))))
+                            .toList();
 
                     CompletableFuture
                             .allOf(exclusiveActionResults.toArray(new CompletableFuture[0]))
@@ -94,27 +97,25 @@ public class LockedActionTest {
 
                     // then
                     try {
-                        assertAtLeastTwoValuesProduced(values);
+                        assertIncrementedDifferentThan(incrementor, threads * Incrementor.RUN_THRESHOLD);
 
                         return true;
-                    } catch(AssertionError ex) {
+                    } catch (AssertionError ex) {
                         return false;
                     }
                 })
                 .filter(Boolean::booleanValue)
                 .findFirst();
 
-        assertThat(maybeMoreValuesProduced).isNotEmpty();
-
+        assertThat(maybeRaceCondition).isNotEmpty();
     }
 
-    private void assertSingleValueProduced(List<String> values) {
-        assertThat(values).hasSize(1);
-
+    private void assertIncremented(Incrementor incrementor, int expectedCounter) {
+        assertThat(incrementor.getCounter()).isEqualTo(expectedCounter);
     }
 
-    private void assertAtLeastTwoValuesProduced(List<String> values) {
-        assertThat(values).hasSizeGreaterThanOrEqualTo(2);
+    private void assertIncrementedDifferentThan(Incrementor incrementor, int notExpectedCounter) {
+        assertThat(incrementor.getCounter()).isNotEqualTo(notExpectedCounter);
     }
 
     private <T> Supplier<T> toSupplier(Runnable action) {
@@ -125,18 +126,25 @@ public class LockedActionTest {
         };
     }
 
-    private static class Producer implements Runnable {
-        private final List<String> values;
+    private static class Incrementor implements Runnable {
+        private static final int INITIAL_COUNTER_VALUE = 0;
+        private static final int RUN_THRESHOLD = 5000000;
 
-        public Producer(List<String> values) {
-            this.values = values;
+        private int counter;
+
+        public Incrementor() {
+            this.counter = INITIAL_COUNTER_VALUE;
         }
 
         @Override
         public void run() {
-            if(values.isEmpty()) {
-                values.add(UUID.randomUUID().toString());
-            }
+            IntStream
+                .range(0, RUN_THRESHOLD)
+                .forEach(index -> counter++);
+        }
+
+        public int getCounter() {
+            return counter;
         }
 
     }
