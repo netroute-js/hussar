@@ -8,12 +8,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public class LockedAction {
+    private static final boolean FAIR_MODE = true;
+
     private static final Duration TRY_LOCK_TIMEOUT = Duration.ofSeconds(10L);
 
     private final ReentrantReadWriteLock lock;
 
     public LockedAction() {
-        this.lock = new ReentrantReadWriteLock();
+        this.lock = new ReentrantReadWriteLock(FAIR_MODE);
     }
 
     public void exclusiveAction(@NonNull Runnable action) {
@@ -40,10 +42,13 @@ public class LockedAction {
         var acquiredLock = isWriteLock ? lock.writeLock() : lock.readLock();
 
         try {
-            acquiredLock.tryLock(TRY_LOCK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+            var acquired = acquiredLock.tryLock(TRY_LOCK_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+            if(!acquired) {
+                throw new IllegalStateException("Acquiring lock timed out");
+            }
 
             return action.get();
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             throw new IllegalStateException("Could not acquire lock", ex);
         } finally {
             acquiredLock.unlock();
