@@ -13,4 +13,5 @@ categories:
   - title: "🐛 Bug Fixes"
     labels: "bugfix"
 
-exclude-labels: "skip-changelog"
+exclude-labels:
+  - "skip-changelog"
