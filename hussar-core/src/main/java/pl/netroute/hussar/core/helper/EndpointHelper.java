@@ -3,9 +3,9 @@ package pl.netroute.hussar.core.helper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.service.Service;
 
 /**
  * An {@link Endpoint} helper.

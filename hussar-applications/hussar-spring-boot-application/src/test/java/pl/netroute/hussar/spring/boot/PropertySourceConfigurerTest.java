@@ -8,8 +8,8 @@ import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +101,7 @@ public class PropertySourceConfigurerTest {
         var mutablePropertySources = environment.getPropertySources();
 
         mutablePropertySources.forEach(propertySource -> mutablePropertySources.remove(propertySource.getName()));
-        propertySources.forEach(propertySource -> mutablePropertySources.addLast(propertySource));
+        propertySources.forEach(mutablePropertySources::addLast);
 
         var context = new StaticApplicationContext();
         context.setEnvironment(environment);

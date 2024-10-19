@@ -2,14 +2,15 @@ package pl.netroute.hussar.service.nosql.mongodb;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
 /**
- * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing MongoDB.
+ * Hussar Docker {@link Service} representing MongoDB.
  */
 public class MongoDBDockerService extends BaseDockerService<MongoDBDockerServiceConfig> {
     private static final int LISTENING_PORT = 27017;

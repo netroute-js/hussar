@@ -1,8 +1,8 @@
 package pl.netroute.hussar.core;
 
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.Environment;
-import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.api.environment.Environment;
+import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
 
 import java.util.concurrent.ForkJoinPool;
 

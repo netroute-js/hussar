@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
@@ -131,7 +131,7 @@ public class WiremockDockerServiceTest {
 
     private WiremockDockerService createWireMockService(WiremockDockerServiceConfig config,
                                                         GenericContainer<?> container) {
-        var configurationRegistry = new MapConfigurationRegistry();
+        var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
 
         return new WiremockDockerService(container, config, configurationRegistry, endpointRegisterer);

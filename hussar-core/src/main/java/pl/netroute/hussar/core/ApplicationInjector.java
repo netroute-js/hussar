@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import pl.netroute.hussar.core.annotation.HussarApplication;
-import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.api.Environment;
+import pl.netroute.hussar.core.api.application.HussarApplication;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.environment.Environment;
 import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;

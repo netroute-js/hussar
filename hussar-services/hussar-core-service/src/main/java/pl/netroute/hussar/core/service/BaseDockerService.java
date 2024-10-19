@@ -4,9 +4,10 @@ import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A base class with default implementation/template for all Hussar Docker {@link pl.netroute.hussar.core.api.Service}.
+ * A base class with default implementation/template for all Hussar Docker {@link Service}.
  *
  * @param <C> the {@link BaseDockerServiceConfig} parameter used by the {@link BaseDockerService}.
  */

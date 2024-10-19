@@ -3,8 +3,8 @@ package pl.netroute.hussar.spring.boot;
 import lombok.NonNull;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * An actual implementation of {@link Application}. It guarantees seamless integration for testing Spring Boot applications.
  */
-public class SpringApplication implements Application {
+public class SpringBootApplication implements Application {
     private static final String HOSTNAME = "localhost";
 
     private final Class<?> applicationClass;
@@ -24,8 +24,8 @@ public class SpringApplication implements Application {
 
     private ConfigurableApplicationContext applicationContext;
 
-    private SpringApplication(@NonNull Class<?> applicationClass,
-                              @NonNull PropertySourceConfigurer propertySourceConfigurer) {
+    private SpringBootApplication(@NonNull Class<?> applicationClass,
+                                  @NonNull PropertySourceConfigurer propertySourceConfigurer) {
         this.applicationClass = applicationClass;
         this.propertySourceConfigurer = propertySourceConfigurer;
         this.lockedAction = new LockedAction();
@@ -90,16 +90,16 @@ public class SpringApplication implements Application {
     }
 
     /**
-     * Factory method to create {@link SpringApplication}.
+     * Factory method to create {@link SpringBootApplication}.
      *
      * @param applicationClass - the main class of your Spring Boot application.
-     * @return the instance of {@link SpringApplication}
+     * @return the instance of {@link SpringBootApplication}
      */
-    public static SpringApplication newApplication(@NonNull Class<?> applicationClass) {
+    public static SpringBootApplication newApplication(@NonNull Class<?> applicationClass) {
         var configurationResolver = new ConfigurationResolver();
         var propertySourceConfigurer = new PropertySourceConfigurer(configurationResolver);
 
-        return new SpringApplication(applicationClass, propertySourceConfigurer);
+        return new SpringBootApplication(applicationClass, propertySourceConfigurer);
     }
 
 }

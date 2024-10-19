@@ -3,11 +3,11 @@ package pl.netroute.hussar.core.service.registerer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
-import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 
 import java.util.Set;
 
@@ -19,7 +19,7 @@ public class EndpointRegistererTest {
 
     @BeforeEach
     public void setup() {
-        configurationRegistry = new MapConfigurationRegistry();
+        configurationRegistry = new DefaultConfigurationRegistry();
 
         endpointRegisterer = new EndpointRegisterer(configurationRegistry);
     }

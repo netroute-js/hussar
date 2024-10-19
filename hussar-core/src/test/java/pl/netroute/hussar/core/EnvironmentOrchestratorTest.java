@@ -2,29 +2,28 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.api.ApplicationStartupContext;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.Environment;
-import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
-import pl.netroute.hussar.core.api.Service;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.environment.Environment;
+import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.api.environment.LocalEnvironmentConfigurer;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
 
 public class EnvironmentOrchestratorTest {
     private EnvironmentOrchestrator orchestrator;
@@ -65,7 +64,7 @@ public class EnvironmentOrchestratorTest {
         var initializationFutures = IntStream
                 .range(0, 10)
                 .mapToObj(index -> CompletableFuture.supplyAsync(() -> orchestrator.initialize(configurerProvider)))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         CompletableFuture
                 .allOf(initializationFutures.toArray(new CompletableFuture[0]))

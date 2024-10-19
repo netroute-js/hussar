@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -12,15 +12,15 @@ import java.util.Set;
  * An actual implementation of {@link ServiceRegistry}.
  */
 @RequiredArgsConstructor
-public class MapServiceRegistry implements ServiceRegistry {
+public class DefaultServiceRegistry implements ServiceRegistry {
 
     @NonNull
     private final Set<Service> registeredServices;
 
     /**
-     * Creates new instance of {@link MapServiceRegistry}.
+     * Creates new instance of {@link DefaultServiceRegistry}.
      */
-    public MapServiceRegistry() {
+    public DefaultServiceRegistry() {
         this(new HashSet<>());
     }
 

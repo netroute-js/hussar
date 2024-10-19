@@ -4,7 +4,7 @@ import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
@@ -42,7 +42,7 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
     public KafkaDockerService configure() {
         var config = createConfig();
         var container = createContainer(config);
-        var configurationRegistry = new MapConfigurationRegistry();
+        var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var listenerConfigurer = new KafkaListenerConfigurer();
         var topicConfigurer = new KafkaTopicConfigurer();

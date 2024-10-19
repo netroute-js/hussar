@@ -2,8 +2,8 @@ package pl.netroute.hussar.spring.boot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.ApplicationStartupContext;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.spring.boot.client.ClientFactory;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;
@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
 
-public class SpringApplicationTest {
+public class SpringBootApplicationTest {
     private static final int PORT_RANGE_START = 30000;
     private static final int PORT_RANGE_END = 40000;
 
@@ -38,11 +38,11 @@ public class SpringApplicationTest {
     private static final String METRICS_URL_ENV_VARIABLE = "METRICS_URL";
     private static final String METRICS_URL_ENV_VARIABLE_VALUE = "https://husar.dev/metrics";
 
-    private SpringApplication application;
+    private SpringBootApplication application;
 
     @BeforeEach
     public void setup() {
-        application = SpringApplication.newApplication(SimpleSpringApplication.class);
+        application = SpringBootApplication.newApplication(SimpleSpringApplication.class);
     }
 
     @Test

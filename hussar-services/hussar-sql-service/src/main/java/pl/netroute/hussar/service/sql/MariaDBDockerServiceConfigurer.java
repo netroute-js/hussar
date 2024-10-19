@@ -1,7 +1,7 @@
 package pl.netroute.hussar.service.sql;
 
 import lombok.experimental.SuperBuilder;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.container.GenericContainerFactory;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
@@ -20,7 +20,7 @@ public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceCon
     public MariaDBDockerService configure() {
         var config = createConfig();
         var container = GenericContainerFactory.create(config);
-        var configurationRegistry = new MapConfigurationRegistry();
+        var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
         var schemaInitializer = new DatabaseSchemaInitializer();

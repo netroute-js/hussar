@@ -5,8 +5,9 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
@@ -14,7 +15,7 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import java.util.List;
 
 /**
- * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing Kafka.
+ * Hussar Docker {@link Service} representing Kafka.
  */
 public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConfig> {
     private final KafkaListenerConfigurer listenerConfigurer;

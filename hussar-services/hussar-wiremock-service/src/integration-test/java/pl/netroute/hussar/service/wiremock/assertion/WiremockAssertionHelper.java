@@ -6,9 +6,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 
 import java.net.SocketException;
@@ -37,7 +37,7 @@ public class WiremockAssertionHelper {
     public void assertWiremockNotAccessible(@NonNull Endpoint endpoint) {
         var wiremockClient = new WireMock(endpoint.host(), endpoint.port());
 
-        assertThatThrownBy(() -> wiremockClient.resetToDefaultMappings())
+        assertThatThrownBy(wiremockClient::resetToDefaultMappings)
                 .isInstanceOfAny(SocketException.class, NoHttpResponseException.class);
     }
 
@@ -62,7 +62,6 @@ public class WiremockAssertionHelper {
     }
 
     private void assertRegisteredEndpointInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(wiremock);
         var configRegistry = wiremock.getConfigurationRegistry();
 
         configRegistry

@@ -3,9 +3,10 @@ package pl.netroute.hussar.service.rabbitmq;
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerService;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing RabbitMQ.
+ * Hussar Docker {@link Service} representing RabbitMQ.
  */
 public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServiceConfig> {
     private static final int LISTENING_PORT = 5672;

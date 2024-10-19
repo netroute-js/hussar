@@ -1,6 +1,8 @@
 package pl.netroute.hussar.core.api;
 
 import lombok.NonNull;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.service.Service;
 
 /**
  * Hussar interface responsible for exposing lifecycle methods of {@link Application} or {@link Service}.

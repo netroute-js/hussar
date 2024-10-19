@@ -3,9 +3,9 @@ package pl.netroute.hussar.service.nosql.mongodb;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
 import java.util.Optional;

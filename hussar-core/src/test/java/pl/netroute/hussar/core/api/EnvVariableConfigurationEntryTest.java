@@ -1,6 +1,8 @@
 package pl.netroute.hussar.core.api;
 
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

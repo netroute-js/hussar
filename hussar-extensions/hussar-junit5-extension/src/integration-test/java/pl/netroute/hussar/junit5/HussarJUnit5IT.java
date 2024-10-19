@@ -2,10 +2,10 @@ package pl.netroute.hussar.junit5;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import pl.netroute.hussar.core.annotation.HussarApplication;
-import pl.netroute.hussar.core.annotation.HussarEnvironment;
-import pl.netroute.hussar.core.annotation.HussarService;
-import pl.netroute.hussar.core.api.Application;
+import pl.netroute.hussar.core.api.application.HussarApplication;
+import pl.netroute.hussar.core.api.environment.HussarEnvironment;
+import pl.netroute.hussar.core.api.service.HussarService;
+import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.junit5.client.ClientFactory;
 import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
 import pl.netroute.hussar.junit5.config.TestEnvironmentConfigurerProvider;

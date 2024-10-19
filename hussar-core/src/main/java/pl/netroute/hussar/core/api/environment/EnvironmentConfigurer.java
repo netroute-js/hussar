@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.environment;
 
 /**
  * Hussar interface responsible for configuring a new instance of testing {@link Environment}.

@@ -1,6 +1,6 @@
 package pl.netroute.hussar.core.service;
 
-import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.service.Service;
 
 /**
  * Hussar interface responsible for configuring {@link Service}.

@@ -3,7 +3,7 @@ package pl.netroute.hussar.service.wiremock;
 import pl.netroute.hussar.service.wiremock.assertion.WiremockAssertionHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 
 import java.util.Optional;

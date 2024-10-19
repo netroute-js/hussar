@@ -1,8 +1,9 @@
 package pl.netroute.hussar.core.domain;
 
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.api.ApplicationStartupContext;
+import lombok.NonNull;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.Endpoint;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class TestApplication implements Application {
     }
 
     @Override
-    public void start(ApplicationStartupContext context) {
+    public void start(@NonNull ApplicationStartupContext context) {
     }
 
     @Override

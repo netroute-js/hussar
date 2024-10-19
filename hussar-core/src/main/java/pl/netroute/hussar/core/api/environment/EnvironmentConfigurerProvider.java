@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.environment;
 
 /**
  * Hussar interface responsible for providing {@link EnvironmentConfigurer}.

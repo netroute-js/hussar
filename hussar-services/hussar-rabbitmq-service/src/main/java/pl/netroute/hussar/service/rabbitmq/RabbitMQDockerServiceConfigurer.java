@@ -2,7 +2,7 @@ package pl.netroute.hussar.service.rabbitmq;
 
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.container.GenericContainerFactory;
@@ -55,7 +55,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
     public RabbitMQDockerService configure() {
         var config = createConfig();
         var container = GenericContainerFactory.create(config);
-        var configurationRegistry = new MapConfigurationRegistry();
+        var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new RabbitMQCredentialsRegisterer(configurationRegistry);
         var queueConfigurer = new RabbitMQQueueConfigurer();

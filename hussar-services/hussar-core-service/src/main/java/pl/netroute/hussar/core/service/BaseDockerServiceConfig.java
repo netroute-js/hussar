@@ -3,9 +3,10 @@ package pl.netroute.hussar.core.service;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import pl.netroute.hussar.core.api.service.Service;
 
 /**
- * A base configuration of Hussar Docker {@link pl.netroute.hussar.core.api.Service}.
+ * A base configuration of Hussar Docker {@link Service}.
  */
 @Getter
 @SuperBuilder

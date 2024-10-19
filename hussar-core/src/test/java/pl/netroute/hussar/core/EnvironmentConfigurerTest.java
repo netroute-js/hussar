@@ -1,11 +1,11 @@
 package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.Application;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.Environment;
-import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
-import pl.netroute.hussar.core.api.Service;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.environment.Environment;
+import pl.netroute.hussar.core.api.environment.LocalEnvironmentConfigurer;
+import pl.netroute.hussar.core.api.service.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 

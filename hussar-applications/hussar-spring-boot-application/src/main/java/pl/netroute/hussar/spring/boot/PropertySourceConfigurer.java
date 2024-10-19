@@ -7,7 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
 
 import java.util.List;
 import java.util.Set;

@@ -1,11 +1,12 @@
 package pl.netroute.hussar.core.domain;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
-import pl.netroute.hussar.core.api.Service;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +21,7 @@ abstract class AbstractTestService implements Service {
     }
 
     @Override
-    public void start(ServiceStartupContext context) {
+    public void start(@NonNull ServiceStartupContext context) {
     }
 
     @Override
@@ -34,7 +35,7 @@ abstract class AbstractTestService implements Service {
 
     @Override
     public ConfigurationRegistry getConfigurationRegistry() {
-        return new MapConfigurationRegistry();
+        return new DefaultConfigurationRegistry();
     }
 
     @Override

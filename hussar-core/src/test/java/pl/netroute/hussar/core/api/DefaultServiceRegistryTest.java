@@ -1,6 +1,8 @@
 package pl.netroute.hussar.core.api;
 
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.service.DefaultServiceRegistry;
+import pl.netroute.hussar.core.api.service.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 import pl.netroute.hussar.core.domain.ServiceTestC;
@@ -11,7 +13,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class MapServiceRegistryTest {
+public class DefaultServiceRegistryTest {
     private static final String FIRST_SERVICE_A_NAME = "first-serviceA-name";
     private static final String SECOND_SERVICE_A_NAME = "second-serviceA-name";
 
@@ -22,7 +24,7 @@ public class MapServiceRegistryTest {
         // given
         var service = new ServiceTestA();
 
-        var serviceRegistry = new MapServiceRegistry();
+        var serviceRegistry = new DefaultServiceRegistry();
 
         // when
         serviceRegistry.register(service);
@@ -37,7 +39,7 @@ public class MapServiceRegistryTest {
         var service = new ServiceTestA();
         var duplicateService = new ServiceTestA();
 
-        var serviceRegistry = new MapServiceRegistry(Set.of(service));
+        var serviceRegistry = new DefaultServiceRegistry(Set.of(service));
 
         // when
         var failure = assertThatThrownBy(() -> serviceRegistry.register(duplicateService));
@@ -54,7 +56,7 @@ public class MapServiceRegistryTest {
         // given
         var service = new ServiceTestA(FIRST_SERVICE_A_NAME);
 
-        var serviceRegistry = new MapServiceRegistry();
+        var serviceRegistry = new DefaultServiceRegistry();
 
         // when
         serviceRegistry.register(service);
@@ -70,7 +72,7 @@ public class MapServiceRegistryTest {
         var secondServiceA = new ServiceTestA(SECOND_SERVICE_A_NAME);
         var serviceB = new ServiceTestB(FIRST_SERVICE_B_NAME);
 
-        var serviceRegistry = new MapServiceRegistry();
+        var serviceRegistry = new DefaultServiceRegistry();
 
         // when
         serviceRegistry.register(firstServiceA);
@@ -89,7 +91,7 @@ public class MapServiceRegistryTest {
         var service = new ServiceTestA(FIRST_SERVICE_A_NAME);
         var duplicateService = new ServiceTestA(FIRST_SERVICE_A_NAME);
 
-        var serviceRegistry = new MapServiceRegistry(Set.of(service));
+        var serviceRegistry = new DefaultServiceRegistry(Set.of(service));
 
         // when
         var failure = assertThatThrownBy(() -> serviceRegistry.register(duplicateService));
@@ -104,7 +106,7 @@ public class MapServiceRegistryTest {
     @Test
     public void shouldReturnEmptyWhenNoTypedServiceExists() {
         // given
-        var serviceRegistry = new MapServiceRegistry();
+        var serviceRegistry = new DefaultServiceRegistry();
         var typedService = ServiceTestC.class;
 
         // when
@@ -117,7 +119,7 @@ public class MapServiceRegistryTest {
     @Test
     public void shouldReturnEmptyWhenNoNamedServiceExists() {
         // given
-        var serviceRegistry = new MapServiceRegistry();
+        var serviceRegistry = new DefaultServiceRegistry();
         var namedService = "some-name";
 
         // when
@@ -132,7 +134,7 @@ public class MapServiceRegistryTest {
         // given
         var typedService = new ServiceTestB();
 
-        var serviceRegistry = new MapServiceRegistry(Set.of(typedService));
+        var serviceRegistry = new DefaultServiceRegistry(Set.of(typedService));
 
         // when
         var foundService = serviceRegistry.findEntryByType(typedService.getClass());
@@ -148,7 +150,7 @@ public class MapServiceRegistryTest {
         var secondNamedServiceA = new ServiceTestA(SECOND_SERVICE_A_NAME);
         var namedServiceB = new ServiceTestB(FIRST_SERVICE_B_NAME);
 
-        var serviceRegistry = new MapServiceRegistry(Set.of(namedServiceA, secondNamedServiceA, namedServiceB));
+        var serviceRegistry = new DefaultServiceRegistry(Set.of(namedServiceA, secondNamedServiceA, namedServiceB));
 
         // when
         var foundService = serviceRegistry.findEntryByName(SECOND_SERVICE_A_NAME);
@@ -169,7 +171,7 @@ public class MapServiceRegistryTest {
         );
     }
 
-    private void assertTypedServiceRegistered(MapServiceRegistry registry, Service expectedService) {
+    private void assertTypedServiceRegistered(DefaultServiceRegistry registry, Service expectedService) {
         long registeredServices = registry
                 .getEntries()
                 .stream()
@@ -179,7 +181,7 @@ public class MapServiceRegistryTest {
         assertThat(registeredServices).isOne();
     }
 
-    private void assertNamedServiceRegistered(MapServiceRegistry registry, Service expectedService) {
+    private void assertNamedServiceRegistered(DefaultServiceRegistry registry, Service expectedService) {
         long registeredServices = registry
                 .getEntries()
                 .stream()

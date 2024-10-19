@@ -1,7 +1,7 @@
 package pl.netroute.hussar.service.wiremock;
 
 import lombok.experimental.SuperBuilder;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.container.GenericContainerFactory;
@@ -21,7 +21,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
     public WiremockDockerService configure() {
         var config = createConfig();
         var container = GenericContainerFactory.create(config);
-        var configurationRegistry = new MapConfigurationRegistry();
+        var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
 
         return new WiremockDockerService(

@@ -2,9 +2,9 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.MapServiceRegistry;
-import pl.netroute.hussar.core.api.Service;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.service.DefaultServiceRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
@@ -16,9 +16,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class ServiceStarterTest {
-    private ServiceTestA serviceA;
-    private ServiceTestB serviceB;
-
     private ServiceStarter starter;
 
     @BeforeEach
@@ -29,11 +26,11 @@ public class ServiceStarterTest {
     @Test
     public void shouldStartStandaloneServices() {
         // given
-        serviceA = mock(ServiceTestA.class);
-        serviceB = mock(ServiceTestB.class);
+        var serviceA = mock(ServiceTestA.class);
+        var serviceB = mock(ServiceTestB.class);
         var standaloneServices = Set.<Service>of(serviceA, serviceB);
 
-        var serviceRegistry = new MapServiceRegistry(standaloneServices);
+        var serviceRegistry = new DefaultServiceRegistry(standaloneServices);
 
         // when
         starter.start(serviceRegistry);

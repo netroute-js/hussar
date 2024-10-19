@@ -1,5 +1,8 @@
 package pl.netroute.hussar.core.api;
 
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.service.Service;
+
 import java.util.List;
 
 /**

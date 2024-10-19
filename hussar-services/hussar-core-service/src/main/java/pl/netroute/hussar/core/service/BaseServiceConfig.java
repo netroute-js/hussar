@@ -3,11 +3,12 @@ package pl.netroute.hussar.core.service;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import pl.netroute.hussar.core.api.service.Service;
 
 import java.util.Set;
 
 /**
- * A base configuration of Hussar {@link pl.netroute.hussar.core.api.Service}.
+ * A base configuration of Hussar {@link Service}.
  */
 @Getter
 @SuperBuilder

@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.service;
 
 import lombok.NonNull;
 

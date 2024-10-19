@@ -1,4 +1,9 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.environment;
+
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceRegistry;
 
 /**
  * Hussar interface responsible for gathering all the details of a testing {@link Environment}.

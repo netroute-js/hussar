@@ -2,13 +2,14 @@ package pl.netroute.hussar.service.sql;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 /**
- * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing MariaDB.
+ * Hussar Docker {@link Service} representing MariaDB.
  */
 public class MariaDBDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 3306;

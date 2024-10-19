@@ -2,9 +2,9 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.annotation.HussarEnvironment;
-import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.api.LocalEnvironmentConfigurer;
+import pl.netroute.hussar.core.api.environment.HussarEnvironment;
+import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.api.environment.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 import pl.netroute.hussar.core.domain.TestApplication;
@@ -18,19 +18,16 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 public class HussarTest {
-    private EnvironmentConfigurerProviderResolver configurerProviderResolver;
     private EnvironmentOrchestrator environmentOrchestrator;
     private Hussar hussar;
 
     @BeforeEach
     public void setup() {
-        configurerProviderResolver = new EnvironmentConfigurerProviderResolver();
-
+        var configurerProviderResolver = new EnvironmentConfigurerProviderResolver();
         var serviceStarter = new ServiceStarter(Executors.newSingleThreadExecutor());
         var servicesStopper = new ServiceStopper(Executors.newSingleThreadExecutor());
 
         environmentOrchestrator = spy(new EnvironmentOrchestrator(serviceStarter, servicesStopper));
-
         hussar = new Hussar(configurerProviderResolver, environmentOrchestrator);
     }
 

@@ -2,7 +2,7 @@ package pl.netroute.hussar.service.rabbitmq;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 import pl.netroute.hussar.service.rabbitmq.assertion.RabbitMQAssertionHelper;
 
@@ -103,7 +103,7 @@ public class RabbitMQDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(DOCKER_IMAGE_VERSION)
                 .done()
-                .configure();;
+                .configure();
 
         // when
         rabbitMQService.start(ServiceStartupContext.empty());

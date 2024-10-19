@@ -1,4 +1,6 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.configuration;
+
+import pl.netroute.hussar.core.api.service.Service;
 
 /**
  * Hussar interface that exposes the methods to access dynamic configuration of components like {@link Service}.

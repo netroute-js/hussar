@@ -3,7 +3,7 @@ package pl.netroute.hussar.service.nosql.redis;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
-import pl.netroute.hussar.core.api.MapConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.container.GenericContainerFactory;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
@@ -54,7 +54,7 @@ public class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigu
     public RedisDockerService configure() {
         var config = createConfig();
         var container = GenericContainerFactory.create(config);
-        var configurationRegistry = new MapConfigurationRegistry();
+        var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new RedisCredentialsRegisterer(configurationRegistry);
         var passwordConfigurer = new RedisPasswordConfigurer();

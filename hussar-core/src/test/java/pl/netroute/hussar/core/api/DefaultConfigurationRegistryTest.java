@@ -2,17 +2,19 @@ package pl.netroute.hussar.core.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MapConfigurationRegistryTest {
+public class DefaultConfigurationRegistryTest {
     private static final int SINGLE_CONFIG_ENTRY_REGISTERED = 1;
 
-    private MapConfigurationRegistry registry;
+    private DefaultConfigurationRegistry registry;
 
     @BeforeEach
     public void setup() {
-        registry = new MapConfigurationRegistry();
+        registry = new DefaultConfigurationRegistry();
     }
 
     @Test

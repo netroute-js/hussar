@@ -2,14 +2,15 @@ package pl.netroute.hussar.service.nosql.redis;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 
 /**
- * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing Redis.
+ * Hussar Docker {@link Service} representing Redis.
  */
 public class RedisDockerService extends BaseDockerService<RedisDockerServiceConfig> {
     private static final int LISTENING_PORT = 6379;

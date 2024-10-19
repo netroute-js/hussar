@@ -1,16 +1,21 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.environment;
 
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.DefaultServiceRegistry;
+import pl.netroute.hussar.core.api.service.Service;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
 
 /**
  * An actual implementation of {@link EnvironmentConfigurer}.
@@ -32,10 +37,10 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
 
     @Override
     public Environment configure() {
-        var serviceRegistry = new MapServiceRegistry(services);
+        var serviceRegistry = new DefaultServiceRegistry(services);
 
         var configurations = mergeConfigurations();
-        var configurationRegistry = new MapConfigurationRegistry(configurations);
+        var configurationRegistry = new DefaultConfigurationRegistry(configurations);
 
         return new DefaultEnvironment(
                 application,

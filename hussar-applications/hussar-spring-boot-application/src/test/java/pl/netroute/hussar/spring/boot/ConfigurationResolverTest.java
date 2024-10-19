@@ -2,14 +2,14 @@ package pl.netroute.hussar.spring.boot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
 
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
 
 public class ConfigurationResolverTest {
     private static final String SERVER_NAME_PROPERTY = "server.name";

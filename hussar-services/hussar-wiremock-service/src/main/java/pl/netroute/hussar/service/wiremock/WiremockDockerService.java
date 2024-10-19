@@ -2,12 +2,13 @@ package pl.netroute.hussar.service.wiremock;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 /**
- * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing WireMock.
+ * Hussar Docker {@link Service} representing WireMock.
  */
 public class WiremockDockerService extends BaseDockerService<WiremockDockerServiceConfig> {
     private static final int HTTP_LISTENING_PORT = 8080;

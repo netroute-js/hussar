@@ -2,11 +2,11 @@
 
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;
- import pl.netroute.hussar.core.api.ConfigurationEntry;
- import pl.netroute.hussar.core.api.ConfigurationRegistry;
- import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
- import pl.netroute.hussar.core.api.MapConfigurationRegistry;
- import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+ import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+ import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+ import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
+ import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
+ import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
  import pl.netroute.hussar.service.rabbitmq.api.RabbitMQCredentials;
 
  import java.util.Set;
@@ -19,7 +19,7 @@
 
      @BeforeEach
      public void setup() {
-         configurationRegistry = new MapConfigurationRegistry();
+         configurationRegistry = new DefaultConfigurationRegistry();
 
          credentialsRegisterer = new RabbitMQCredentialsRegisterer(configurationRegistry);
      }

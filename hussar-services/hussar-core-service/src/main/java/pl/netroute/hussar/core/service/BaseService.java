@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.Service;
-import pl.netroute.hussar.core.api.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceStartupContext;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
@@ -32,7 +33,7 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
 
     /**
      * An instance of {@link ConfigurationRegistry} used by this {@link Service}.
-     * All the dynamic {@link pl.netroute.hussar.core.api.ConfigurationEntry} will be registered in this instance.
+     * All the dynamic {@link ConfigurationEntry} will be registered in this instance.
      */
     @NonNull
     protected final ConfigurationRegistry configurationRegistry;

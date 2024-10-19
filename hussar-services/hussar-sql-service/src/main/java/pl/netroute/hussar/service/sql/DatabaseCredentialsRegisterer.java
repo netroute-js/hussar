@@ -3,9 +3,9 @@ package pl.netroute.hussar.service.sql;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 import java.util.Optional;

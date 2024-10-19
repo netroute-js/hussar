@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api;
+package pl.netroute.hussar.core.api.configuration;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -10,15 +10,15 @@ import java.util.Set;
  * An actual implementation of {@link ConfigurationRegistry}.
  */
 @RequiredArgsConstructor
-public class MapConfigurationRegistry implements ConfigurationRegistry {
+public class DefaultConfigurationRegistry implements ConfigurationRegistry {
 
     @NonNull
     private final Set<ConfigurationEntry> registeredConfigurations;
 
     /**
-     * Creates new instance of {@link MapConfigurationRegistry}.
+     * Creates new instance of {@link DefaultConfigurationRegistry}.
      */
-    public MapConfigurationRegistry() {
+    public DefaultConfigurationRegistry() {
         this(new HashSet<>());
     }
 

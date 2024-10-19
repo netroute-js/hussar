@@ -3,9 +3,9 @@ package pl.netroute.hussar.spring.boot;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.ConfigurationEntry;
-import pl.netroute.hussar.core.api.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,6 @@ class ConfigurationResolver {
         var mutableConfiguration = new HashMap<>(applicationConfigurations);
 
         externalConfigurations
-                .stream()
                 .forEach(configuration -> replaceConfigurationEntry(mutableConfiguration, configuration));
 
         return Map.copyOf(mutableConfiguration);

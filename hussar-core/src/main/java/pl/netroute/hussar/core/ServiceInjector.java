@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import pl.netroute.hussar.core.annotation.HussarService;
-import pl.netroute.hussar.core.api.Environment;
-import pl.netroute.hussar.core.api.Service;
-import pl.netroute.hussar.core.api.ServiceRegistry;
+import pl.netroute.hussar.core.api.service.HussarService;
+import pl.netroute.hussar.core.api.environment.Environment;
+import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.api.service.ServiceRegistry;
 import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
