@@ -8,7 +8,7 @@ allprojects {
     apply plugin: "io.freefair.lombok"
 
     group = "pl.netroute"
-    sourceCompatibility = "17"
+    sourceCompatibility = "21"
 
     java {
         withJavadocJar()

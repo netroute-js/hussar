@@ -33,7 +33,7 @@ dependencyResolutionManagement {
             def logbackVersion = version("logback", "1.2.11")
             def testcontainersVersion = version("testcontainers", "1.19.7")
             def wiremockVersion = version("wiremock", "3.3.1")
-            def mockitoVersion = version("mockito", "4.6.1")
+            def mockitoVersion = version("mockito", "5.14.2")
             def assertjVersion = version("assertj", "3.22.0")
             def junit5Version = version("junit", "5.8.2")
 
@@ -74,9 +74,8 @@ dependencyResolutionManagement {
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef(junit5Version)
             library("assertj-core", "org.assertj", "assertj-core").versionRef(assertjVersion)
             library("mockito-core", "org.mockito", "mockito-core").versionRef(mockitoVersion)
-            library("mockito-inline", "org.mockito", "mockito-inline").versionRef(mockitoVersion)
 
-            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core', 'mockito-inline'])
+            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core'])
         }
     }
 }
