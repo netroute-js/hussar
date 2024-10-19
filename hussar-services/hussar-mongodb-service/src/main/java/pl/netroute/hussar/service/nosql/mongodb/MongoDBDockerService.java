@@ -8,6 +8,9 @@ import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing MongoDB.
+ */
 public class MongoDBDockerService extends BaseDockerService<MongoDBDockerServiceConfig> {
     private static final int LISTENING_PORT = 27017;
 
@@ -20,6 +23,15 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
     private final MongoDBCredentials credentials;
     private final MongoDBCredentialsRegisterer credentialsRegisterer;
 
+    /**
+     * Creates new MongoDB {@link MongoDBDockerService}.
+     *
+     * @param container - the {@link GenericContainer} used by this {@link MongoDBDockerService}.
+     * @param config - the {@link MongoDBDockerServiceConfig} used by this {@link MongoDBDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link MongoDBDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link MongoDBDockerService}.
+     * @param credentialsRegisterer - the {@link MongoDBCredentialsRegisterer} used by this {@link MongoDBDockerService}.
+     */
     MongoDBDockerService(@NonNull GenericContainer<?> container,
                          @NonNull MongoDBDockerServiceConfig config,
                          @NonNull ConfigurationRegistry configurationRegistry,
@@ -48,6 +60,11 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
         registerCredentialsUnderEnvironmentVariables();
     }
 
+    /**
+     * Returns {@link MongoDBCredentials}.
+     *
+     * @return the actual {@link MongoDBCredentials}
+     */
     public MongoDBCredentials getCredentials() {
         return credentials;
     }

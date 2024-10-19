@@ -6,6 +6,9 @@ import pl.netroute.hussar.core.api.EnvironmentConfigurerProvider;
 
 import java.util.concurrent.ForkJoinPool;
 
+/**
+ * The main Hussar facade responsible for environment lifecycle management.
+ */
 public class Hussar {
     private final EnvironmentConfigurerProviderResolver configurerProviderResolver;
     private final EnvironmentOrchestrator environmentOrchestrator;
@@ -16,12 +19,20 @@ public class Hussar {
         this.environmentOrchestrator = environmentOrchestrator;
     }
 
+    /**
+     * Initializes Hussar environment for the given test class - if applicable.
+     *
+     * @param testObject the test object class
+     */
     public void initializeFor(@NonNull Object testObject) {
         configurerProviderResolver
                 .resolve(testObject)
                 .ifPresent(environmentConfigurerProvider -> initializeEnvironment(testObject, environmentConfigurerProvider));
     }
 
+    /**
+     * Shutdowns all Hussar environments.
+     */
     public void shutdown() {
         environmentOrchestrator.shutdown();
     }
@@ -43,6 +54,11 @@ public class Hussar {
         applicationInjector.inject(testObject);
     }
 
+    /**
+     * Creates new Hussar instance.
+     *
+     * @return the Hussar instance
+     */
     public static Hussar newInstance() {
         var configurerResolver = new EnvironmentConfigurerProviderResolver();
 

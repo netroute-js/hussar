@@ -7,6 +7,9 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing MariaDB.
+ */
 public class MariaDBDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 3306;
 
@@ -15,6 +18,16 @@ public class MariaDBDockerService extends BaseDatabaseDockerService<SQLDatabaseD
     private static final String MARIA_DB_ROOT_USERNAME = "root";
     private static final String MARIA_DB_ROOT_PASSWORD = "test";
 
+    /**
+     * Creates new {@link MariaDBDockerService}.
+     *
+     * @param container - the {@link GenericContainer} used by this {@link MariaDBDockerService}.
+     * @param config - the {@link SQLDatabaseDockerServiceConfig} used by this {@link MariaDBDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link MariaDBDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link MariaDBDockerService}.
+     * @param credentialsRegisterer - the {@link DatabaseCredentialsRegisterer} used by this {@link MariaDBDockerService}.
+     * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link MariaDBDockerService}.
+     */
     MariaDBDockerService(@NonNull GenericContainer<?> container,
                          @NonNull SQLDatabaseDockerServiceConfig config,
                          @NonNull ConfigurationRegistry configurationRegistry,

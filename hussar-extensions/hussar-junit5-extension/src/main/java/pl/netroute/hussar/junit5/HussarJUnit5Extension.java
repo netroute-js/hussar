@@ -10,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
 import java.util.Optional;
 
+/**
+ * Hussar extension to seamlessly integrate with JUnit5 testing framework.
+ */
 public class HussarJUnit5Extension implements BeforeAllCallback, AfterAllCallback, TestInstancePostProcessor {
     private static final String HUSSAR_ENVIRONMENT = "HUSSAR";
     private static final Namespace HUSSAR_NAMESPACE = Namespace.create(HUSSAR_ENVIRONMENT);

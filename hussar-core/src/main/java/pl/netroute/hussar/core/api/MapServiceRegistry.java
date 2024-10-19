@@ -8,12 +8,18 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * An actual implementation of {@link ServiceRegistry}.
+ */
 @RequiredArgsConstructor
 public class MapServiceRegistry implements ServiceRegistry {
 
     @NonNull
     private final Set<Service> registeredServices;
 
+    /**
+     * Creates new instance of {@link MapServiceRegistry}.
+     */
     public MapServiceRegistry() {
         this(new HashSet<>());
     }

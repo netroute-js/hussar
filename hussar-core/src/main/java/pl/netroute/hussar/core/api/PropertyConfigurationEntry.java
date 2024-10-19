@@ -4,6 +4,9 @@ import lombok.NonNull;
 
 import java.util.Objects;
 
+/**
+ * Actual implementation of {@link ConfigurationEntry}. It represents the property.
+ */
 public record PropertyConfigurationEntry(@NonNull String name,
                                          @NonNull String value) implements ConfigurationEntry {
 

@@ -12,6 +12,9 @@ import java.util.stream.Stream;
 import static pl.netroute.hussar.core.api.ConfigurationEntry.envVariable;
 import static pl.netroute.hussar.core.api.ConfigurationEntry.property;
 
+/**
+ * An actual implementation of {@link EnvironmentConfigurer}.
+ */
 @Builder(builderMethodName = "newInstance", buildMethodName = "done", setterPrefix = "with")
 public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
 

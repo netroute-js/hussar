@@ -1,14 +1,19 @@
 plugins {
-    id "java" apply true
+    id "java-library" apply true
     id "io.freefair.lombok" version "8.6" apply true
 }
 
 allprojects {
-    apply plugin: "java"
+    apply plugin: "java-library"
     apply plugin: "io.freefair.lombok"
 
     group = "pl.netroute"
     sourceCompatibility = "17"
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
     test {
         useJUnitPlatform()

@@ -10,10 +10,20 @@ import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
 import java.sql.SQLException;
 
+/**
+ * An initializer to create configured SQL DB schema.
+ */
 @Slf4j
 public class DatabaseSchemaInitializer {
     private static final String CREATE_DATABASE_SQL_TEMPLATE = "CREATE DATABASE %s";
 
+    /**
+     * Initializes SQL DB schema.
+     *
+     * @param endpoint - the {@link Endpoint} of the SQL DB.
+     * @param credentials - the {@link SQLDatabaseCredentials} of SQL DB.
+     * @param database - the {@link SQLDatabaseSchema} to be initialized.
+     */
     public void initialize(@NonNull Endpoint endpoint,
                            @NonNull SQLDatabaseCredentials credentials,
                            @NonNull SQLDatabaseSchema database) {

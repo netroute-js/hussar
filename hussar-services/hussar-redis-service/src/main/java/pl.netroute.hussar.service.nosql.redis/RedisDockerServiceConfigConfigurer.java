@@ -12,23 +12,41 @@ import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 import java.util.Set;
 
+/**
+ * Hussar {@link RedisDockerService} configurer. This is the only way to create {@link RedisDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigurer<RedisDockerService> {
     private static final String DOCKER_IMAGE = "redis";
     private static final String SERVICE = "redis_service";
     private static final String REDIS_SCHEME = "redis://";
 
+    /**
+     * Shall run Redis in password less mode.
+     */
     @Builder.Default boolean enablePassword = false;
 
+    /**
+     * Set of properties to be used to register Redis username under.
+     */
     @Singular
     protected final Set<String> registerUsernameUnderProperties;
 
+    /**
+     * Set of environment variables to be used to register Redis username under.
+     */
     @Singular
     protected final Set<String> registerUsernameUnderEnvironmentVariables;
 
+    /**
+     * Set of properties to be used to register Redis password under.
+     */
     @Singular
     protected final Set<String> registerPasswordUnderProperties;
 
+    /**
+     * Set of environment variables to be used to register Redis password under.
+     */
     @Singular
     protected final Set<String> registerPasswordUnderEnvironmentVariables;
 

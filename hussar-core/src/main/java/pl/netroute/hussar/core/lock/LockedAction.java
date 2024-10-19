@@ -7,6 +7,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
+/**
+ * A class responsible for controlling the execution of an action.
+ */
 public class LockedAction {
     private static final boolean FAIR_MODE = true;
 
@@ -14,18 +17,38 @@ public class LockedAction {
 
     private final ReentrantReadWriteLock lock;
 
+    /**
+     * Creates new {@link LockedAction}.
+     */
     public LockedAction() {
         this.lock = new ReentrantReadWriteLock(FAIR_MODE);
     }
 
+    /**
+     * Guarantees that the action will be executed exclusively. Only one thread can be executing this action.
+     *
+     * @param action - the {@link Runnable} that has to be executed exclusively.
+     */
     public void exclusiveAction(@NonNull Runnable action) {
         lockedAction(toSupplier(action), true);
     }
 
+    /**
+     * Executes action without any guarantees. Multiple threads can be running in parallel.
+     *
+     * @param action - the {@link Runnable} that can be executed by multiple threads.
+     */
     public void sharedAction(@NonNull Runnable action) {
         lockedAction(toSupplier(action), false);
     }
 
+    /**
+     * Executes action without any guarantees. Multiple threads can be running in parallel.
+     *
+     * @param <T>    the type parameter
+     * @param action - the {@link Supplier} that can be executed by multiple threads.
+     * @return the actual result of the processing
+     */
     public <T> T sharedAction(@NonNull Supplier<T> action) {
         return lockedAction(action, false);
     }

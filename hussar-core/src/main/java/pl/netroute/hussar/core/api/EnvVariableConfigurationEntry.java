@@ -4,6 +4,9 @@ import lombok.NonNull;
 
 import java.util.Objects;
 
+/**
+ * Actual implementation of {@link ConfigurationEntry}. It represents the environment variable.
+ */
 public record EnvVariableConfigurationEntry(@NonNull String name,
                                             @NonNull String formattedName,
                                             @NonNull String value) implements ConfigurationEntry {

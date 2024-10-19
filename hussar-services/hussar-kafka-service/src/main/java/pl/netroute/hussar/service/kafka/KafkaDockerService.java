@@ -13,12 +13,27 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing Kafka.
+ */
 public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConfig> {
     private final KafkaListenerConfigurer listenerConfigurer;
     private final KafkaTopicConfigurer topicConfigurer;
     private final KafkaTopicAutoCreationConfigurer topicAutoCreationConfigurer;
     private final KafkaKraftModeConfigurer kraftModeConfigurer;
 
+    /**
+     * Creates new instance of {@link KafkaDockerService}.
+     *
+     * @param container - the {@link KafkaContainer} used by this {@link KafkaDockerService}.
+     * @param config - the {@link KafkaDockerServiceConfig} used by this {@link KafkaDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link KafkaDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link KafkaDockerService}.
+     * @param listenerConfigurer - the {@link KafkaListenerConfigurer} used by this {@link KafkaDockerService}.
+     * @param topicConfigurer - the {@link KafkaTopicConfigurer} used by this {@link KafkaDockerService}.
+     * @param topicAutoCreationConfigurer - the {@link KafkaTopicConfigurer} used by this {@link KafkaDockerService}.
+     * @param kraftModeConfigurer - the {@link KafkaKraftModeConfigurer} used by this {@link KafkaDockerService}.
+     */
     KafkaDockerService(@NonNull KafkaContainer container,
                        @NonNull KafkaDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,

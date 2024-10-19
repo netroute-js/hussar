@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing RabbitMQ.
+ */
 public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServiceConfig> {
     private static final int LISTENING_PORT = 5672;
     private static final int MANAGEMENT_API_LISTENING_PORT = 15672;
@@ -32,6 +35,16 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
     private final RabbitMQQueueConfigurer queueConfigurer;
     private final RabbitMQCredentials credentials;
 
+    /**
+     * Creates new {@link RabbitMQDockerService}.
+     *
+     * @param container - the {@link GenericContainer} used by this {@link RabbitMQDockerService}.
+     * @param config - the {@link RabbitMQDockerServiceConfig} used by this {@link RabbitMQDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link RabbitMQDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link RabbitMQDockerService}.
+     * @param credentialsRegisterer - the {@link RabbitMQCredentialsRegisterer} used by this {@link RabbitMQDockerService}.
+     * @param queueConfigurer - the {@link RabbitMQQueueConfigurer} used by this {@link RabbitMQDockerService}.
+     */
     RabbitMQDockerService(@NonNull GenericContainer<?> container,
                           @NonNull RabbitMQDockerServiceConfig config,
                           @NonNull ConfigurationRegistry configurationRegistry,
@@ -84,10 +97,20 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
         registerCredentialsUnderEnvironmentVariables();
     }
 
+    /**
+     * Returns {@link RabbitMQCredentials}.
+     *
+     * @return the actual {@link RabbitMQCredentials}.
+     */
     public RabbitMQCredentials getCredentials() {
         return credentials;
     }
 
+    /**
+     * Gets management endpoint.
+     *
+     * @return the management endpoint
+     */
     public Optional<Endpoint> getManagementEndpoint() {
         if(isManagementApiSupported()) {
             var host = container.getHost();

@@ -8,6 +8,9 @@ import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing Redis.
+ */
 public class RedisDockerService extends BaseDockerService<RedisDockerServiceConfig> {
     private static final int LISTENING_PORT = 6379;
 
@@ -18,6 +21,16 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
     private final RedisCredentialsRegisterer credentialsRegisterer;
     private final RedisPasswordConfigurer passwordConfigurer;
 
+    /**
+     * Creates new {@link RedisDockerService}.
+     *
+     * @param container - the {@link GenericContainer} used by this {@link RedisDockerService}.
+     * @param config - the {@link RedisDockerServiceConfig} used by this {@link RedisDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link RedisDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link RedisDockerService}.
+     * @param credentialsRegisterer - the {@link RedisCredentialsRegisterer} used by this {@link RedisDockerService}.
+     * @param passwordConfigurer - the {@link RedisPasswordConfigurer} used by this {@link RedisDockerService}.
+     */
     RedisDockerService(@NonNull GenericContainer<?> container,
                        @NonNull RedisDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,
@@ -55,6 +68,11 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
         registerCredentialsUnderEnvironmentVariables();
     }
 
+    /**
+     * Returns {@link RedisCredentials}.
+     *
+     * @return the actual {@link RedisCredentials}.
+     */
     public RedisCredentials getCredentials() {
         return credentials;
     }

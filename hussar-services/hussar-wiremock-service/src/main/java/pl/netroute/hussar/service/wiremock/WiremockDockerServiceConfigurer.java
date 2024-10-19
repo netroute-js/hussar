@@ -9,6 +9,9 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
+/**
+ * Hussar {@link WiremockDockerService} configurer. This is the only way to create {@link WiremockDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer<WiremockDockerService> {
     private static final String DOCKER_IMAGE = "wiremock/wiremock";

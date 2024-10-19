@@ -7,6 +7,9 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing MySQL.
+ */
 public class MySQLDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 3306;
 
@@ -15,6 +18,16 @@ public class MySQLDockerService extends BaseDatabaseDockerService<SQLDatabaseDoc
     private static final String MYSQL_ROOT_USERNAME = "root";
     private static final String MYSQL_ROOT_PASSWORD = "test";
 
+    /**
+     * Creates new {@link MySQLDockerService}.
+     *
+     * @param container - the {@link GenericContainer} used by this {@link MySQLDockerService}.
+     * @param config - the {@link SQLDatabaseDockerServiceConfig} used by this {@link MySQLDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link MySQLDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link MySQLDockerService}.
+     * @param credentialsRegisterer - the {@link DatabaseCredentialsRegisterer} used by this {@link MySQLDockerService}.
+     * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link MySQLDockerService}.
+     */
     MySQLDockerService(@NonNull GenericContainer<?> container,
                        @NonNull SQLDatabaseDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,

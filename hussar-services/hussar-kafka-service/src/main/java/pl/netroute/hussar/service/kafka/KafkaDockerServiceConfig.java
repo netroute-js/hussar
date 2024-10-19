@@ -12,7 +12,7 @@ import java.util.Set;
 @Value
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class KafkaDockerServiceConfig extends BaseDockerServiceConfig {
+class KafkaDockerServiceConfig extends BaseDockerServiceConfig {
     boolean kraftMode;
     boolean topicAutoCreation;
 

@@ -5,6 +5,9 @@ import lombok.NonNull;
 
 import java.util.Map;
 
+/**
+ * Custom type representing RabbitMQ queue.
+ */
 @Builder
 public record RabbitMQQueue(@NonNull String name,
                             boolean durable,

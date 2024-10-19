@@ -2,23 +2,21 @@ package pl.netroute.hussar.core.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+/**
+ * A String helper class
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringHelper {
-    private static final String DEFAULT_DELIMITER = ",";
 
+    /**
+     * Checks whether the value is not null and not blank.
+     *
+     * @param value - the value to be checked.
+     * @return true if there is any value. False otherwise.
+     */
     public static boolean hasValue(String value) {
         return value != null && !value.isBlank();
-    }
-
-    public static String concat(@NonNull String... values) {
-        return Stream
-                .of(values)
-                .collect(Collectors.joining(DEFAULT_DELIMITER));
     }
 
 }

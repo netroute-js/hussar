@@ -8,6 +8,9 @@ import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+/**
+ * Hussar {@link MariaDBDockerService} configurer. This is the only way to create {@link MariaDBDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<MariaDBDockerService> {
     private static final String DOCKER_IMAGE = "mariadb";

@@ -7,6 +7,9 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+/**
+ * Hussar Docker {@link pl.netroute.hussar.core.api.Service} representing PostgreSQL.
+ */
 public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDatabaseDockerServiceConfig> {
     private static final int LISTENING_PORT = 5432;
 
@@ -15,6 +18,16 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
     private static final String POSTGRE_SQL_USERNAME = "postgres";
     private static final String POSTGRE_SQL_PASSWORD = "test";
 
+    /**
+     * Creates new {@link PostgreSQLDockerService}.
+     *
+     * @param container - the {@link GenericContainer} used by this {@link PostgreSQLDockerService}.
+     * @param config - the {@link SQLDatabaseDockerServiceConfig} used by this {@link PostgreSQLDockerService}.
+     * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link PostgreSQLDockerService}.
+     * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link PostgreSQLDockerService}.
+     * @param credentialsRegisterer - the {@link DatabaseCredentialsRegisterer} used by this {@link PostgreSQLDockerService}.
+     * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link PostgreSQLDockerService}.
+     */
     PostgreSQLDockerService(@NonNull GenericContainer<?> container,
                             @NonNull SQLDatabaseDockerServiceConfig config,
                             @NonNull ConfigurationRegistry configurationRegistry,

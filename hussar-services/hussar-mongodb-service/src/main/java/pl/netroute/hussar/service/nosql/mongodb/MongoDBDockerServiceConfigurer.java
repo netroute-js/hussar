@@ -11,21 +11,36 @@ import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 import java.util.Set;
 
+/**
+ * Hussar {@link MongoDBDockerService} configurer. This is the only way to create {@link MongoDBDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<MongoDBDockerService> {
     private static final String DOCKER_IMAGE = "mongo";
     private static final String SERVICE = "mongodb_service";
     private static final String MONGODB_SCHEME = "mongodb://";
 
+    /**
+     * Set of properties to be used to register MongoDB username under.
+     */
     @Singular
     protected final Set<String> registerUsernameUnderProperties;
 
+    /**
+     * Set of environment variables to be used to register MongoDB username under.
+     */
     @Singular
     protected final Set<String> registerUsernameUnderEnvironmentVariables;
 
+    /**
+     * Set of properties to be used to register MongoDB password under.
+     */
     @Singular
     protected final Set<String> registerPasswordUnderProperties;
 
+    /**
+     * Set of environment variables to be used to register MongoDB password under.
+     */
     @Singular
     protected final Set<String> registerPasswordUnderEnvironmentVariables;
 

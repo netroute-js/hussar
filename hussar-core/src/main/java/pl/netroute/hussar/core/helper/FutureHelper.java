@@ -8,9 +8,18 @@ import java.time.Duration;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A {@link Future} helper.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FutureHelper {
 
+    /**
+     * It waits until a given {@link Future} finishes or timeouts.
+     *
+     * @param task - a task to finish or timeout.
+     * @param timeout - the timeout of a given task.
+     */
     public static void waitForTaskCompletion(@NonNull Future<?> task,
                                              @NonNull Duration timeout) {
         try {

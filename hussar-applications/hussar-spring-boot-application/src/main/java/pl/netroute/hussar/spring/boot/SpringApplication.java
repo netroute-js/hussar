@@ -12,6 +12,9 @@ import pl.netroute.hussar.core.lock.LockedAction;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * An actual implementation of {@link Application}. It guarantees seamless integration for testing Spring Boot applications.
+ */
 public class SpringApplication implements Application {
     private static final String HOSTNAME = "localhost";
 
@@ -50,7 +53,7 @@ public class SpringApplication implements Application {
     }
 
     @Override
-    public void start(ApplicationStartupContext context) {
+    public void start(@NonNull ApplicationStartupContext context) {
         lockedAction.exclusiveAction(() ->
             Optional
                     .ofNullable(applicationContext)
@@ -86,6 +89,12 @@ public class SpringApplication implements Application {
                 .run();
     }
 
+    /**
+     * Factory method to create {@link SpringApplication}.
+     *
+     * @param applicationClass - the main class of your Spring Boot application.
+     * @return the instance of {@link SpringApplication}
+     */
     public static SpringApplication newApplication(@NonNull Class<?> applicationClass) {
         var configurationResolver = new ConfigurationResolver();
         var propertySourceConfigurer = new PropertySourceConfigurer(configurationResolver);

@@ -8,6 +8,9 @@ import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+/**
+ * Hussar {@link PostgreSQLDockerService} configurer. This is the only way to create {@link PostgreSQLDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class PostgreSQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<PostgreSQLDockerService> {
     private static final String DOCKER_IMAGE = "postgres";

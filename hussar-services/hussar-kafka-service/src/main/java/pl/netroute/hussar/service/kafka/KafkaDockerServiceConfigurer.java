@@ -13,15 +13,28 @@ import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 
 import java.util.Set;
 
+/**
+ * Hussar {@link KafkaDockerService} configurer. This is the only way to create {@link KafkaDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<KafkaDockerService> {
     private static final String DOCKER_IMAGE = "confluentinc/cp-kafka";
     private static final String SERVICE = "kafka_service";
     private static final String KAFKA_SCHEME = "";
 
+    /**
+     * Shall configure Kafka to run in kraft mode.
+     */
     boolean kraftMode;
+
+    /**
+     * Shall configure auto topic creation.
+     */
     boolean topicAutoCreation;
 
+    /**
+     * Set of topics to be created on Kafka startup.
+     */
     @Singular
     protected final Set<KafkaTopic> topics;
 

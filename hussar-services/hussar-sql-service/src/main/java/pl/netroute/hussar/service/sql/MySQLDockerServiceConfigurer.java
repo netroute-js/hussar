@@ -8,6 +8,9 @@ import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+/**
+ * Hussar {@link MySQLDockerService} configurer. This is the only way to create {@link MySQLDockerService}.
+ */
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 public class MySQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfigurer<MySQLDockerService> {
     private static final String DOCKER_IMAGE = "mysql";
