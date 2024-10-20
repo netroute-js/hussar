@@ -14,9 +14,9 @@ include "hussar-services:hussar-rabbitmq-service"
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            def springVersion = version("springVersion", "5.3.31")
-            def springBootVersion = version("springBoot", "2.7.18")
-            def springCloudVersion = version("springCloud", "3.1.6")
+            def springVersion = version("springVersion", "6.1.13")
+            def springBootVersion = version("springBoot", "3.3.4")
+            def springCloudVersion = version("springCloud", "4.1.3")
             def flywayVersion = version("flyway", "10.7.1")
             def mysqlConnectorVersion = version("mysqlConnector", "8.3.0")
             def mariadbConnectorVersion = version("mariadbConnector", "3.3.2")
