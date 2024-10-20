@@ -1,4 +1,4 @@
-# Hussar
+### Hussar
 
 ---
 
@@ -25,7 +25,7 @@
 Overall, **Hussar** provides a powerful, flexible, and efficient solution for integration testing, making it a valuable tool for teams seeking to enhance their testing workflows.
 
 
-## Table of Contents
+### Table of Contents
 
 ---
 

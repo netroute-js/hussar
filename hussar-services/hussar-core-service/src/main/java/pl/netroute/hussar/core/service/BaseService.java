@@ -1,5 +1,6 @@
 package pl.netroute.hussar.core.service;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
  *
  * @param <C> the {@link BaseServiceConfig} parameter used by the {@link BaseService}.
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseService<C extends BaseServiceConfig> implements Service {
 
     /**

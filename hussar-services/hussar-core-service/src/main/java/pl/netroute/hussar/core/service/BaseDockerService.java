@@ -34,10 +34,10 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link BaseDockerService}.
      * @param endpointRegisterer - the {@link EndpointRegisterer} used by this {@link BaseDockerService}.
      */
-    public BaseDockerService(@NonNull GenericContainer<?> container,
-                             @NonNull C config,
-                             @NonNull ConfigurationRegistry configurationRegistry,
-                             @NonNull EndpointRegisterer endpointRegisterer) {
+    protected BaseDockerService(@NonNull GenericContainer<?> container,
+                                @NonNull C config,
+                                @NonNull ConfigurationRegistry configurationRegistry,
+                                @NonNull EndpointRegisterer endpointRegisterer) {
         super(config, configurationRegistry, endpointRegisterer);
 
         this.container = container;
