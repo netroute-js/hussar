@@ -8,8 +8,6 @@ import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class DatabaseCredentialsRegisterer {
 
@@ -18,33 +16,30 @@ class DatabaseCredentialsRegisterer {
 
     void registerUsernameUnderProperty(@NonNull SQLDatabaseCredentials credentials,
                                        @NonNull String usernameProperty) {
-        Optional
-                .of(usernameProperty)
-                .map(property -> new PropertyConfigurationEntry(property, credentials.username()))
-                .ifPresent(configurationRegistry::register);
+        var property = new PropertyConfigurationEntry(usernameProperty, credentials.username());
+
+        configurationRegistry.register(property);
     }
 
     void registerPasswordUnderProperty(@NonNull SQLDatabaseCredentials credentials,
                                        @NonNull String passwordProperty) {
-        Optional
-                .of(passwordProperty)
-                .map(property -> new PropertyConfigurationEntry(property, credentials.password()))
-                .ifPresent(configurationRegistry::register);
+        var property = new PropertyConfigurationEntry(passwordProperty, credentials.password());
+
+        configurationRegistry.register(property);
     }
 
     void registerUsernameUnderEnvironmentVariable(@NonNull SQLDatabaseCredentials credentials,
                                                   @NonNull String usernameEnvVariable) {
-        Optional
-                .of(usernameEnvVariable)
-                .map(envVariable -> new EnvVariableConfigurationEntry(envVariable, credentials.username()))
-                .ifPresent(configurationRegistry::register);
+        var envVariable = new EnvVariableConfigurationEntry(usernameEnvVariable, credentials.username());
+
+        configurationRegistry.register(envVariable);
     }
 
     void registerPasswordUnderEnvironmentVariable(@NonNull SQLDatabaseCredentials credentials,
                                                   @NonNull String passwordEnvVariable) {
-        Optional
-                .of(passwordEnvVariable)
-                .map(property -> new EnvVariableConfigurationEntry(property, credentials.password()))
-                .ifPresent(configurationRegistry::register);
+        var envVariable = new EnvVariableConfigurationEntry(passwordEnvVariable, credentials.password());
+
+        configurationRegistry.register(envVariable);
     }
+
 }
