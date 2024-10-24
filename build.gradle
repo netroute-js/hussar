@@ -1,6 +1,21 @@
 plugins {
     id "java-library" apply true
+    id "net.researchgate.release" version "3.0.2" apply true
     id "io.freefair.lombok" version "8.6" apply true
+}
+
+release {
+    failOnCommitNeeded = false
+    failOnPublishNeeded = false
+    preTagCommitMessage = '[Gradle Release Plugin] - preparing release version: '
+    tagCommitMessage = '[Gradle Release Plugin] - creating release version: '
+    newVersionCommitMessage = '[Gradle Release Plugin] - preparing development version: '
+    versionPropertyFile = 'gradle.properties'
+    buildTasks = []
+
+    git {
+        requireBranch.set('master')
+    }
 }
 
 allprojects {
@@ -22,4 +37,5 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
 }

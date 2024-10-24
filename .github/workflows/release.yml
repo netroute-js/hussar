@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release version'
+        required: true
+
+jobs:
+  release_hussar:
+    name: Releasing Hussar components
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking out codebase
+        uses: actions/checkout@v4
+
+      - name: Configuring JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Configuring Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Configuring Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email ""
+
+      - name: Releasing with Gradle
+        run: ./gradlew release -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=${{ github.event.inputs.release-version }}
+
