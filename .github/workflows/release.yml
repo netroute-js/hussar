@@ -11,6 +11,8 @@ jobs:
   release_hussar:
     name: Releasing Hussar components
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checking out codebase
         uses: actions/checkout@v4
