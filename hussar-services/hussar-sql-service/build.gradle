@@ -1,32 +1,6 @@
-sourceSets {
-
-	integrationTest {
-		java.srcDir file('src/integration-test/java')
-		resources.srcDir file('src/integration-test/resources')
-
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
-	}
-
+plugins {
+	id "hussar.java-conventions"
 }
-
-configurations {
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntime.extendsFrom testRuntime
-	integrationTestCompileOnly.extendsFrom compileOnly
-}
-
-task integrationTest(type: Test) {
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	outputs.upToDateWhen {false}
-	testLogging.showStandardStreams = true
-	testLogging.exceptionFormat = 'full'
-	useJUnitPlatform()
-}
-
-integrationTest.dependsOn test
-check.dependsOn integrationTest
 
 dependencies {
 	implementation project(":hussar-core")

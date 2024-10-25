@@ -1,3 +1,7 @@
+plugins {
+	id "hussar.java-conventions"
+}
+
 dependencies {
 	implementation project(":hussar-core")
 	implementation libs.spring.boot.starter
