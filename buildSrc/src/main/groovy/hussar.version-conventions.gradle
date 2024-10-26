@@ -1,0 +1,17 @@
+plugins {
+    id "net.researchgate.release"
+}
+
+release {
+    failOnCommitNeeded = false
+    failOnPublishNeeded = false
+    preTagCommitMessage = '[Gradle Release Plugin] - preparing release version: '
+    tagCommitMessage = '[Gradle Release Plugin] - creating release version: '
+    newVersionCommitMessage = '[Gradle Release Plugin] - preparing development version: '
+    versionPropertyFile = 'gradle.properties'
+    buildTasks = []
+
+    git {
+        requireBranch.set('master')
+    }
+}

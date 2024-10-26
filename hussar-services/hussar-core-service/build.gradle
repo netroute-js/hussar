@@ -1,7 +1,10 @@
 plugins {
 	id "hussar.java-conventions"
+	id "hussar.release-conventions"
 	id "java-test-fixtures"
 }
+
+description = "Provides core Hussar services features"
 
 dependencies {
 	implementation project(":hussar-core")

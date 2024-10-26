@@ -1,6 +1,9 @@
 plugins {
 	id "hussar.java-conventions"
+	id "hussar.release-conventions"
 }
+
+description = "Provides components to integrate Hussar with JUnit5"
 
 dependencies {
 	implementation project(":hussar-core")

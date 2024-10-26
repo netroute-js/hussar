@@ -1,6 +1,9 @@
 plugins {
 	id "hussar.java-conventions"
+	id "hussar.release-conventions"
 }
+
+description = "Provides Hussar Kafka service"
 
 dependencies {
 	implementation project(":hussar-core")

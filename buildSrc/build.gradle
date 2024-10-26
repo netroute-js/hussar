@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation("io.freefair.gradle:lombok-plugin:8.10.2")
     implementation("net.researchgate:gradle-release:3.0.2")
+    implementation("org.jreleaser:jreleaser-gradle-plugin:1.14.0")
 }
 
 repositories {

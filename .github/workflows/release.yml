@@ -32,5 +32,12 @@ jobs:
           git config user.email ""
 
       - name: Releasing with Gradle
+        env:
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew release -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=${{ github.event.inputs.release-version }}
 

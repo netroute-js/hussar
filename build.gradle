@@ -1,3 +1,7 @@
 plugins {
-    id "hussar.release-conventions"
+    id "hussar.version-conventions"
+    id "hussar.release-plugins-only"
 }
+
+afterReleaseBuild.dependsOn publish
+afterReleaseBuild.dependsOn jreleaserFullRelease

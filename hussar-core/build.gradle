@@ -1,6 +1,9 @@
 plugins {
 	id "hussar.java-conventions"
+	id "hussar.release-conventions"
 }
+
+description = "Provides core Hussar features"
 
 dependencies {
 	implementation libs.slf4j.api
