@@ -11,8 +11,6 @@ jobs:
   release_hussar:
     name: Releasing Hussar components
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checking out codebase
         uses: actions/checkout@v4
@@ -32,6 +30,8 @@ jobs:
           git config user.email ""
 
       - name: Releasing with Gradle
+        with:
+          token: ${{ secrets.NETROUTE_JS_PAT }}
         env:
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
