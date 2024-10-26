@@ -65,4 +65,10 @@ jreleaser {
             }
         }
     }
+
+    release {
+        github {
+            tagName = "{{projectVersion}}"
+        }
+    }
 }
