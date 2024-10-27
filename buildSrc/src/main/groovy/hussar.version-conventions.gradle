@@ -9,7 +9,7 @@ release {
     tagCommitMessage = '[Gradle Release Plugin] - creating release version: '
     newVersionCommitMessage = '[Gradle Release Plugin] - preparing development version: '
     versionPropertyFile = 'gradle.properties'
-    buildTasks = []
+    buildTasks = ["jreleaserFullRelease"]
 
     git {
         requireBranch.set('master')

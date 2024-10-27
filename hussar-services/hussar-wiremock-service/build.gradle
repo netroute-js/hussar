@@ -1,6 +1,6 @@
 plugins {
 	id "hussar.java-conventions"
-	id "hussar.release-conventions"
+	id "hussar.publish-conventions"
 }
 
 description = "Provides Hussar WireMock service"

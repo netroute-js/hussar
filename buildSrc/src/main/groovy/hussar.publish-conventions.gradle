@@ -1,0 +1,49 @@
+plugins {
+    id "maven-publish"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+
+            from components.java
+
+            afterEvaluate {
+                pom {
+                    name = project.name
+                    description = project.description
+                    url = "https://github.com/netroute-js/hussar"
+                    inceptionYear = "2024"
+
+                    licenses {
+                        license {
+                            name = "Apache-2.0"
+                            url = "https://spdx.org/licenses/Apache-2.0.html"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = "netroute-js"
+                            name = "Jachowicz Sławomir"
+                        }
+                    }
+
+                    scm {
+                        url = "https://github.com/netroute-js/hussar"
+                        connection = "scm:git:git@github.com:netroute-js/hussar.git"
+                        developerConnection = "scm:git:git@github.com:netroute-js/hussar.git"
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir("staging-deploy")
+        }
+    }
+}
