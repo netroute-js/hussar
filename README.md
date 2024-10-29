@@ -10,8 +10,8 @@
 - **Minimal Dependency Footprint:**  
   The framework is designed with simplicity in mind, requiring only a minimal set of dependencies. This ensures that it can be easily incorporated into complex projects without introducing unnecessary overhead or conflicts.
 
-- **JDK 17 Foundation:**  
-  Hussar is developed using JDK 17, leveraging the latest advancements in the Java platform. This ensures compatibility with modern Java features and optimizations, providing a solid foundation for high-performance testing.
+- **JDK 21 Foundation:**  
+  Hussar is developed using JDK 21, leveraging the latest advancements in the Java platform. This ensures compatibility with modern Java features and optimizations, providing a solid foundation for high-performance testing.
 
 - **Automated and Efficient Test Setup:**  
   The framework includes built-in mechanisms for automatic and rapid test environment setup. This reduces the manual effort required for test preparation and minimizes setup time, allowing developers to focus on writing and executing tests.
@@ -1189,7 +1189,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >    var partitions = 10;
 >    var topic = new KafkaTopic("hussar_topic", partitions); // it creates topic on startup 
 >    
->    var kafkaService = RabbitMQDockerServiceConfigurer
+>    var kafkaService = KafkaDockerServiceConfigurer
 >            .newInstance()
 >            .name("kafka-service") // it sets the name of the service. It's optional parameter.
 >            .dockerImageVersion("7.5.4") // it sets the docker image version. It's optional parameter.

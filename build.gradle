@@ -1,17 +1,8 @@
 plugins {
     id "hussar.version-conventions"
     id "hussar.release-conventions"
-}
-
-tasks.register("publishAll") {
-    var publishTaskName = "publish"
-
-    rootProject
-            .subprojects
-            .stream()
-            .filter {subProject -> subProject.tasks.names.contains(publishTaskName)}
-            .map {subProject -> subProject.tasks.getByName(publishTaskName)}
-            .forEach {publishTask -> publishTask.execute()}
+    id "hussar.global-publish-conventions"
+    id "hussar.artifact-metadata-conventions"
 }
 
 jreleaserFullRelease.dependsOn publishAll

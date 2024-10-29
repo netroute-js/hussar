@@ -1,0 +1,34 @@
+import org.apache.commons.io.FileUtils
+
+import java.util.stream.Collectors
+
+tasks.register("publishAll") {publishAll ->
+    def publishTaskName = "publish"
+
+    def buildableSubProjects = subprojects
+            .stream()
+            .filter { subProject -> subProject.buildFile.exists() }
+            .collect(Collectors.toUnmodifiableList())
+
+    buildableSubProjects.each { subProject ->
+        subProject.tasks.matching { it.name == publishTaskName }.all { publishTask ->
+            publishAll.dependsOn(publishTask)
+        }
+    }
+
+    doLast {
+        def stagingDir = "build/staging-deploy"
+        def rootStagingDir = toFile(rootProject.layout.projectDirectory, stagingDir)
+
+        buildableSubProjects
+                .stream()
+                .map { subProject -> subProject.layout.projectDirectory }
+                .filter { subProjectDir -> subProjectDir.asFile.exists() }
+                .map { subProjectDir -> toFile(subProjectDir, stagingDir) }
+                .forEach { subProjectStagingDir -> FileUtils.copyDirectory(subProjectStagingDir, rootStagingDir) }
+    }
+}
+
+def static toFile(Directory directory, String path) {
+    return directory.dir(path).asFile
+}

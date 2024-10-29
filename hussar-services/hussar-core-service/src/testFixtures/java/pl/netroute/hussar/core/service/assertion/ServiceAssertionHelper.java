@@ -37,5 +37,4 @@ public class ServiceAssertionHelper {
         assertThat(registry.getEntries()).isEmpty();
     }
 
-    // assert name
 }
