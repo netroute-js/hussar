@@ -29,14 +29,15 @@ public class SpringBootApplicationTest {
     private static final String SERVER_NAME_PROPERTY_VALUE = "husar-junit5";
     private static final String SERVER_AUTH_PROPERTY_VALUE = "credentials";
 
-    private static final String APPLICATION_WIREMOCK_PROPERTY = "application.wiremock";
     private static final String APPLICATION_WIREMOCK_URL_PROPERTY = "application.wiremock.url";
-    private static final String APPLICATION_WIREMOCK_ALTERNATIVE_URL_PROPERTY = "application.wiremock.alternative.url";
-    private static final String APPLICATION_WIREMOCK_PROPERTY_VALUE = "wiremock-instance";
+    private static final String APPLICATION_WIREMOCK_URL_PROPERTY_VALUE = "https://hussar.wiremock.dev";
 
     private static final String METRICS_URL_PROPERTY = "metrics.url";
     private static final String METRICS_URL_ENV_VARIABLE = "METRICS_URL";
-    private static final String METRICS_URL_ENV_VARIABLE_VALUE = "https://husar.dev/metrics";
+    private static final String METRICS_URL_ENV_VARIABLE_VALUE = "https://hussar.dev/metrics";
+
+    private static final String MANAGEMENT_TRACING_ENABLED_PROPERTY = "management.tracing.enabled";
+    private static final String MANAGEMENT_TRACING_ENABLED_PROPERTY_VALUE = "false";
 
     private SpringBootApplication application;
 
@@ -50,11 +51,9 @@ public class SpringBootApplicationTest {
         // given
         var serverAuthProperty = property(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
         var metricsUrlEnvVariable = envVariable(METRICS_URL_ENV_VARIABLE, METRICS_URL_ENV_VARIABLE_VALUE);
-        var wiremockProperty = property(APPLICATION_WIREMOCK_PROPERTY, APPLICATION_WIREMOCK_PROPERTY_VALUE);
         var externalConfigurations = Set.<ConfigurationEntry>of(
                 serverAuthProperty,
-                metricsUrlEnvVariable,
-                wiremockProperty
+                metricsUrlEnvVariable
         );
 
         var startupContext = new ApplicationStartupContext(externalConfigurations);
@@ -72,7 +71,6 @@ public class SpringBootApplicationTest {
         var client = applicationClient(endpoints);
         assertPingEndpointAccessible(client);
         assertConfiguredProperties(client);
-        assertNotConfiguredProperties(client);
     }
 
     @Test
@@ -80,11 +78,9 @@ public class SpringBootApplicationTest {
         // given
         var serverAuthProperty = property(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
         var metricsUrlEnvVariable = envVariable(METRICS_URL_ENV_VARIABLE, METRICS_URL_ENV_VARIABLE_VALUE);
-        var wiremockProperty = property(APPLICATION_WIREMOCK_PROPERTY, APPLICATION_WIREMOCK_PROPERTY_VALUE);
         var externalConfigurations = Set.<ConfigurationEntry>of(
                 serverAuthProperty,
-                metricsUrlEnvVariable,
-                wiremockProperty
+                metricsUrlEnvVariable
         );
 
         var startupContext = new ApplicationStartupContext(externalConfigurations);
@@ -103,7 +99,6 @@ public class SpringBootApplicationTest {
         var client = applicationClient(endpoints);
         assertPingEndpointAccessible(client);
         assertConfiguredProperties(client);
-        assertNotConfiguredProperties(client);
     }
 
     @Test
@@ -167,7 +162,7 @@ public class SpringBootApplicationTest {
     private void assertEndpointExists(List<Endpoint> endpoints) {
         assertThat(endpoints).hasSize(1);
 
-        var endpoint = endpoints.get(0);
+        var endpoint = endpoints.getFirst();
         assertThat(endpoint.host()).isEqualTo(LOCALHOST);
         assertThat(endpoint.port()).isBetween(PORT_RANGE_START, PORT_RANGE_END);
         assertThat(endpoint.address()).matches(ENDPOINT_REGEX);
@@ -183,19 +178,9 @@ public class SpringBootApplicationTest {
         assertPropertyConfigured(client, DynamicConfigurationConfigurer.SERVER_PORT);
         assertPropertyConfigured(client, SERVER_NAME_PROPERTY, SERVER_NAME_PROPERTY_VALUE);
         assertPropertyConfigured(client, SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
+        assertPropertyConfigured(client, MANAGEMENT_TRACING_ENABLED_PROPERTY, MANAGEMENT_TRACING_ENABLED_PROPERTY_VALUE);
         assertPropertyConfigured(client, METRICS_URL_PROPERTY, METRICS_URL_ENV_VARIABLE_VALUE);
-        assertPropertyConfigured(client, APPLICATION_WIREMOCK_PROPERTY, APPLICATION_WIREMOCK_PROPERTY_VALUE);
-    }
-
-    private void assertNotConfiguredProperties(SimpleApplicationClient client) {
-        assertPropertyNotConfigured(client, APPLICATION_WIREMOCK_URL_PROPERTY);
-        assertPropertyNotConfigured(client, APPLICATION_WIREMOCK_ALTERNATIVE_URL_PROPERTY);
-    }
-
-    private void assertPropertyNotConfigured(SimpleApplicationClient client, String property) {
-        var foundProperty = client.getProperty(property);
-
-        assertThat(foundProperty).isEmpty();
+        assertPropertyConfigured(client, APPLICATION_WIREMOCK_URL_PROPERTY, APPLICATION_WIREMOCK_URL_PROPERTY_VALUE);
     }
 
     private void assertPropertyConfigured(SimpleApplicationClient client, String property, String expectedValue) {
@@ -211,7 +196,7 @@ public class SpringBootApplicationTest {
     }
 
     private SimpleApplicationClient applicationClient(List<Endpoint> endpoints) {
-        var endpoint = endpoints.get(0);
+        var endpoint = endpoints.getFirst();
 
         return ClientFactory.create(endpoint, SimpleApplicationClient.class);
     }

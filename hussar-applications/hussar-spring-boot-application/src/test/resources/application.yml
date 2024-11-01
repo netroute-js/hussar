@@ -2,11 +2,13 @@ server:
   name: husar-junit5
   auth: oauth2
 
+management:
+  tracing:
+    enabled: false
+
 metrics:
   url: ${METRICS_URL}
 
 application:
   wiremock:
-    url: https://husar.wiremock.dev
-    alternative:
-      url: https://husar.wiremock.alt.dev
+    url: https://hussar.wiremock.dev

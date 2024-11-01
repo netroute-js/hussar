@@ -39,6 +39,7 @@ dependencyResolutionManagement {
 
             library("spring-boot-starter", "org.springframework.boot", "spring-boot-starter").versionRef(springBootVersion)
             library("spring-boot-starter-web", "org.springframework.boot", "spring-boot-starter-web").versionRef(springBootVersion)
+            library("spring-boot-starter-actuator", "org.springframework.boot", "spring-boot-starter-actuator").versionRef(springBootVersion)
             library("spring-jdbc", "org.springframework", "spring-jdbc").versionRef(springVersion)
             library("spring-cloud-openfeign-core", "org.springframework.cloud", "spring-cloud-openfeign-core").versionRef(springCloudVersion)
 

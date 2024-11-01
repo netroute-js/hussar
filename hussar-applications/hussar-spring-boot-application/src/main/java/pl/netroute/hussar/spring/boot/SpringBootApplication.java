@@ -3,9 +3,9 @@ package pl.netroute.hussar.spring.boot;
 import lombok.NonNull;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
@@ -19,15 +19,15 @@ public class SpringBootApplication implements Application {
     private static final String HOSTNAME = "localhost";
 
     private final Class<?> applicationClass;
-    private final PropertySourceConfigurer propertySourceConfigurer;
+    private final CommandLineArgumentConfigurer argumentConfigurer;
     private final LockedAction lockedAction;
 
     private ConfigurableApplicationContext applicationContext;
 
     private SpringBootApplication(@NonNull Class<?> applicationClass,
-                                  @NonNull PropertySourceConfigurer propertySourceConfigurer) {
+                                  @NonNull CommandLineArgumentConfigurer argumentConfigurer) {
         this.applicationClass = applicationClass;
-        this.propertySourceConfigurer = propertySourceConfigurer;
+        this.argumentConfigurer = argumentConfigurer;
         this.lockedAction = new LockedAction();
     }
 
@@ -83,10 +83,11 @@ public class SpringBootApplication implements Application {
 
     private ConfigurableApplicationContext initializeApplication(ApplicationStartupContext startupContext) {
         var externalConfigurations = DynamicConfigurationConfigurer.configure(startupContext.externalConfigurations());
+        var commandLineArguments = argumentConfigurer.configure(externalConfigurations);
 
         return new SpringApplicationBuilder(applicationClass)
-                .initializers(context -> propertySourceConfigurer.configure(externalConfigurations, context))
-                .run();
+                .addCommandLineProperties(true)
+                .run(commandLineArguments.toArray(new String[0]));
     }
 
     /**
@@ -96,10 +97,9 @@ public class SpringBootApplication implements Application {
      * @return the instance of {@link SpringBootApplication}
      */
     public static SpringBootApplication newApplication(@NonNull Class<?> applicationClass) {
-        var configurationResolver = new ConfigurationResolver();
-        var propertySourceConfigurer = new PropertySourceConfigurer(configurationResolver);
+        var argumentConfigurer = new CommandLineArgumentConfigurer();
 
-        return new SpringBootApplication(applicationClass, propertySourceConfigurer);
+        return new SpringBootApplication(applicationClass, argumentConfigurer);
     }
 
 }

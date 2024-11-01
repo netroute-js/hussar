@@ -8,6 +8,7 @@ description = "Provides components to integrate Hussar with Spring Boot"
 dependencies {
 	implementation project(":hussar-core")
 	implementation libs.spring.boot.starter
+	implementation libs.spring.boot.starter.actuator
 	implementation libs.slf4j.api
 
 	testImplementation libs.bundles.testing
