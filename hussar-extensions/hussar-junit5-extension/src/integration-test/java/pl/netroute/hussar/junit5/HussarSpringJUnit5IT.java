@@ -2,13 +2,13 @@ package pl.netroute.hussar.junit5;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.api.application.HussarApplication;
 import pl.netroute.hussar.core.api.environment.HussarEnvironment;
 import pl.netroute.hussar.core.api.service.HussarService;
-import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.junit5.client.ClientFactory;
 import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
-import pl.netroute.hussar.junit5.config.TestEnvironmentConfigurerProvider;
+import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
 import pl.netroute.hussar.service.kafka.KafkaDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
 import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
@@ -19,6 +19,7 @@ import pl.netroute.hussar.service.sql.PostgreSQLDockerService;
 import pl.netroute.hussar.service.wiremock.WiremockDockerService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.netroute.hussar.junit5.assertion.ApplicationAssertionHelper.assertApplicationBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
 import static pl.netroute.hussar.junit5.assertion.KafkaAssertionHelper.assertKafkaBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.MariaDBAssertionHelper.assertMariaDBBootstrapped;
@@ -44,8 +45,8 @@ import static pl.netroute.hussar.junit5.factory.RedisServiceFactory.REDIS_NAME;
 import static pl.netroute.hussar.junit5.factory.WiremockServiceFactory.WIREMOCK_NAME;
 
 @ExtendWith(HussarJUnit5Extension.class)
-@HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class)
-public class HussarJUnit5IT {
+@HussarEnvironment(configurerProvider = SpringTestEnvironmentConfigurerProvider.class)
+public class HussarSpringJUnit5IT {
     private static final String PING_RESPONSE = "pong";
 
     @HussarApplication
@@ -82,6 +83,7 @@ public class HussarJUnit5IT {
 
         // when
         // then
+        assertApplicationBootstrapped(application);
         assertPingEndpointAccessible(applicationClient);
         assertPropertyConfigured(SERVER_NAME_PROPERTY, SERVER_NAME_PROPERTY_VALUE, applicationClient);
         assertPropertyConfigured(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE, applicationClient);
@@ -106,7 +108,7 @@ public class HussarJUnit5IT {
     private SimpleApplicationClient applicationClient(Application application) {
         var endpoint = application
                 .getEndpoints()
-                .get(0);
+                .getFirst();
 
         return ClientFactory.create(endpoint, SimpleApplicationClient.class);
     }

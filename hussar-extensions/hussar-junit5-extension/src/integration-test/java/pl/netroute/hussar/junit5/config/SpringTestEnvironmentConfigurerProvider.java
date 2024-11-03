@@ -18,7 +18,7 @@ import static pl.netroute.hussar.junit5.config.ApplicationProperties.METRICS_URL
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_AUTH_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.SERVER_AUTH_PROPERTY_VALUE;
 
-public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
+public class SpringTestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
 
     @Override
     public EnvironmentConfigurer provide() {

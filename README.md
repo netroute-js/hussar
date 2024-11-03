@@ -34,6 +34,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
 - [Components](#components)
   - [Core](#core-component)
   - [Applications](#applications-component)
+    - [Module application - TO BE RELEASED(1.3)](#module-application-component)
     - [Spring Boot application](#spring-boot-application-component)
   - [Extensions](#extensions-component)
     - [JUnit5 extension](#junit5-extension-component)
@@ -50,6 +51,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
 - [Examples](#examples)
   - [JUnit5 & Spring Boot](#junit5-springboot-basic-example)
   - [JUnit5 & Spring Boot - advanced](#junit5-springboot-advanced-example)
+  - [JUnit5 & Module Application - TO BE RELEASED(1.3)](#junit5-module-example)
   - [Dynamic binding of application configurations - environment variables](#dynamic-binding-app-config-environment-variable-example)
   - [Dynamic binding of application configurations - properties](#dynamic-binding-app-config-properties-example)
   - [Reference Hussar Application](#reference-hussar-application-example)
@@ -145,6 +147,25 @@ This section offers a concise overview of the individual **Hussar components**, 
 ---
 
 This section provides an overview of all **supported Hussar applications** that are available out of the box. These pre-configured applications are designed to integrate seamlessly into the Hussar ecosystem, offering standardized functionality.
+
+> **Module application** <a id="module-application-component"/>
+>
+> This component serves as the **integration layer** that seamlessly binds the **Hussar platform** with framework less applications (like Spring web etc.). So if you have hexagonal architecture and want to test modules(adapters) then it's for you.
+>
+> Below are the instructions for integrating this artifact into your Gradle or Maven projects:
+>```
+>Gradle
+>implementation pl.netroute:hussar-core:${version}
+>```
+>
+>```
+>Maven
+><dependency>
+>   <groupId>pl.netroute</groupId>
+>   <artifactId>hussar-core</artifactId>
+>   version>${version}</version>
+><dependency>
+>```
 
 > **Spring Boot application** <a id="spring-boot-application-component"/>
 >
@@ -585,6 +606,63 @@ This section provides a comprehensive collection of **examples** demonstrating t
 > See [Dynamic binding of application configurations - environment variables](#dynamic-binding-app-config-environment-variable-example) or [Dynamic binding of application configurations - properties](#dynamic-binding-app-config-properties-example) section for more details about dynamic binding of configurations in Hussar.
 >
 > This is all you need to configure to have **Hussar / Junit5 / Spring Boot** combination.
+---
+> **JUnit5 & Module Application** <a id="junit5-module-example"/>
+>
+> Let's say that you want to use Hussar to test your modules (for example parts of Hexagonal architecture) application using JUnit5 testing framework. For the purpose of this example let's assume that our module needs to integrate with MySQL database . You will need the following Hussar components:
+> - pl.netroute:hussar-core
+> - pl.netroute:hussar-sql-service
+> - pl.netroute:hussar-junit5-extension
+>
+> The next step is to create a JUnit5 test class:
+>
+>```java
+>@ExtendWith(HussarJUnit5Extension.class) // it glues Hussar and JUnit5 together. It's basically everything you need to make them work together
+>@HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class) // it provides Hussar tests environment configuration
+>public class ModuleDatabaseIT {
+>
+>    @HussarService // it injects the Hussar's WireMock service
+>    private MySQLDockerService mySQL;
+>
+>    // you can use MySQL's object method to get the physical endpoint - i.e. EndpointHelper.getAnyEndpointOrFail(mySQL)
+>  
+>    // test methods
+>    
+>}
+>```
+>
+> See [Reference Hussar Service](#reference-hussar-service-example) section for more details about referencing Hussar's services in test classes.
+>
+> It's time to go to the next critical component - **TestEnvironmentConfigurerProvider**:
+>
+>```java
+>public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider { // to provide Hussar's tests environment configuration, you need to implement this interface
+>
+>  @Override
+>  public LocalEnvironmentConfigurer provide() { // to provide Hussar's tests environment, you need to implement this method and provide the setup you wish to have
+>      var application = ModuleApplication.newApplication(); // in our example, we want to test our module application
+>
+>      var databaseSchema = new SQLDatabaseSchema("HussarDB", "/db/migration/scripts"); // it creates a SQL database schema on startup. The schema will use the scripts to initialize everything 
+>    
+>      var mySQLService = MySQLDockerServiceConfigurer
+>            .newInstance()
+>            .name("mysql-service") // it sets the name of the service. It's optional parameter.
+>            .dockerImageVersion("8.2.0") // it sets the docker image version. It's optional parameter.
+>            .databaseSchema(databaseSchema) // it sets the database schema that should be created and initialized. It's optional parameter.
+>            .done()
+>            .configure();
+>    
+>      return LocalEnvironmentConfigurer
+>            .newInstance()
+>            .withApplication(application) // it adds the Module application to the environment configuration
+>            .withService(wiremockService) // it adds MySQL service to the environment configuration
+>            .done();
+>  }
+>
+>}
+>```
+>
+> This is all you need to configure to have **Hussar / Junit5 / Module** combination.
 ---
 > **Dynamic binding of application configurations - environment variables** <a id="dynamic-binding-app-config-environment-variable-example"/>
 >

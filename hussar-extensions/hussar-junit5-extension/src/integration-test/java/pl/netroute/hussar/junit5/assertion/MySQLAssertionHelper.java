@@ -34,4 +34,11 @@ public class MySQLAssertionHelper {
         assertPropertyConfigured(MYSQL_ALTERNATIVE_PASSWORD_PROPERTY, credentials.password(), applicationClient);
     }
 
+    public static void assertMySQLBootstrapped(@NonNull MySQLDockerService mysqlService) {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(mysqlService);
+        var credentials = mysqlService.getCredentials();
+
+        assertDatabaseReachable(endpoint, SCHEMA, credentials);
+    }
+
 }
