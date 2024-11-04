@@ -38,16 +38,17 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
     - [Spring Boot application](#spring-boot-application-component)
   - [Extensions](#extensions-component)
     - [JUnit5 extension](#junit5-extension-component)
-  - [Services](#services)
-    - [WireMock](#wiremock-service)
-    - [MySQL](#mysql-service)
-    - [MariaDB](#mariadb-service)
-    - [PostgreSQL](#postgresql-service)
-    - [MongoDB](#mongodb-service)
-    - [Redis](#redis-service)
-    - [RabbitMQ](#rabbitmq-service)
-    - [Kafka](#kafka-service)
-    - [Custom](#custom-service)
+  - [Services](#services-component)
+    - [Service Core](#core-service-component) 
+    - [WireMock](#wiremock-service-component)
+    - [MySQL](#mysql-service-component)
+    - [MariaDB](#mariadb-service-component)
+    - [PostgreSQL](#postgresql-service-component)
+    - [MongoDB](#mongodb-service-component)
+    - [Redis](#redis-service-component)
+    - [RabbitMQ](#rabbitmq-service-component)
+    - [Kafka](#kafka-service-component)
+    - [Custom](#custom-service-component)
 - [Examples](#examples)
   - [JUnit5 & Spring Boot](#junit5-springboot-basic-example)
   - [JUnit5 & Spring Boot - advanced](#junit5-springboot-advanced-example)
@@ -212,14 +213,33 @@ This section provides an overview of all **supported Hussar test engine extensio
 ><dependency>
 >```
 
-<a id="services"></a>
+<a id="services-component"></a>
 #### Services
 
 ---
 
 This section provides a detailed overview of all **supported Hussar services** that are available out of the box. These services are pre-configured to integrate seamlessly with the Hussar platform.
 
-> **WireMock** <a id="wiremock-service"/>
+> **Service Core** <a id="core-service-component"/>
+>
+> This component contains all the core features of Hussar Services. If you need to use any Hussar Service (highly probable) then this component has to be added as a dependency.
+>
+> Below are the instructions for integrating this artifact into your Gradle or Maven projects:
+>```
+>Gradle
+>implementation pl.netroute:hussar-service-core:${version}
+>```
+>
+>```
+>Maven
+><dependency>
+>   <groupId>pl.netroute</groupId>
+>   <artifactId>hussar-service-core</artifactId>
+>   version>${version}</version>
+><dependency>
+>```
+---
+> **WireMock** <a id="wiremock-service-component"/>
 >  
 > WireMock is a robust and flexible tool for mocking HTTP-based APIs, primarily used in testing scenarios. It allows developers to simulate HTTP services and create realistic test environments without relying on actual external systems.
 > By mimicking the behavior of web services, WireMock enables the development and testing of applications in isolation.
@@ -237,7 +257,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >| `done`                                     	  | Finishes configuring WireMock's configurer.                                                 	 | N/A                     	|
 > If you want to see a proper example, you can find it under [WireMock configuration](#wiremock-configuration-example) section.
 ---
-> **MySQL** <a id="mysql-service"/>
+> **MySQL** <a id="mysql-service-component"/>
 > 
 > MySQL is a popular and widely-used, open-source relational database management system (RDBMS). MySQL offers enhanced performance, reliability, scalability, and features, making it a strong choice for developers building modern applications.
 > 
@@ -260,7 +280,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 > 
 > If you want to see a proper example, you can find it under [MySQL configuration](#mysql-configuration-example) section.
 ---
-> **MariaDB** <a id="mariadb-service"/>
+> **MariaDB** <a id="mariadb-service-component"/>
 >
 > MariaDB is a popular and widely-used, open-source relational database management system (RDBMS). MariaDB offers enhanced performance, reliability, scalability, and features, making it a strong choice for developers building modern applications.
 > 
@@ -283,7 +303,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > If you want to see a proper example, you can find it under [MariaDB configuration](#mariadb-configuration-example) section.
 ---
-> **PostgreSQL** <a id="postgresql-service"/>
+> **PostgreSQL** <a id="postgresql-service-component"/>
 >
 > PostgreSQL is a popular and widely-used, open-source relational database management system (RDBMS). PostgreSQL offers enhanced performance, reliability, scalability, and features, making it a strong choice for developers building modern applications.
 >
@@ -306,7 +326,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > If you want to see a proper example, you can find it under [PostgreSQL configuration](#postgresql-configuration-example) section.
 ---
-> **MongoDB** <a id="mongodb-service"/>
+> **MongoDB** <a id="mongodb-service-component"/>
 >
 > MongoDB is a NoSQL database designed for scalability, flexibility, and performance. It uses a document-oriented data model, allowing developers to store and retrieve data in JSON-like BSON (Binary JSON) format, making it a popular choice for modern applications.
 >
@@ -328,7 +348,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > If you want to see a proper example, you can find it under [MongoDB configuration](#mongodb-configuration-example) section.
 ---
-> **Redis** <a id="redis-service"/>
+> **Redis** <a id="redis-service-component"/>
 >
 > Redis is an in-memory data structure store used as a database, cache, and message broker. Known for its high performance and versatility, Redis supports various data structures such as strings, hashes, lists, sets, and more, making it a popular choice for real-time applications.
 >
@@ -351,7 +371,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > If you want to see a proper example, you can find it under [Redis configuration](#redis-configuration-example) section.
 ---
-> **RabbitMQ** <a id="rabbitmq-service"/>
+> **RabbitMQ** <a id="rabbitmq-service-component"/>
 >
 > RabbitMQ is a robust message broker that facilitates communication between distributed systems by implementing the Advanced Message Queuing Protocol (AMQP). It is designed for reliability, scalability, and flexibility, making it an essential tool for building scalable and resilient applications.
 >
@@ -374,7 +394,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > If you want to see a proper example, you can find it under [RabbitMQ configuration](#rabbitmq-configuration-example) section.
 ---
-> **Kafka** <a id="kafka-service"/>
+> **Kafka** <a id="kafka-service-component"/>
 >
 > Kafka is a distributed streaming platform developed by Apache, designed for building real-time data pipelines and streaming applications. It is renowned for its scalability, fault tolerance, and high throughput, making it a popular choice for handling large volumes of real-time data.
 >
@@ -395,7 +415,7 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 >If you want to see a proper example, you can find it under [Kafka configuration](#kafka-configuration-example) section.
 ---
-> **Custom** <a id="custom-service"/>
+> **Custom** <a id="custom-service-component"/>
 >
 > Can't you find a Hussar service that suits your needs? Don't worry, there are a couple of solutions:
 > - let us know about that. We want to support a huge variety of Hussar services being available out of the box.
@@ -501,6 +521,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 > Let's say that you want to use Hussar to test your Spring Boot application using JUnit5 testing framework. For the purpose of this example let's assume that our application needs to integrate with MongoDB and 3rd party payment service via HTTP API. You will need the following Hussar components:
 > - pl.netroute:hussar-core
 > - pl.netroute:hussar-spring-boot-application
+> - pl.netroute:hussar-core-service
 > - pl.netroute:hussar-mongodb-service
 > - pl.netroute:hussar-wiremock-service
 > - pl.netroute:hussar-junit5-extension
@@ -611,6 +632,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >
 > Let's say that you want to use Hussar to test your modules (for example parts of Hexagonal architecture) application using JUnit5 testing framework. For the purpose of this example let's assume that our module needs to integrate with MySQL database . You will need the following Hussar components:
 > - pl.netroute:hussar-core
+> - pl.netroute:hussar-core-service
 > - pl.netroute:hussar-sql-service
 > - pl.netroute:hussar-junit5-extension
 >
@@ -852,15 +874,21 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >
 > This section shows how to configure Hussar's WireMock service in your project.
 >
-> To use it, first of all you need to add a Gradle/Maven dependency to your project.
+> To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-wiremock-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-wiremock-service</artifactId>
@@ -896,21 +924,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's WireMock service. To get more details about this service go to [WireMock section](#wiremock-service).
+> This is all you need to do to configure Hussar's WireMock service. To get more details about this service go to [WireMock section](#wiremock-service-component).
 ---
 > **MySQL configuration** <a id="mysql-configuration-example"/>
 >
 > This section shows how to configure Hussar's MySQL service in your project.
 >
-> To use it, first of all you need to add a Gradle/Maven dependency to your project.
+> To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-sql-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-sql-service</artifactId>
@@ -953,21 +987,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's MySQL service. To get more details about this service go to [MySQL section](#mysql-service).
+> This is all you need to do to configure Hussar's MySQL service. To get more details about this service go to [MySQL section](#mysql-service-component).
 ---
 > **MariaDB configuration** <a id="mariadb-configuration-example"/>
 >
 > This section shows how to configure Hussar's MariaDB service in your project.
 >
-> To use it, first of all you need to add a Gradle/Maven dependency to your project.
+> To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-sql-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-sql-service</artifactId>
@@ -1010,21 +1050,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's MariaDB service. To get more details about this service go to [MariaDB section](#mariadb-service).
+> This is all you need to do to configure Hussar's MariaDB service. To get more details about this service go to [MariaDB section](#mariadb-service-component).
 ---
 > **PostgreSQL configuration** <a id="postgresql-configuration-example"/>
 >
 > This section shows how to configure Hussar's PostgreSQL service in your project.
 >
-> To use it, first of all you need to add a Gradle/Maven dependency to your project.
+> To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-sql-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-sql-service</artifactId>
@@ -1067,21 +1113,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's PostgreSQL service. To get more details about this service go to [PostgreSQL section](#postgresql-service).
+> This is all you need to do to configure Hussar's PostgreSQL service. To get more details about this service go to [PostgreSQL section](#postgresql-service-component).
 ---
 > **MongoDB configuration** <a id="mongodb-configuration-example"/>
 >
 > This section shows how to configure Hussar's MongoDB service in your project.
 >
-> To use it, first of all you need to add a Gradle/Maven dependency to your project.
+> To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-mongodb-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-mongodb-service</artifactId>
@@ -1121,21 +1173,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's MongoDB service. To get more details about this service go to [MongoDB section](#mongodb-service).
+> This is all you need to do to configure Hussar's MongoDB service. To get more details about this service go to [MongoDB section](#mongodb-service-component).
 ---
 > **Redis configuration** <a id="redis-configuration-example"/>
 >
 >This section shows how to configure Hussar's Redis service in your project.
 >
->To use it, first of all you need to add a Gradle/Maven dependency to your project.
+>To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-redis-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-redis-service</artifactId>
@@ -1176,21 +1234,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's Redis service. To get more details about this service go to [Redis section](#redis-service).
+> This is all you need to do to configure Hussar's Redis service. To get more details about this service go to [Redis section](#redis-service-component).
 ---
 > **RabbitMQ configuration** <a id="rabbitmq-configuration-example"/>
 >
 >This section shows how to configure Hussar's RabbitMQ service in your project.
 >
->To use it, first of all you need to add a Gradle/Maven dependency to your project.
+>To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-rabbitmq-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-rabbitmq-service</artifactId>
@@ -1233,21 +1297,27 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's RabbitMQ service. To get more details about this service go to [RabbitMQ section](#rabbitmq-service).
+> This is all you need to do to configure Hussar's RabbitMQ service. To get more details about this service go to [RabbitMQ section](#rabbitmq-service-component).
 ---
 > **Kafka configuration** <a id="kafka-configuration-example"/>
 >
 > This section shows how to configure Hussar's Kafka service in your project.
 >
-> To use it, first of all you need to add a Gradle/Maven dependency to your project.
+> To use it, first of all you need to add a Gradle/Maven dependencies to your project.
 >
 >```
 >Gradle
+>implementation pl.netroute:hussar-core-service:${version}
 >implementation pl.netroute:hussar-kafka-service:${version}
 >```
 >
 >```
 >Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
 ><dependency>
 >    <groupId>pl.netroute</groupId>
 >    <artifactId>hussar-kafka-service</artifactId>
@@ -1289,7 +1359,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >}
 >```
 >
-> This is all you need to do to configure Hussar's Kafka service. To get more details about this service go to [Kafka section](#kafka-service).
+> This is all you need to do to configure Hussar's Kafka service. To get more details about this service go to [Kafka section](#kafka-service-component).
 
 <a id="contributors"></a>
 ### Contributors
