@@ -72,7 +72,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
 
     private RabbitMQDockerServiceConfig createConfig() {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
+        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return RabbitMQDockerServiceConfig
                 .builder()

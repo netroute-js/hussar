@@ -34,7 +34,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
 
     private WiremockDockerServiceConfig createConfig() {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
+        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
         var scheme = SchemesHelper.HTTP_SCHEME;
 
         return WiremockDockerServiceConfig

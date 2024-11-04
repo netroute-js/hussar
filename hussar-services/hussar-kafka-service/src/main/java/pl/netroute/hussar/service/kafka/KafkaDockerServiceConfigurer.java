@@ -83,7 +83,7 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
 
     private KafkaDockerServiceConfig createConfig() {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
+        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return KafkaDockerServiceConfig
                 .builder()

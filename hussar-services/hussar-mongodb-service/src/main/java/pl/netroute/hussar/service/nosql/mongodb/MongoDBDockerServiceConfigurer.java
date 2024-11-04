@@ -62,7 +62,7 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
 
     private MongoDBDockerServiceConfig createConfig() {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
+        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return MongoDBDockerServiceConfig
                 .builder()

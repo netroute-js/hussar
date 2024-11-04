@@ -71,7 +71,7 @@ public class RedisDockerServiceConfigConfigurer extends BaseDockerServiceConfigu
 
     private RedisDockerServiceConfig createConfig() {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(DOCKER_IMAGE, dockerImageVersion);
+        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return RedisDockerServiceConfig
                 .builder()

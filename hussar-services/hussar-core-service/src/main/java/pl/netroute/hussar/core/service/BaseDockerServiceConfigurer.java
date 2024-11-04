@@ -14,6 +14,12 @@ import pl.netroute.hussar.core.api.service.Service;
 public abstract class BaseDockerServiceConfigurer<S extends Service> extends BaseServiceConfigurer<S> {
 
     /**
+     * The default Docker Registry URL. By default, it will point to Docker Hub.
+     */
+    @NonNull
+    protected final @Builder.Default String dockerRegistryUrl = "";
+
+    /**
      * The default Docker image version.
      */
     @NonNull
