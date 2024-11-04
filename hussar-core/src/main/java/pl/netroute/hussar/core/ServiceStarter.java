@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ServiceStarter {
-    private static final Duration SERVICE_STARTUP_TIMEOUT = Duration.ofMinutes(2L);
+    private static final Duration SERVICE_STARTUP_TIMEOUT = Duration.ofMinutes(10L);
 
     @NonNull
     private final ExecutorService executorService;
