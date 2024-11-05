@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.service.BaseDockerServiceConfig;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * A custom GenericContainer factory.
@@ -15,12 +15,11 @@ public class GenericContainerFactory {
     /**
      * Factory method to create {@link GenericContainer}.
      *
-     * @param <T> - the subtype of {@link BaseDockerServiceConfig}.
-     * @param config - the config of {@link BaseDockerServiceConfig}
+     * @param dockerImage - the resolved {@link DockerImageName}
      * @return the instance of {@link GenericContainer}
      */
-    public static <T extends BaseDockerServiceConfig> GenericContainer<?> create(@NonNull T config) {
-        return new GenericContainer<>(config.getDockerImage());
+    public static GenericContainer<?> create(@NonNull DockerImageName dockerImage) {
+        return new GenericContainer<>(dockerImage);
     }
 
 }

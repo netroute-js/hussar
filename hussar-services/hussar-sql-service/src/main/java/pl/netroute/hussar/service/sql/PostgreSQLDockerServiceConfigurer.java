@@ -1,6 +1,7 @@
 package pl.netroute.hussar.service.sql;
 
 import lombok.experimental.SuperBuilder;
+import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.container.GenericContainerFactory;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
@@ -18,8 +19,9 @@ public class PostgreSQLDockerServiceConfigurer extends BaseDatabaseDockerService
     private static final String JDBC_SCHEME = "jdbc:postgresql://";
 
     public PostgreSQLDockerService configure() {
-        var config = createConfig();
-        var container = GenericContainerFactory.create(config);
+        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var config = createConfig(dockerImage);
+        var container = GenericContainerFactory.create(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
@@ -35,14 +37,13 @@ public class PostgreSQLDockerServiceConfigurer extends BaseDatabaseDockerService
         );
     }
 
-    private SQLDatabaseDockerServiceConfig createConfig() {
+    private SQLDatabaseDockerServiceConfig createConfig(DockerImageName dockerImage) {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return SQLDatabaseDockerServiceConfig
                 .builder()
                 .name(resolvedName)
-                .dockerImage(resolvedDockerImage)
+                .dockerImage(dockerImage.asCanonicalNameString())
                 .scheme(JDBC_SCHEME)
                 .databaseSchemas(databaseSchemas)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)

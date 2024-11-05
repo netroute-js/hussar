@@ -40,8 +40,9 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
 
     @Override
     public KafkaDockerService configure() {
-        var config = createConfig();
-        var container = createContainer(config);
+        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var config = createConfig(dockerImage);
+        var container = createContainer(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var listenerConfigurer = new KafkaListenerConfigurer();
@@ -61,9 +62,7 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
         );
     }
 
-    private KafkaContainer createContainer(KafkaDockerServiceConfig config) {
-        var dockerImage = DockerImageName.parse(config.getDockerImage());
-
+    private KafkaContainer createContainer(DockerImageName dockerImage) {
         return new KafkaContainer(dockerImage) {
 
             @Override
@@ -81,14 +80,13 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
         };
     }
 
-    private KafkaDockerServiceConfig createConfig() {
+    private KafkaDockerServiceConfig createConfig(DockerImageName dockerImage) {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return KafkaDockerServiceConfig
                 .builder()
                 .name(resolvedName)
-                .dockerImage(resolvedDockerImage)
+                .dockerImage(dockerImage.asCanonicalNameString())
                 .scheme(KAFKA_SCHEME)
                 .topics(topics)
                 .kraftMode(kraftMode)

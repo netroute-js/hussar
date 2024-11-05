@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.rabbitmq;
 
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
+import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
@@ -53,8 +54,9 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
 
     @Override
     public RabbitMQDockerService configure() {
-        var config = createConfig();
-        var container = GenericContainerFactory.create(config);
+        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var config = createConfig(dockerImage);
+        var container = GenericContainerFactory.create(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new RabbitMQCredentialsRegisterer(configurationRegistry);
@@ -70,14 +72,13 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
         );
     }
 
-    private RabbitMQDockerServiceConfig createConfig() {
+    private RabbitMQDockerServiceConfig createConfig(DockerImageName dockerImage) {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
 
         return RabbitMQDockerServiceConfig
                 .builder()
                 .name(resolvedName)
-                .dockerImage(resolvedDockerImage)
+                .dockerImage(dockerImage.asCanonicalNameString())
                 .scheme(SchemesHelper.EMPTY_SCHEME)
                 .queues(queues)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)

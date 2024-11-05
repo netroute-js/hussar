@@ -1,6 +1,7 @@
 package pl.netroute.hussar.service.wiremock;
 
 import lombok.experimental.SuperBuilder;
+import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
@@ -19,8 +20,9 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
 
     @Override
     public WiremockDockerService configure() {
-        var config = createConfig();
-        var container = GenericContainerFactory.create(config);
+        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var config = createConfig(dockerImage);
+        var container = GenericContainerFactory.create(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
 
@@ -32,15 +34,14 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
         );
     }
 
-    private WiremockDockerServiceConfig createConfig() {
+    private WiremockDockerServiceConfig createConfig(DockerImageName dockerImage) {
         var resolvedName = ServiceNameResolver.resolve(SERVICE, name);
-        var resolvedDockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
         var scheme = SchemesHelper.HTTP_SCHEME;
 
         return WiremockDockerServiceConfig
                 .builder()
                 .name(resolvedName)
-                .dockerImage(resolvedDockerImage)
+                .dockerImage(dockerImage.asCanonicalNameString())
                 .scheme(scheme)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
                 .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)
