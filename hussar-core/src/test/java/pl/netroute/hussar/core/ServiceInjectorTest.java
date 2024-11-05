@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +62,30 @@ public class ServiceInjectorTest {
         // then
         assertServiceLookupByTypePerformed(serviceRegistry);
         assertServiceLookupByNamePerformed(serviceRegistry);
+        assertServicesInjected(testInstance, serviceA, serviceB);
+    }
+
+    @Test
+    public void shouldInjectServiceWhenInheritancePresent() {
+        // given
+        var serviceTypeA = ServiceTestA.class;
+        var serviceA = mock(ServiceTestA.class);
+
+        var serviceTypeB = ServiceTestB.class;
+        var serviceB = mock(ServiceTestB.class);
+
+        var testInstance = new SubTestClassWithServices();
+
+        when(serviceRegistry.findEntryByType(serviceTypeA)).thenReturn(Optional.of(serviceA));
+        when(serviceRegistry.findEntryByType(serviceTypeB)).thenReturn(Optional.of(serviceB));
+
+        // when
+        serviceInjector.inject(testInstance);
+
+        // then
+        var expectedTypeLookups = 3;
+
+        assertServiceLookupByTypePerformed(serviceRegistry, expectedTypeLookups);
         assertServicesInjected(testInstance, serviceA, serviceB);
     }
 
@@ -113,11 +138,23 @@ public class ServiceInjectorTest {
         verify(serviceRegistry).findEntryByType(any());
     }
 
+    private void assertServiceLookupByTypePerformed(ServiceRegistry serviceRegistry, int numberOfLookups) {
+        verify(serviceRegistry, times(numberOfLookups)).findEntryByType(any());
+    }
+
     private void assertServicesInjected(TestClassWithServices testInstance, ServiceTestA expectedServiceA, ServiceTestB expectedServiceB) {
         assertThat(testInstance.serviceA).isEqualTo(expectedServiceA);
         assertThat(testInstance.serviceB).isEqualTo(expectedServiceB);
         assertThat(testInstance.anotherServiceA).isNull();
         assertThat(testInstance.anotherServiceB).isNull();
+    }
+
+    private void assertServicesInjected(SubTestClassWithServices testInstance, ServiceTestA expectedServiceA, ServiceTestB expectedServiceB) {
+        assertThat(testInstance.baseServiceA).isEqualTo(expectedServiceA);
+        assertThat(testInstance.serviceA).isEqualTo(expectedServiceA);
+        assertThat(testInstance.serviceB).isEqualTo(expectedServiceB);
+        assertThat(testInstance.baseAnotherServiceA).isNull();
+        assertThat(testInstance.anotherServiceA).isNull();
     }
 
     private static class TestClassWithoutServices {
@@ -148,6 +185,25 @@ public class ServiceInjectorTest {
         ServiceTestA anotherServiceA;
         ServiceTestB anotherServiceB;
 
+    }
+
+    private static class BaseTestClassWithServices {
+
+        @HussarService
+        ServiceTestA baseServiceA;
+
+        ServiceTestA baseAnotherServiceA;
+    }
+
+    private static class SubTestClassWithServices extends BaseTestClassWithServices {
+
+        @HussarService
+        ServiceTestA serviceA;
+
+        @HussarService
+        ServiceTestB serviceB;
+
+        ServiceTestA anotherServiceA;
     }
 
 }

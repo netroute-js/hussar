@@ -6,9 +6,9 @@ import lombok.NonNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * A simple Reflection helper.
@@ -49,14 +49,7 @@ public class ReflectionHelper {
         Objects.requireNonNull(target, "target is required");
         Objects.requireNonNull(annotationType, "annotationType is required");
 
-        var fields = target
-                .getClass()
-                .getDeclaredFields();
-
-        return Stream
-                .of(fields)
-                .filter(field -> field.isAnnotationPresent(annotationType))
-                .toList();
+        return gatherAllFieldsAnnotatedWith(target.getClass(), annotationType);
     }
 
     /**
@@ -78,6 +71,22 @@ public class ReflectionHelper {
         } catch(IllegalAccessException ex) {
             throw new IllegalStateException("Unable to set value", ex);
         }
+    }
+
+    private static <A extends Annotation> List<Field> gatherAllFieldsAnnotatedWith(Class<?> clazz, Class<A> annotationType) {
+        var fields = Arrays
+                .stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(annotationType))
+                .toList();
+
+        var superClass = clazz.getSuperclass();
+        if(superClass != null) {
+            var superClassFields = gatherAllFieldsAnnotatedWith(superClass, annotationType);
+
+            return CollectionHelper.mergeLists(fields, superClassFields);
+        }
+
+        return fields;
     }
 
 }
