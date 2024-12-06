@@ -28,6 +28,10 @@ public class ModuleApplication implements Application {
     }
 
     @Override
+    public void restart() {
+    }
+
+    @Override
     public void shutdown() {
     }
 

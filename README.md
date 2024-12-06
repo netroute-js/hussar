@@ -59,6 +59,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
   - [Reference Hussar Service](#reference-hussar-service-example)
   - [Share environment between multiple tests](#share-multiple-environments-example)
   - [Multiple Environments](#multiple-test-environments-example)
+  - [Restarting application [TO BE RELEASED in 1.5]](#restarting-application-example)
   - [WireMock configuration](#wiremock-configuration-example)
   - [MySQL configuration](#mysql-configuration-example)
   - [MariaDB configuration](#mariadb-configuration-example)
@@ -878,6 +879,24 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >```
 >
 > In such situation Hussar will initialize and start two environments, so they can co-exist together and each test class will use its own instance.
+---
+> **Restarting application [TO BE RELEASED in 1.5]** <a id="restarting-application-example"/>
+>
+> In some test scenarios, it may be required to reset the application under the test to a clean state. To enforce a fresh application state, annotate the test method with @HussarApplicationRestart. See the example below:
+>
+>```java
+>@ExtendWith(HussarJUnit5Extension.class) // it glues Hussar and JUnit5 together. It's basically everything you need to make them work together
+>@HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class) // it provides Hussar tests environment configuration
+>public class HussarIT {
+>   
+>   @Test
+>   @HussarApplicationRestart // it restarts Hussar application
+>   public void shouldTestRestartedApplication() {
+>       // test logic
+>   }
+>
+>}
+>``` 
 ---
 > **WireMock configuration** <a id="wiremock-configuration-example"/>
 >

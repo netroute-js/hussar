@@ -44,7 +44,6 @@ public class DefaultServiceRegistryTest {
         // when
         var failure = assertThatThrownBy(() -> serviceRegistry.register(duplicateService));
 
-
         // then
         failure
                 .isInstanceOf(IllegalArgumentException.class)

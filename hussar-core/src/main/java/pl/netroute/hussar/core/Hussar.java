@@ -1,9 +1,12 @@
 package pl.netroute.hussar.core;
 
 import lombok.NonNull;
+import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.api.application.HussarApplicationRestart;
 import pl.netroute.hussar.core.api.environment.Environment;
 import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.ForkJoinPool;
 
 /**
@@ -12,11 +15,20 @@ import java.util.concurrent.ForkJoinPool;
 public class Hussar {
     private final EnvironmentConfigurerProviderResolver configurerProviderResolver;
     private final EnvironmentOrchestrator environmentOrchestrator;
+    private final EnvironmentRegistry environmentRegistry;
+    private final ApplicationRestarter applicationRestarter;
+    private final AnnotationDetector annotationDetector;
 
-    Hussar(@NonNull EnvironmentConfigurerProviderResolver configurerProviderResolver,
-           @NonNull EnvironmentOrchestrator environmentOrchestrator) {
-        this.configurerProviderResolver = configurerProviderResolver;
+    Hussar(@NonNull EnvironmentConfigurerProviderResolver environmentConfigurerProviderResolver,
+           @NonNull EnvironmentOrchestrator environmentOrchestrator,
+           @NonNull EnvironmentRegistry environmentRegistry,
+           @NonNull ApplicationRestarter applicationRestarter,
+           @NonNull AnnotationDetector annotationDetector) {
+        this.configurerProviderResolver = environmentConfigurerProviderResolver;
         this.environmentOrchestrator = environmentOrchestrator;
+        this.environmentRegistry = environmentRegistry;
+        this.applicationRestarter = applicationRestarter;
+        this.annotationDetector = annotationDetector;
     }
 
     /**
@@ -31,17 +43,46 @@ public class Hussar {
     }
 
     /**
+     * Intercepts test method invocation - if applicable.
+     *
+     * @param testObject the test object
+     * @param testMethod the test method
+     */
+    public void interceptTest(@NonNull Object testObject,
+                              @NonNull Method testMethod) {
+        environmentRegistry
+                .getEntry(testObject)
+                .ifPresent(environment -> executeBeforeTest(testMethod, environment));
+    }
+
+    /**
      * Shutdowns all Hussar environments.
      */
     public void shutdown() {
         environmentOrchestrator.shutdown();
+        environmentRegistry.deleteEntries();
+    }
+
+    private void executeBeforeTest(Method testMethod, Environment environment) {
+        var application = environment.application();
+
+        annotationDetector.detect(testMethod, HussarApplicationRestart.class, annotation -> restartApplication(application));
     }
 
     private void initializeEnvironment(Object testObject, EnvironmentConfigurerProvider environmentConfigurerProvider) {
-        Environment environment = environmentOrchestrator.initialize(environmentConfigurerProvider);
+        var environment = environmentOrchestrator.initialize(environmentConfigurerProvider);
 
+        cacheEnvironment(testObject, environment);
         injectServices(testObject, environment);
         injectApplication(testObject, environment);
+    }
+
+    private void restartApplication(Application application) {
+        applicationRestarter.restart(application);
+    }
+
+    private void cacheEnvironment(Object testObject, Environment environment) {
+        environmentRegistry.register(testObject, environment);
     }
 
     private void injectServices(Object testObject, Environment environment) {
@@ -60,14 +101,17 @@ public class Hussar {
      * @return the Hussar instance
      */
     public static Hussar newInstance() {
-        var configurerResolver = new EnvironmentConfigurerProviderResolver();
-
-        var orchestrator = new EnvironmentOrchestrator(
+        var environmentConfigurerResolver = new EnvironmentConfigurerProviderResolver();
+        var environmentOrchestrator = new EnvironmentOrchestrator(
                 new ServiceStarter(ForkJoinPool.commonPool()),
                 new ServiceStopper(ForkJoinPool.commonPool())
         );
 
-        return new Hussar(configurerResolver, orchestrator);
+        var environmentRegistry = new EnvironmentRegistry();
+        var applicationRestarter = new ApplicationRestarter();
+        var annotationDetector = new AnnotationDetector();
+
+        return new Hussar(environmentConfigurerResolver, environmentOrchestrator, environmentRegistry, applicationRestarter, annotationDetector);
     }
 
 }

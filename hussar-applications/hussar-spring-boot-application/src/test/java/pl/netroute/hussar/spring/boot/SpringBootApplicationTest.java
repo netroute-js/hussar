@@ -19,6 +19,8 @@ public class SpringBootApplicationTest {
     private static final int PORT_RANGE_START = 30000;
     private static final int PORT_RANGE_END = 40000;
 
+    private static final int INITIAL_VERSION = 1;
+
     private static final String LOCALHOST = "localhost";
     private static final String ENDPOINT_REGEX = "http://localhost:\\d+";
 
@@ -102,13 +104,49 @@ public class SpringBootApplicationTest {
     }
 
     @Test
+    public void shouldRestartApplication() {
+        // given
+        var serverAuthProperty = property(SERVER_AUTH_PROPERTY, SERVER_AUTH_PROPERTY_VALUE);
+        var metricsUrlEnvVariable = envVariable(METRICS_URL_ENV_VARIABLE, METRICS_URL_ENV_VARIABLE_VALUE);
+        var externalConfigurations = Set.<ConfigurationEntry>of(
+                serverAuthProperty,
+                metricsUrlEnvVariable
+        );
+
+        var startupContext = new ApplicationStartupContext(externalConfigurations);
+
+        // when
+        application.start(startupContext);
+
+        var endpoints = application.getEndpoints();
+        var client = applicationClient(endpoints);
+
+        var incrementedVersion = client.incrementVersion();
+
+        application.restart();
+
+        // then
+        var expectedVersion = 2;
+        assertVersionChanged(incrementedVersion, expectedVersion);
+
+        var initialized = application.isInitialized();
+        assertInitialized(initialized);
+
+        endpoints = application.getEndpoints();
+        client = applicationClient(endpoints);
+
+        assertPingEndpointAccessible(client);
+        assertConfiguredProperties(client);
+        assertVersionReset(client);
+    }
+
+    @Test
     public void shouldShutdownApplication() {
         // given
         var startupContext = new ApplicationStartupContext(Set.of());
 
-        application.start(startupContext);
-
         // when
+        application.start(startupContext);
         application.shutdown();
 
         // then
@@ -172,6 +210,16 @@ public class SpringBootApplicationTest {
         var pingResponse = client.ping();
 
         assertThat(pingResponse).isEqualTo(PING_RESPONSE);
+    }
+
+    private void assertVersionChanged(int version, int expectedVersion) {
+        assertThat(version).isEqualTo(expectedVersion);
+    }
+
+    private void assertVersionReset(SimpleApplicationClient client) {
+        var version = client.getVersion();
+
+        assertThat(version).isEqualTo(INITIAL_VERSION);
     }
 
     private void assertConfiguredProperties(SimpleApplicationClient client) {

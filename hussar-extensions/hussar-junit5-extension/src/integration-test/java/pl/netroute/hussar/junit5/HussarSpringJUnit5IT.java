@@ -6,9 +6,9 @@ import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.api.application.HussarApplication;
 import pl.netroute.hussar.core.api.environment.HussarEnvironment;
 import pl.netroute.hussar.core.api.service.HussarService;
-import pl.netroute.hussar.junit5.client.ClientFactory;
 import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
 import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
+import pl.netroute.hussar.junit5.factory.SimpleSpringApplicationClientFactory;
 import pl.netroute.hussar.service.kafka.KafkaDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
 import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
@@ -79,7 +79,7 @@ public class HussarSpringJUnit5IT {
     @Test
     public void shouldStartupEnvironment() {
         // given
-        var applicationClient = applicationClient(application);
+        var applicationClient = SimpleSpringApplicationClientFactory.create(application);
 
         // when
         // then
@@ -105,11 +105,4 @@ public class HussarSpringJUnit5IT {
         assertThat(pingResponse).isEqualTo(PING_RESPONSE);
     }
 
-    private SimpleApplicationClient applicationClient(Application application) {
-        var endpoint = application
-                .getEndpoints()
-                .getFirst();
-
-        return ClientFactory.create(endpoint, SimpleApplicationClient.class);
-    }
 }

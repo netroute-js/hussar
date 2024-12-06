@@ -23,6 +23,7 @@ public class SpringBootApplication implements Application {
     private final LockedAction lockedAction;
 
     private ConfigurableApplicationContext applicationContext;
+    private ApplicationStartupContext applicationStartupContext;
 
     private SpringBootApplication(@NonNull Class<?> applicationClass,
                                   @NonNull CommandLineArgumentConfigurer argumentConfigurer) {
@@ -59,9 +60,15 @@ public class SpringBootApplication implements Application {
                     .ofNullable(applicationContext)
                     .ifPresentOrElse(
                             appContext -> {},
-                            () -> this.applicationContext = initializeApplication(context)
+                            () -> doStart(context)
                     )
         );
+    }
+
+    @Override
+    public void restart() {
+        shutdown();
+        start(applicationStartupContext);
     }
 
     @Override
@@ -69,7 +76,7 @@ public class SpringBootApplication implements Application {
         lockedAction.exclusiveAction(() ->
                 Optional
                         .ofNullable(applicationContext)
-                        .ifPresent(ConfigurableApplicationContext::close)
+                        .ifPresent(this::doShutdown)
         );
     }
 
@@ -88,6 +95,17 @@ public class SpringBootApplication implements Application {
         return new SpringApplicationBuilder(applicationClass)
                 .addCommandLineProperties(true)
                 .run(commandLineArguments.toArray(new String[0]));
+    }
+
+    private void doStart(ApplicationStartupContext context) {
+        this.applicationStartupContext = context;
+        this.applicationContext = initializeApplication(context);
+    }
+
+    private void doShutdown(ConfigurableApplicationContext applicationContext) {
+        applicationContext.close();
+
+        this.applicationContext = null;
     }
 
     /**

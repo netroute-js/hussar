@@ -26,6 +26,10 @@ public class TestApplication implements Application {
     }
 
     @Override
+    public void restart() {
+    }
+
+    @Override
     public void shutdown() {
     }
 

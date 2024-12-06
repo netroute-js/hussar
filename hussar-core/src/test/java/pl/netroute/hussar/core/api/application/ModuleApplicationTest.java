@@ -30,6 +30,16 @@ public class ModuleApplicationTest {
     }
 
     @Test
+    public void shouldRestartApplication() {
+        // given
+        // when
+        application.restart();
+
+        // then
+        // nothing to assert on
+    }
+
+    @Test
     public void shouldShutdownApplication() {
         // given
         // when
