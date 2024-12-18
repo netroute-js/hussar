@@ -7,8 +7,9 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
+import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
 import pl.netroute.hussar.service.kafka.KafkaDockerService;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 
@@ -28,19 +29,18 @@ public class KafkaAssertionHelper {
     private static final Duration KAFKA_TIMEOUT = Duration.ofSeconds(5L);
 
     public static void assertKafkaBootstrapped(@NonNull KafkaDockerService kafkaService,
-                                               @NonNull SimpleApplicationClient applicationClient) {
+                                               @NonNull Application application) {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(kafkaService);
+        var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertKafkaReachable(endpoint);
         assertTopicsCreated(endpoint, List.of(KAFKA_EVENTS_TOPIC));
-        assertPropertyConfigured(KAFKA_URL_PROPERTY, endpoint.address(), applicationClient);
-        assertPropertyConfigured(KAFKA_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient);
+        applicationClientRunner.run(applicationClient -> assertPropertyConfigured(KAFKA_URL_PROPERTY, endpoint.address(), applicationClient));
+        applicationClientRunner.run(applicationClient -> assertPropertyConfigured(KAFKA_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
     }
 
     private static void assertKafkaReachable(Endpoint endpoint) {
-        var client = createClient(endpoint);
-
-        try {
+        try(var client = createClient(endpoint)) {
             var nodes = client
                     .describeCluster()
                     .nodes()
@@ -65,9 +65,7 @@ public class KafkaAssertionHelper {
     }
 
     private static List<String> listTopics(Endpoint endpoint) {
-        var client = createClient(endpoint);
-
-        try {
+        try(var client = createClient(endpoint)) {
             return client
                     .listTopics()
                     .listings()

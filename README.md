@@ -52,6 +52,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
 - [Examples](#examples)
   - [JUnit5 & Spring Boot](#junit5-springboot-basic-example)
   - [JUnit5 & Spring Boot - advanced](#junit5-springboot-advanced-example)
+  - [JUnit5 & Replicated Spring Boot [TO BE RELEASED in 1.5]](#junit5-replicated-springboot-example)
   - [JUnit5 & Module Application](#junit5-module-example)
   - [Dynamic binding of application configurations - environment variables](#dynamic-binding-app-config-environment-variable-example)
   - [Dynamic binding of application configurations - properties](#dynamic-binding-app-config-properties-example)
@@ -637,6 +638,51 @@ This section provides a comprehensive collection of **examples** demonstrating t
 > See [Dynamic binding of application configurations - environment variables](#dynamic-binding-app-config-environment-variable-example) or [Dynamic binding of application configurations - properties](#dynamic-binding-app-config-properties-example) section for more details about dynamic binding of configurations in Hussar.
 >
 > This is all you need to configure to have **Hussar / Junit5 / Spring Boot** combination.
+---
+> **JUnit5 & Replicated Spring Boot [TO BE RELEASED in 1.5]** <a id="junit5-replicated-springboot-example"/>
+>
+> Modern software development predominantly involves distributed systems. Frequently, multiple replicas are deployed in production environments. Hussar simplifies the process of testing replicated scenarios, enabling integration tests to closely mirror production conditions.
+>
+> To see how to setup JUnit5 & Spring Boot, see the following sections [Basic](#junit5-springboot-basic-example) and [Advanced](#junit5-springboot-advanced-example) sections for more detailed examples.
+> 
+> This sections focuses on showing how to configure replicated Spring Boot application with JUnit5.
+>
+> The next step is to create a JUnit5 test class:
+>
+>```java
+>@ExtendWith(HussarJUnit5Extension.class) // it glues Hussar and JUnit5 together. It's basically everything you need to make them work together
+>@HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class) // it provides Hussar tests environment configuration
+>public class ReplicatedIT {
+>
+>    @HussarApplication // it injects the Hussar's application (in our case a replicated one)
+>    private Application application;
+>
+>    // you can use application's object method to get the physical endpoints - i.e. application.getEndpoints(). It will return the endpoint of each replica
+>  
+>    // test methods
+>    
+>}
+>```
+>
+> It's time to go to the next critical component - **TestEnvironmentConfigurerProvider**:
+>
+>```java
+>public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider { // to provide Hussar's tests environment configuration, you need to implement this interface
+>
+>  @Override
+>  public LocalEnvironmentConfigurer provide() { // to provide Hussar's tests environment, you need to implement this method and provide the setup you wish to have
+>      var application = ClusterSpringBootApplication.newApplication(REPLICAS_NUMBER, SimpleSpringApplication.class);; // in our example, we want to test clustered SpringBoot applications (REPLICAS_NUMBER)
+>    
+>      return LocalEnvironmentConfigurer
+>            .newInstance()
+>            .withApplication(application) // it adds the Clustered SpringBoot application to the environment configuration
+>            .done();
+>  }
+>
+>}
+>```
+>
+> This is all you need to configure to have **Hussar / Junit5 / Replicated Spring Boot** combination.
 ---
 > **JUnit5 & Module Application** <a id="junit5-module-example"/>
 >

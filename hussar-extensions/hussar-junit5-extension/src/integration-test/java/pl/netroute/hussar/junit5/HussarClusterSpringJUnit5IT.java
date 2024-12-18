@@ -6,7 +6,7 @@ import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.api.application.HussarApplication;
 import pl.netroute.hussar.core.api.environment.HussarEnvironment;
 import pl.netroute.hussar.core.api.service.HussarService;
-import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
+import pl.netroute.hussar.junit5.config.ClusterSpringTestEnvironmentConfigurerProvider;
 import pl.netroute.hussar.service.kafka.KafkaDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
 import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
@@ -35,8 +35,8 @@ import static pl.netroute.hussar.junit5.factory.RedisServiceFactory.REDIS_NAME;
 import static pl.netroute.hussar.junit5.factory.WiremockServiceFactory.WIREMOCK_NAME;
 
 @ExtendWith(HussarJUnit5Extension.class)
-@HussarEnvironment(configurerProvider = SpringTestEnvironmentConfigurerProvider.class)
-public class HussarSpringJUnit5IT {
+@HussarEnvironment(configurerProvider = ClusterSpringTestEnvironmentConfigurerProvider.class)
+public class HussarClusterSpringJUnit5IT {
 
     @HussarApplication
     Application application;

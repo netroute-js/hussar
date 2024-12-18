@@ -1,8 +1,10 @@
 package pl.netroute.hussar.spring.boot.client;
 
+import lombok.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import pl.netroute.hussar.core.api.Endpoint;
 
 import java.util.Optional;
 
@@ -19,5 +21,9 @@ public interface SimpleApplicationClient {
 
     @PostMapping("/api/v1/version")
     Integer incrementVersion();
+
+    static SimpleApplicationClient newClient(@NonNull Endpoint endpoint) {
+        return ClientFactory.create(endpoint, SimpleApplicationClient.class);
+    }
 
 }

@@ -15,19 +15,21 @@ import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelpe
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.SERVER_AUTH_PROPERTY;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.SERVER_AUTH_PROPERTY_VALUE;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationInitialized;
+import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationMultipleEndpointsExists;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationNotInitialized;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationPingEndpointAccessible;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationPropertiesConfigured;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationRestarted;
-import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertApplicationSingleEndpointExists;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.assertNoApplicationEndpointsExist;
 
-public class SpringBootApplicationTest {
-    private SpringBootApplication application;
+public class ClusterSpringBootApplicationTest {
+    private static final int REPLICAS = 2;
+
+    private ClusterSpringBootApplication application;
 
     @BeforeEach
     public void setup() {
-        application = SpringBootApplication.newApplication(SimpleSpringApplication.class);
+        application = ClusterSpringBootApplication.newApplication(REPLICAS, SimpleSpringApplication.class);
     }
 
     @Test
@@ -47,7 +49,7 @@ public class SpringBootApplicationTest {
 
         // then
         assertApplicationInitialized(application);
-        assertApplicationSingleEndpointExists(application);
+        assertApplicationMultipleEndpointsExists(application, REPLICAS);
         assertApplicationPingEndpointAccessible(application);
         assertApplicationPropertiesConfigured(application);
     }
@@ -70,7 +72,7 @@ public class SpringBootApplicationTest {
 
         // then
         assertApplicationInitialized(application);
-        assertApplicationSingleEndpointExists(application);
+        assertApplicationMultipleEndpointsExists(application, REPLICAS);
         assertApplicationPingEndpointAccessible(application);
         assertApplicationPropertiesConfigured(application);
     }
@@ -102,7 +104,7 @@ public class SpringBootApplicationTest {
 
         // then
         assertApplicationInitialized(application);
-        assertApplicationSingleEndpointExists(application);
+        assertApplicationMultipleEndpointsExists(application, REPLICAS);
         assertApplicationPingEndpointAccessible(application);
         assertApplicationPropertiesConfigured(application);
         assertApplicationRestarted(application);

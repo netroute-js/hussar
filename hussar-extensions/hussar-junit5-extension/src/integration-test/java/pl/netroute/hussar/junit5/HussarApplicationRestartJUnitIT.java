@@ -7,8 +7,8 @@ import pl.netroute.hussar.core.api.application.Application;
 import pl.netroute.hussar.core.api.application.HussarApplication;
 import pl.netroute.hussar.core.api.application.HussarApplicationRestart;
 import pl.netroute.hussar.core.api.environment.HussarEnvironment;
+import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
 import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
-import pl.netroute.hussar.junit5.factory.SimpleSpringApplicationClientFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,7 +23,7 @@ public class HussarApplicationRestartJUnitIT {
     @Order(1)
     public void shouldChangeApplicationState() {
         // given
-        var applicationClient = SimpleSpringApplicationClientFactory.create(application);
+        var applicationClient = SimpleApplicationClient.newClient(application);
 
         // when
         var version = applicationClient.incrementVersion();
@@ -39,7 +39,7 @@ public class HussarApplicationRestartJUnitIT {
     @HussarApplicationRestart
     public void shouldRestartApplication() {
         // given
-        var applicationClient = SimpleSpringApplicationClientFactory.create(application);
+        var applicationClient = SimpleApplicationClient.newClient(application);
 
         // when
         var version = applicationClient.getVersion();
