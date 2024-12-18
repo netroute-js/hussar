@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * An actual implementation of {@link Application}. It guarantees seamless integration for testing clustered Spring Boot applications.
+ */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClusterSpringBootApplication implements Application {
 
@@ -48,6 +51,13 @@ public class ClusterSpringBootApplication implements Application {
         applications.forEach(Application::restart);
     }
 
+    /**
+     * Factory method to create clustered {@link SpringBootApplication}.
+     *
+     * @param replicas - number of replicas in a cluster
+     * @param applicationClass - the main class of your Spring Boot application.
+     * @return the instance of clustered {@link SpringBootApplication}
+     */
     public static ClusterSpringBootApplication newApplication(int replicas, @NonNull Class<?> applicationClass) {
         if(replicas <= 1) {
             throw new IllegalArgumentException("replicas must be greater than 1");
