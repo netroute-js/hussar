@@ -52,11 +52,11 @@ public class ClusterSpringBootApplication implements Application {
     }
 
     /**
-     * Factory method to create clustered {@link SpringBootApplication}.
+     * Factory method to create {@link ClusterSpringBootApplication}.
      *
      * @param replicas - number of replicas in a cluster
      * @param applicationClass - the main class of your Spring Boot application.
-     * @return the instance of clustered {@link SpringBootApplication}
+     * @return the instance of {@link ClusterSpringBootApplication}
      */
     public static ClusterSpringBootApplication newApplication(int replicas, @NonNull Class<?> applicationClass) {
         if(replicas <= 1) {
