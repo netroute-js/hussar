@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api.application;
+package pl.netroute.hussar.core.application.api;
 
 import lombok.AccessLevel;
 import lombok.NonNull;

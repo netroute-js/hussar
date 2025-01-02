@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.api.service.ServiceStartupContext;
+import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 

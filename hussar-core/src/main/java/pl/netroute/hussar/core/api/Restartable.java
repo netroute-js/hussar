@@ -1,9 +1,9 @@
 package pl.netroute.hussar.core.api;
 
-import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.application.api.Application;
 
 /**
- * Hussar interface responsible for exposing methods to restart {@link Application}.
+ * Hussar interface responsible for exposing methods to restart component.
  */
 public interface Restartable {
 

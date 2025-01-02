@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api.service;
+package pl.netroute.hussar.core.service.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

@@ -4,10 +4,10 @@ import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.service.Service;
-import pl.netroute.hussar.core.api.service.ServiceStartupContext;
+import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 

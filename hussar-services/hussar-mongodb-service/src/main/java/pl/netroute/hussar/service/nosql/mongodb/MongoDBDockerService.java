@@ -2,9 +2,9 @@ package pl.netroute.hussar.service.nosql.mongodb;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.service.Service;
-import pl.netroute.hussar.core.api.service.ServiceStartupContext;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;

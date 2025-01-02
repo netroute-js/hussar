@@ -3,9 +3,9 @@ package pl.netroute.hussar.service.nosql.redis;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)

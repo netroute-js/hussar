@@ -2,11 +2,11 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.environment.HussarEnvironment;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.api.environment.LocalEnvironmentConfigurer;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.environment.api.HussarEnvironment;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
+import pl.netroute.hussar.core.service.api.Service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

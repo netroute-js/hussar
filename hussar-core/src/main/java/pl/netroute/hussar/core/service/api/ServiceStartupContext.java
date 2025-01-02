@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.api.service;
+package pl.netroute.hussar.core.service.api;
 
 /**
  * Hussar context used during {@link Service} startup.

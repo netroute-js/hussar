@@ -2,7 +2,7 @@ package pl.netroute.hussar.service.wiremock;
 
 import lombok.experimental.SuperBuilder;
 import org.testcontainers.utility.DockerImageName;
-import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.container.GenericContainerFactory;

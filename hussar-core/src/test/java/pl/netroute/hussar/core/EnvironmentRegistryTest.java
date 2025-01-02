@@ -1,7 +1,7 @@
 package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.environment.Environment;
+import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.test.factory.EnvironmentTestFactory;
 
 import java.util.Map;

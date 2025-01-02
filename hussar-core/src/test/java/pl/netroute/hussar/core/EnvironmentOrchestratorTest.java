@@ -2,14 +2,14 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
-import pl.netroute.hussar.core.api.environment.Environment;
-import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.api.environment.LocalEnvironmentConfigurer;
-import pl.netroute.hussar.core.api.service.Service;
-import pl.netroute.hussar.core.api.service.ServiceStartupContext;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.environment.api.Environment;
+import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
+import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 
@@ -22,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.property;
 
 public class EnvironmentOrchestratorTest {
     private EnvironmentOrchestrator orchestrator;

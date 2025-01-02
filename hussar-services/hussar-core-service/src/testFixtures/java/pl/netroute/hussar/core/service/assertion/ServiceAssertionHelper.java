@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.service.api.Service;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package pl.netroute.hussar.core;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.application.api.Application;
 
 @Slf4j
 class ApplicationRestarter {

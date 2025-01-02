@@ -6,9 +6,9 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.TopicListing;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.kafka.KafkaDockerService;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
@@ -35,9 +35,7 @@ public class KafkaAssertionHelper {
     public void asserKafkaAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(kafka);
 
-        var client = createClient(endpoint);
-
-        try {
+        try(var client = createClient(endpoint)) {
             var nodes = client
                     .describeCluster()
                     .nodes()
@@ -50,9 +48,7 @@ public class KafkaAssertionHelper {
     }
 
     public void asserKafkaNotAccessible(@NonNull Endpoint endpoint) {
-        var client = createClient(endpoint);
-
-        try {
+        try(var client = createClient(endpoint)) {
             client
                     .describeCluster()
                     .nodes()
@@ -127,9 +123,7 @@ public class KafkaAssertionHelper {
     }
 
     private List<String> listTopics(Endpoint endpoint) {
-        var client = createClient(endpoint);
-
-        try {
+        try(var client = createClient(endpoint)) {
             return client
                     .listTopics()
                     .listings()

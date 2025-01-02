@@ -1,21 +1,21 @@
-package pl.netroute.hussar.core.api.environment;
+package pl.netroute.hussar.core.environment.api;
 
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.api.service.DefaultServiceRegistry;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
+import pl.netroute.hussar.core.service.api.Service;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.property;
 
 /**
  * An actual implementation of {@link EnvironmentConfigurer}.

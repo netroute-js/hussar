@@ -2,7 +2,7 @@ package pl.netroute.hussar.spring.boot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 
 import java.util.List;
 import java.util.Set;

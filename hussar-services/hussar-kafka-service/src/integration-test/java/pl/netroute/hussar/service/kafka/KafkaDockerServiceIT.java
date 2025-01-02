@@ -2,7 +2,7 @@ package pl.netroute.hussar.service.kafka;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.service.ServiceStartupContext;
+import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 import pl.netroute.hussar.service.kafka.assertion.KafkaAssertionHelper;

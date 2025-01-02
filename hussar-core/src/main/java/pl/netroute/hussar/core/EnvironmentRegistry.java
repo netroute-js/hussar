@@ -1,7 +1,7 @@
 package pl.netroute.hussar.core;
 
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.environment.Environment;
+import pl.netroute.hussar.core.environment.api.Environment;
 
 import java.util.HashMap;
 import java.util.Map;

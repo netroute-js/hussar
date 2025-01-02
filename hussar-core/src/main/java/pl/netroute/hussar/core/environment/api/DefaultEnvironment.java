@@ -1,9 +1,9 @@
-package pl.netroute.hussar.core.api.environment;
+package pl.netroute.hussar.core.environment.api;
 
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.service.ServiceRegistry;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.service.api.ServiceRegistry;
 
 /**
  * An actual implementation of {@link Environment}.

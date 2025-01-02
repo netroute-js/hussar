@@ -3,13 +3,13 @@ package pl.netroute.hussar.core.test.factory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.application.ModuleApplication;
-import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.api.environment.DefaultEnvironment;
-import pl.netroute.hussar.core.api.environment.Environment;
-import pl.netroute.hussar.core.api.service.DefaultServiceRegistry;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.application.api.ModuleApplication;
+import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.environment.api.DefaultEnvironment;
+import pl.netroute.hussar.core.environment.api.Environment;
+import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
+import pl.netroute.hussar.core.service.api.Service;
 
 import java.util.Set;
 

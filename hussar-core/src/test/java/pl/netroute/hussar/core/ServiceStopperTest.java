@@ -2,8 +2,8 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.service.DefaultServiceRegistry;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
+import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
 

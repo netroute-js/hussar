@@ -2,8 +2,8 @@ package pl.netroute.hussar.service.wiremock;
 
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 

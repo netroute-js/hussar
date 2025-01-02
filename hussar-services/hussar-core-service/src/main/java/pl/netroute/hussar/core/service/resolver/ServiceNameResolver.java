@@ -3,7 +3,7 @@ package pl.netroute.hussar.core.service.resolver;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.service.api.Service;
 
 import java.util.Optional;
 import java.util.UUID;

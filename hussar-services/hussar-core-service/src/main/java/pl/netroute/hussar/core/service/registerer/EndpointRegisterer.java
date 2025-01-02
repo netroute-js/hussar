@@ -3,9 +3,9 @@ package pl.netroute.hussar.core.service.registerer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 
 /**
  * A custom {@link Endpoint} registerer in {@link ConfigurationRegistry}.

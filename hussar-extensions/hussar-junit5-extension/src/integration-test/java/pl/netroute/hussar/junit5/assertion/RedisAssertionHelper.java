@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.assertj.core.api.Assertions;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
 import pl.netroute.hussar.service.nosql.redis.RedisDockerService;

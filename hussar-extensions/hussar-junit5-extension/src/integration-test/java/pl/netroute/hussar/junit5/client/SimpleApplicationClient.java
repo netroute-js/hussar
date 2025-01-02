@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.application.api.Application;
 
 import java.util.Optional;
 

@@ -2,14 +2,14 @@ package pl.netroute.hussar.spring.boot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;
 
 import java.util.Set;
 
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.envVariable;
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.envVariable;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.property;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.METRICS_URL_ENV_VARIABLE;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.METRICS_URL_ENV_VARIABLE_VALUE;
 import static pl.netroute.hussar.spring.boot.SpringBootApplicationAssertionHelper.SERVER_AUTH_PROPERTY;

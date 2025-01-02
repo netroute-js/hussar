@@ -2,11 +2,11 @@ package pl.netroute.hussar.service.nosql.mongodb;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.ConfigurationRegistry;
-import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 
 import java.util.Set;

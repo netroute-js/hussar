@@ -1,9 +1,9 @@
 package pl.netroute.hussar.junit5.config;
 
-import pl.netroute.hussar.core.api.application.ModuleApplication;
-import pl.netroute.hussar.core.api.environment.EnvironmentConfigurer;
-import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.api.environment.LocalEnvironmentConfigurer;
+import pl.netroute.hussar.core.application.api.ModuleApplication;
+import pl.netroute.hussar.core.environment.api.EnvironmentConfigurer;
+import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.junit5.factory.MySQLServiceFactory;
 
 public class ModuleTestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {

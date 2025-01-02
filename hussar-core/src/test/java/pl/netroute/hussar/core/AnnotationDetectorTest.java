@@ -2,7 +2,7 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.application.HussarApplicationRestart;
+import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

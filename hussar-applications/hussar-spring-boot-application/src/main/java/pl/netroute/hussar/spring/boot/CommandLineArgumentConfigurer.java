@@ -1,7 +1,7 @@
 package pl.netroute.hussar.spring.boot;
 
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 
 import java.util.List;
 import java.util.Set;

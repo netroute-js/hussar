@@ -1,17 +1,14 @@
 package pl.netroute.hussar.core.api;
 
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.service.Service;
-
 /**
- * Hussar interface responsible for exposing methods to determine whether {@link Application} or {@link Service} is initialized.
+ * Hussar interface responsible for exposing methods to determine component is initialized.
  */
 public interface Initializable {
 
     /**
-     * Returns whether {@link Application} or {@link Service} is initialized.
+     * Returns whether component is initialized.
      *
-     * @return true if {@link Application} or {@link Service} is initialized. Returns false otherwise.
+     * @return true if component is initialized. Returns false otherwise.
      */
     boolean isInitialized();
 

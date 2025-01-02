@@ -3,8 +3,8 @@ package pl.netroute.hussar.core;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.environment.HussarEnvironment;
-import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.environment.api.HussarEnvironment;
+import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.util.Optional;

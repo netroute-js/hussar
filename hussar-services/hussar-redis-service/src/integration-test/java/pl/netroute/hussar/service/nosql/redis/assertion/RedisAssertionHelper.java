@@ -2,10 +2,10 @@ package pl.netroute.hussar.service.nosql.redis.assertion;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @RequiredArgsConstructor
 public class RedisAssertionHelper {
@@ -37,14 +36,20 @@ public class RedisAssertionHelper {
 
     public void asserRedisAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(redis);
-        var client = createClient(endpoint);
 
-        var result = client.ping();
-        assertThat(result).isEqualTo(PING_RESULT);
+        try(var client = createClient(endpoint)) {
+            var result = client.ping();
+            assertThat(result).isEqualTo(PING_RESULT);
+        }
     }
 
     public void asserRedisNotAccessible(@NonNull Endpoint endpoint) {
-        assertThatThrownBy(() -> createClient(endpoint)).isInstanceOf(JedisConnectionException.class);
+        try(var client = createClient(endpoint)) {
+            throw new AssertionError("Expected JedisConnectionException");
+        } catch (JedisConnectionException ex) {
+        } catch (Exception ex) {
+            throw new AssertionError("Expected JedisConnectionException");
+        }
     }
 
     public void assertRegisteredEndpointUnderProperty(@NonNull String registeredProperty) {

@@ -4,8 +4,8 @@ import lombok.NonNull;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.application.ApplicationStartupContext;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 

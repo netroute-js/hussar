@@ -12,9 +12,9 @@ import com.mongodb.connection.SocketSettings;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.EnvVariableConfigurationEntry;
-import pl.netroute.hussar.core.api.configuration.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
 
@@ -40,22 +40,22 @@ public class MongoDBAssertionHelper {
     public void asserDatabaseAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
 
-        var client = createClient(endpoint);
-
-        assertThat(client.listDatabaseNames()).contains(DEFAULT_AUTH_DB);
+        try(var client = createClient(endpoint)) {
+            assertThat(client.listDatabaseNames()).contains(DEFAULT_AUTH_DB);
+        }
     }
 
     public void assertDatabaseNotAccessible(@NonNull Endpoint endpoint) {
-        var client = createClient(endpoint);
+        try(var client = createClient(endpoint)) {
+            var states = client
+                    .getClusterDescription()
+                    .getServerDescriptions()
+                    .stream()
+                    .map(ServerDescription::getState)
+                    .toList();
 
-        var states = client
-                .getClusterDescription()
-                .getServerDescriptions()
-                .stream()
-                .map(ServerDescription::getState)
-                .toList();
-
-        assertThat(states).containsOnly(ServerConnectionState.CONNECTING);
+            assertThat(states).containsOnly(ServerConnectionState.CONNECTING);
+        }
     }
 
     public void assertRegisteredEndpointUnderProperty(@NonNull String registeredProperty) {

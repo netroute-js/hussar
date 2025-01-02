@@ -3,13 +3,13 @@ package pl.netroute.hussar.spring.boot;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.configuration.ConfigurationEntry;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.helper.PortFinderHelper;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static pl.netroute.hussar.core.api.configuration.ConfigurationEntry.property;
+import static pl.netroute.hussar.core.configuration.api.ConfigurationEntry.property;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class DynamicConfigurationConfigurer {

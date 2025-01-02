@@ -2,7 +2,7 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.application.api.Application;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

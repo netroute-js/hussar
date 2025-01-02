@@ -1,19 +1,16 @@
 package pl.netroute.hussar.core.api;
 
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.service.Service;
-
 import java.util.List;
 
 /**
- * Hussar interface responsible for exposing methods to access {@link Application} or {@link Service}.
+ * Hussar interface responsible for exposing methods to access component.
  */
 public interface Accessible {
 
     /**
-     * Returns endpoints of {@link Application} or {@link Service}.
+     * Returns endpoints of component.
      *
-     * @return the list of endpoints of {@link Application} or {@link Service}.
+     * @return the list of component's endpoints.
      */
     List<Endpoint> getEndpoints();
 

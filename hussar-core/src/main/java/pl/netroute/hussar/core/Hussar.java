@@ -1,10 +1,10 @@
 package pl.netroute.hussar.core;
 
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.application.HussarApplicationRestart;
-import pl.netroute.hussar.core.api.environment.Environment;
-import pl.netroute.hussar.core.api.environment.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
+import pl.netroute.hussar.core.environment.api.Environment;
+import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ForkJoinPool;

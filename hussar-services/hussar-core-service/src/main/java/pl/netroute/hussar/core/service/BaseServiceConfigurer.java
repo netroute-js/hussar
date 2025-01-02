@@ -3,7 +3,7 @@ package pl.netroute.hussar.core.service;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.service.api.Service;
 
 import java.util.Set;
 

@@ -3,7 +3,7 @@ package pl.netroute.hussar.spring.boot;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.application.Application;
+import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.spring.boot.client.SimpleApplicationClient;
 
 import java.util.function.Consumer;

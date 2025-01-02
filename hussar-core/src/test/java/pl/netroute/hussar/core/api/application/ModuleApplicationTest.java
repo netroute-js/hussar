@@ -3,6 +3,8 @@ package pl.netroute.hussar.core.api.application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.application.api.ModuleApplication;
 
 import java.util.List;
 import java.util.Set;

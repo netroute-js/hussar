@@ -2,8 +2,8 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.api.application.Application;
-import pl.netroute.hussar.core.api.application.HussarApplication;
+import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.application.api.HussarApplication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

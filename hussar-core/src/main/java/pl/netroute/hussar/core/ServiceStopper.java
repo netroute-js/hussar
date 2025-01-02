@@ -3,8 +3,8 @@ package pl.netroute.hussar.core;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.api.service.Service;
-import pl.netroute.hussar.core.api.service.ServiceRegistry;
+import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.api.ServiceRegistry;
 import pl.netroute.hussar.core.helper.FutureHelper;
 
 import java.time.Duration;

@@ -1,6 +1,6 @@
 package pl.netroute.hussar.service.sql;
 
-import pl.netroute.hussar.core.api.service.Service;
+import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 
 /**
