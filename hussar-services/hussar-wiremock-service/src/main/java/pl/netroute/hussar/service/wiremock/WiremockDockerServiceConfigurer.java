@@ -5,9 +5,9 @@ import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
-import pl.netroute.hussar.core.service.container.GenericContainerFactory;
+import pl.netroute.hussar.core.docker.GenericContainerFactory;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
+import pl.netroute.hussar.core.docker.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 /**

@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.service.container;
+package pl.netroute.hussar.core.docker;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

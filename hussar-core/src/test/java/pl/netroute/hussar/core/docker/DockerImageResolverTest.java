@@ -1,11 +1,9 @@
-package pl.netroute.hussar.core.service;
+package pl.netroute.hussar.core.docker;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.testcontainers.utility.DockerImageName;
-import pl.netroute.hussar.core.service.resolver.DockerImageResolver;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class DockerImageResolverTest {
     private static final String DOCKER_IMAGE_TEMPLATE = "%s:%s";
@@ -50,7 +48,7 @@ public class DockerImageResolverTest {
     }
 
     private void assertResolvedImage(DockerImageName resolvedImage, String expectedImage) {
-        assertThat(resolvedImage.asCanonicalNameString()).isEqualTo(expectedImage);
+        Assertions.assertThat(resolvedImage.asCanonicalNameString()).isEqualTo(expectedImage);
     }
 
 }
