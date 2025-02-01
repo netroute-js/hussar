@@ -42,7 +42,8 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
 
     @Override
     public KafkaDockerService configure(@NonNull ServiceConfigureContext context) {
-        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var dockerRegistry = context.dockerRegistry();
+        var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = createContainer(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();

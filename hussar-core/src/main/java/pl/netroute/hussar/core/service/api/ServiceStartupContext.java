@@ -6,11 +6,11 @@ package pl.netroute.hussar.core.service.api;
 public record ServiceStartupContext() {
 
     /**
-     * Returns an empty/default context.
+     * Returns default context.
      *
-     * @return the actual empty/default context.
+     * @return the actual default context.
      */
-    public static ServiceStartupContext empty() {
+    public static ServiceStartupContext defaultContext() {
         return new ServiceStartupContext();
     }
 

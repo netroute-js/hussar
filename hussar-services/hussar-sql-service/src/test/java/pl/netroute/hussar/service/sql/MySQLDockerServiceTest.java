@@ -72,7 +72,7 @@ public class MySQLDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
@@ -126,7 +126,7 @@ public class MySQLDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);

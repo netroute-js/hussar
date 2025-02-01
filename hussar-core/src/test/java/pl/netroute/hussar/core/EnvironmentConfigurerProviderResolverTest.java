@@ -61,7 +61,7 @@ public class EnvironmentConfigurerProviderResolverTest {
         private final StubServiceConfigurer<ServiceTestA> standaloneServiceA;
         private final StubServiceConfigurer<ServiceTestB> standaloneServiceB;
 
-        TestEnvironmentConfigurerProvider() {
+        public TestEnvironmentConfigurerProvider() {
             this.application = mock(Application.class);
             this.standaloneServiceA = new StubServiceConfigurer<>(ServiceTestA.class);
             this.standaloneServiceB = new StubServiceConfigurer<>(ServiceTestB.class);

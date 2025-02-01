@@ -34,10 +34,10 @@ public class RabbitMQDockerServiceIT {
                 .newInstance()
                 .dockerImageVersion(DOCKER_IMAGE_VERSION)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        rabbitMQService.start(ServiceStartupContext.empty());
+        rabbitMQService.start(ServiceStartupContext.defaultContext());
 
         // then
         var rabbitMQAssertion = new RabbitMQAssertionHelper(rabbitMQService);
@@ -77,10 +77,10 @@ public class RabbitMQDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        rabbitMQService.start(ServiceStartupContext.empty());
+        rabbitMQService.start(ServiceStartupContext.defaultContext());
 
         // then
         var rabbitMQAssertion = new RabbitMQAssertionHelper(rabbitMQService);
@@ -104,10 +104,10 @@ public class RabbitMQDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(DOCKER_IMAGE_VERSION)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        rabbitMQService.start(ServiceStartupContext.empty());
+        rabbitMQService.start(ServiceStartupContext.defaultContext());
 
         var endpoint = rabbitMQService
                 .getManagementEndpoint()

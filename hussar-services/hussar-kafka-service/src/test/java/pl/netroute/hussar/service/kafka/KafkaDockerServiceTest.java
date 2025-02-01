@@ -76,7 +76,7 @@ public class KafkaDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(EMPTY_SCHEME, KAFKA_HOST, KAFKA_MAPPED_PORT);
@@ -130,7 +130,7 @@ public class KafkaDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(EMPTY_SCHEME, KAFKA_HOST, KAFKA_MAPPED_PORT);
@@ -182,7 +182,7 @@ public class KafkaDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
         service.shutdown();
 
         // then

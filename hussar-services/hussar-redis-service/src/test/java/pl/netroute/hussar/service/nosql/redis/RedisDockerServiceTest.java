@@ -72,7 +72,7 @@ public class RedisDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(REDIS_SCHEME, REDIS_HOST, REDIS_MAPPED_PORT);
@@ -119,7 +119,7 @@ public class RedisDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(REDIS_SCHEME, REDIS_HOST, REDIS_MAPPED_PORT);
@@ -181,7 +181,7 @@ public class RedisDockerServiceTest {
         // when
         // then
         Assertions
-                .assertThatThrownBy(() -> service.start(ServiceStartupContext.empty()))
+                .assertThatThrownBy(() -> service.start(ServiceStartupContext.defaultContext()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Could not configure Redis credentials");
     }
@@ -208,7 +208,7 @@ public class RedisDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
         service.shutdown();
 
         // then

@@ -6,6 +6,7 @@ import lombok.Singular;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerRegistry;
 import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
@@ -27,6 +28,10 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
 
     @NonNull
     private final Application application;
+
+    @NonNull
+    @Builder.Default
+    private final DockerRegistry dockerRegistry = DockerRegistry.defaultRegistry();
 
     @Singular
     private final Set<ServiceConfigurer<? extends Service>> services;
@@ -53,9 +58,11 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
     }
 
     private Set<Service> configureServices() {
+        var context = new ServiceConfigureContext(dockerRegistry);
+
         return services
                 .stream()
-                .map(serviceConfigurer -> serviceConfigurer.configure(new ServiceConfigureContext()))
+                .map(serviceConfigurer -> serviceConfigurer.configure(context))
                 .collect(Collectors.toUnmodifiableSet());
     }
 

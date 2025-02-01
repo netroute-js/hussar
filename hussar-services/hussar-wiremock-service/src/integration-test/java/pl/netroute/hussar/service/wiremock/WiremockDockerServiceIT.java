@@ -25,10 +25,10 @@ public class WiremockDockerServiceIT {
         wiremockService = WiremockDockerServiceConfigurer
                 .newInstance()
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        wiremockService.start(ServiceStartupContext.empty());
+        wiremockService.start(ServiceStartupContext.defaultContext());
 
         // then
         var wiremockAssertion = new WiremockAssertionHelper(wiremockService);
@@ -52,10 +52,10 @@ public class WiremockDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        wiremockService.start(ServiceStartupContext.empty());
+        wiremockService.start(ServiceStartupContext.defaultContext());
 
         // then
         var wiremockAssertion = new WiremockAssertionHelper(wiremockService);
@@ -76,10 +76,10 @@ public class WiremockDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        wiremockService.start(ServiceStartupContext.empty());
+        wiremockService.start(ServiceStartupContext.defaultContext());
 
         var endpoint = EndpointHelper.getAnyEndpointOrFail(wiremockService);
 

@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.testcontainers.utility.DockerImageName;
+import pl.netroute.hussar.core.docker.api.DockerRegistry;
 
 public class DockerImageResolverTest {
     private static final String DOCKER_IMAGE_TEMPLATE = "%s:%s";
@@ -16,11 +17,11 @@ public class DockerImageResolverTest {
     })
     public void shouldResolveImage(String imageVersion) {
         // given
-        var dockerRegistryURL = "";
+        var dockerRegistry = DockerRegistry.defaultRegistry();
         var baseImage = "ubuntu";
 
         // when
-        var resolvedImage = DockerImageResolver.resolve(dockerRegistryURL, baseImage, imageVersion);
+        var resolvedImage = DockerImageResolver.resolve(dockerRegistry, baseImage, imageVersion);
 
         // then
         var expectedImage = String.format(DOCKER_IMAGE_TEMPLATE, baseImage, imageVersion);
@@ -35,14 +36,15 @@ public class DockerImageResolverTest {
     })
     public void shouldResolveImageWithCustomDockerRegistryURL(String imageVersion) {
         // given
-        var dockerRegistryURL = "custom-docker.netroute.pl";
+        var dockerRegistryUrl = "custom-docker.netroute.pl";
+        var dockerRegistry = new DockerRegistry(dockerRegistryUrl);
         var baseImage = "ubuntu";
 
         // when
-        var resolvedImage = DockerImageResolver.resolve(dockerRegistryURL, baseImage, imageVersion);
+        var resolvedImage = DockerImageResolver.resolve(dockerRegistry, baseImage, imageVersion);
 
         // then
-        var expectedImage = String.format(DOCKER_IMAGE_WITH_CUSTOM_REGISTRY_TEMPLATE, dockerRegistryURL, baseImage, imageVersion);
+        var expectedImage = String.format(DOCKER_IMAGE_WITH_CUSTOM_REGISTRY_TEMPLATE, dockerRegistryUrl, baseImage, imageVersion);
 
         assertResolvedImage(resolvedImage, expectedImage);
     }

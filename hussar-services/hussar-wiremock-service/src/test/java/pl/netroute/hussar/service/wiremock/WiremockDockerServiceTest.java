@@ -53,7 +53,7 @@ public class WiremockDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(SchemesHelper.HTTP_SCHEME, WIREMOCK_HOST, WIREMOCK_MAPPED_PORT);
@@ -89,7 +89,7 @@ public class WiremockDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(SchemesHelper.HTTP_SCHEME, WIREMOCK_HOST, WIREMOCK_MAPPED_PORT);

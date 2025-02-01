@@ -21,7 +21,8 @@ public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceCon
     private static final String JDBC_SCHEME = "jdbc:mariadb://";
 
     public MariaDBDockerService configure(@NonNull ServiceConfigureContext context) {
-        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var dockerRegistry = context.dockerRegistry();
+        var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();

@@ -72,7 +72,7 @@ public class PostgreSQLDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(POSTGRE_SQL_SCHEME, POSTGRE_SQL_HOST, POSTGRE_SQL_MAPPED_PORT);
@@ -126,7 +126,7 @@ public class PostgreSQLDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(POSTGRE_SQL_SCHEME, POSTGRE_SQL_HOST, POSTGRE_SQL_MAPPED_PORT);

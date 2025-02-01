@@ -72,7 +72,7 @@ public class MariaDBDockerServiceTest  {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(MARIA_DB_SCHEME, MARIA_DB_HOST, MARIA_DB_MAPPED_PORT);
@@ -126,7 +126,7 @@ public class MariaDBDockerServiceTest  {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(MARIA_DB_SCHEME, MARIA_DB_HOST, MARIA_DB_MAPPED_PORT);

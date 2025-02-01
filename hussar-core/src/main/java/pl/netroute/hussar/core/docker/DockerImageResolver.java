@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.testcontainers.utility.DockerImageName;
+import pl.netroute.hussar.core.docker.api.DockerRegistry;
 
 /**
  * A custom Docker image resolver.
@@ -16,14 +17,16 @@ public class DockerImageResolver {
     /**
      * Resolves formatted Docker image.
      *
-     * @param dockerRegistryUrl - the docker registry URL.
+     * @param dockerRegistry - the docker registry.
      * @param dockerImage - the docker image.
      * @param dockerImageVersion - the docker image version.
      * @return the formatted Docker image.
      */
-    public static DockerImageName resolve(@NonNull String dockerRegistryUrl,
+    public static DockerImageName resolve(@NonNull DockerRegistry dockerRegistry,
                                           @NonNull String dockerImage,
                                           @NonNull String dockerImageVersion) {
+        var dockerRegistryUrl = dockerRegistry.url();
+
         if(isCustomRegistryConfigured(dockerRegistryUrl)) {
             return resolveDockerImageForCustomRegistry(dockerRegistryUrl, dockerImage, dockerImageVersion);
         }

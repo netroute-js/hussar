@@ -2,9 +2,9 @@ package pl.netroute.hussar.service.nosql.redis;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisAssertionHelper;
 
 import java.util.Optional;
@@ -25,10 +25,10 @@ public class RedisDockerServiceIT {
         redisService = RedisDockerServiceConfigConfigurer
                 .newInstance()
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        redisService.start(ServiceStartupContext.empty());
+        redisService.start(ServiceStartupContext.defaultContext());
 
         // then
         var redisAssertion = new RedisAssertionHelper(redisService);
@@ -44,10 +44,10 @@ public class RedisDockerServiceIT {
                 .newInstance()
                 .enablePassword(true)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        redisService.start(ServiceStartupContext.empty());
+        redisService.start(ServiceStartupContext.defaultContext());
 
         // then
         var redisAssertion = new RedisAssertionHelper(redisService);
@@ -83,10 +83,10 @@ public class RedisDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        redisService.start(ServiceStartupContext.empty());
+        redisService.start(ServiceStartupContext.defaultContext());
 
         // then
         var redisAssertion = new RedisAssertionHelper(redisService);
@@ -110,10 +110,10 @@ public class RedisDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        redisService.start(ServiceStartupContext.empty());
+        redisService.start(ServiceStartupContext.defaultContext());
 
         var endpoint = EndpointHelper.getAnyEndpointOrFail(redisService);
 

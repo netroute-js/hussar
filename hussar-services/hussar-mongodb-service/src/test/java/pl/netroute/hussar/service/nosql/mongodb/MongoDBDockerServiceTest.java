@@ -68,7 +68,7 @@ public class MongoDBDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(MONGO_DB_SCHEME, MONGO_DB_HOST, MONGO_DB_MAPPED_PORT);
@@ -118,7 +118,7 @@ public class MongoDBDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
         var endpoint = Endpoint.of(MONGO_DB_SCHEME, MONGO_DB_HOST, MONGO_DB_MAPPED_PORT);
@@ -177,7 +177,7 @@ public class MongoDBDockerServiceTest {
         givenContainerAccessible(container);
 
         // when
-        service.start(ServiceStartupContext.empty());
+        service.start(ServiceStartupContext.defaultContext());
         service.shutdown();
 
         // then

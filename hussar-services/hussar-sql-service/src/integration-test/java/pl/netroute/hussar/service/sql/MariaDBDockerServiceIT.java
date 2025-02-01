@@ -33,10 +33,10 @@ public class MariaDBDockerServiceIT {
                 .newInstance()
                 .databaseSchema(databaseSchema)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        databaseService.start(ServiceStartupContext.defaultContext());
 
         // then
         var databaseAssertion = new SQLDBAssertionHelper(databaseService);
@@ -77,10 +77,10 @@ public class MariaDBDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        databaseService.start(ServiceStartupContext.defaultContext());
 
         // then
         var databaseAssertion = new SQLDBAssertionHelper(databaseService);
@@ -109,10 +109,10 @@ public class MariaDBDockerServiceIT {
                 .databaseSchema(databaseSchema)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        databaseService.start(ServiceStartupContext.empty());
+        databaseService.start(ServiceStartupContext.defaultContext());
 
         var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
 

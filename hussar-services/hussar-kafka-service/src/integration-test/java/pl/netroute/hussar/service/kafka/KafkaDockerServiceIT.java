@@ -2,9 +2,9 @@ package pl.netroute.hussar.service.kafka;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 import pl.netroute.hussar.service.kafka.assertion.KafkaAssertionHelper;
 import pl.netroute.hussar.service.kafka.helper.KafkaSenderFactory;
@@ -30,10 +30,10 @@ public class KafkaDockerServiceIT {
         kafkaService = KafkaDockerServiceConfigurer
                 .newInstance()
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        kafkaService.start(ServiceStartupContext.empty());
+        kafkaService.start(ServiceStartupContext.defaultContext());
 
         // then
         var kafkaAssertion = new KafkaAssertionHelper(kafkaService);
@@ -67,10 +67,10 @@ public class KafkaDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        kafkaService.start(ServiceStartupContext.empty());
+        kafkaService.start(ServiceStartupContext.defaultContext());
 
         // then
         var kafkaAssertion = new KafkaAssertionHelper(kafkaService);
@@ -104,9 +104,9 @@ public class KafkaDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
-        kafkaService.start(ServiceStartupContext.empty());
+        kafkaService.start(ServiceStartupContext.defaultContext());
 
         // when
         KafkaSenderFactory
@@ -132,9 +132,9 @@ public class KafkaDockerServiceIT {
                 .newInstance()
                 .topicAutoCreation(false)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
-        kafkaService.start(ServiceStartupContext.empty());
+        kafkaService.start(ServiceStartupContext.defaultContext());
 
         // when
         // then
@@ -162,11 +162,11 @@ public class KafkaDockerServiceIT {
                 .dockerImageVersion(dockerVersion)
                 .kraftMode(true)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
         // then
-        assertThatThrownBy(() -> kafkaService.start(ServiceStartupContext.empty()))
+        assertThatThrownBy(() -> kafkaService.start(ServiceStartupContext.defaultContext()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Provided Confluent Platform's version 3.0.0 is not supported in Kraft mode (must be 7.0.0 or above)");
     }
@@ -181,10 +181,10 @@ public class KafkaDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure(new ServiceConfigureContext());
+                .configure(ServiceConfigureContext.defaultContext());
 
         // when
-        kafkaService.start(ServiceStartupContext.empty());
+        kafkaService.start(ServiceStartupContext.defaultContext());
 
         var endpoint = EndpointHelper.getAnyEndpointOrFail(kafkaService);
 

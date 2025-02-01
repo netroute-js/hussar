@@ -26,7 +26,7 @@ class ServiceStarter {
     private void startStandaloneServices(Set<Service> services) {
         services
                 .stream()
-                .map(service -> executorService.submit(() -> service.start(ServiceStartupContext.empty())))
+                .map(service -> executorService.submit(() -> service.start(ServiceStartupContext.defaultContext())))
                 .forEach(task -> FutureHelper.waitForTaskCompletion(task, SERVICE_STARTUP_TIMEOUT));
     }
 

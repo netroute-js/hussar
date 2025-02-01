@@ -21,7 +21,8 @@ public class MySQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfi
     private static final String JDBC_SCHEME = "jdbc:mysql://";
 
     public MySQLDockerService configure(@NonNull ServiceConfigureContext context) {
-        var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
+        var dockerRegistry = context.dockerRegistry();
+        var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
