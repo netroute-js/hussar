@@ -1,11 +1,13 @@
 package pl.netroute.hussar.service.wiremock;
 
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.docker.GenericContainerFactory;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.docker.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
@@ -19,7 +21,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
     private static final String SERVICE = "wiremock_service";
 
     @Override
-    public WiremockDockerService configure() {
+    public WiremockDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);

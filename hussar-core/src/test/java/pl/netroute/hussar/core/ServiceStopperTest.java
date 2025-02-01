@@ -27,8 +27,7 @@ public class ServiceStopperTest {
         var serviceA = mock(ServiceTestA.class);
         var serviceB = mock(ServiceTestB.class);
         var standaloneServices = Set.<Service>of(serviceA, serviceB);
-
-        var servicesConfig = new DefaultServiceRegistry(standaloneServices);
+        var servicesConfig = DefaultServiceRegistry.of(standaloneServices);
 
         // when
         stopper.stop(servicesConfig);

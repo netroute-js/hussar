@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.kafka;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
@@ -29,7 +30,7 @@ public class KafkaDockerServiceIT {
         kafkaService = KafkaDockerServiceConfigurer
                 .newInstance()
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         kafkaService.start(ServiceStartupContext.empty());
@@ -66,7 +67,7 @@ public class KafkaDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         kafkaService.start(ServiceStartupContext.empty());
@@ -103,7 +104,7 @@ public class KafkaDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         kafkaService.start(ServiceStartupContext.empty());
 
@@ -131,7 +132,7 @@ public class KafkaDockerServiceIT {
                 .newInstance()
                 .topicAutoCreation(false)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         kafkaService.start(ServiceStartupContext.empty());
 
@@ -161,7 +162,7 @@ public class KafkaDockerServiceIT {
                 .dockerImageVersion(dockerVersion)
                 .kraftMode(true)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         // then
@@ -180,7 +181,7 @@ public class KafkaDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         kafkaService.start(ServiceStartupContext.empty());

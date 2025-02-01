@@ -1,6 +1,6 @@
-package pl.netroute.hussar.core.service;
+package pl.netroute.hussar.core.service.api;
 
-import pl.netroute.hussar.core.service.api.Service;
+import lombok.NonNull;
 
 /**
  * Hussar interface responsible for configuring {@link Service}.
@@ -14,6 +14,6 @@ public interface ServiceConfigurer<S extends Service> {
      *
      * @return the instance of configured {@link Service}
      */
-    S configure();
+    S configure(@NonNull ServiceConfigureContext context);
 
 }

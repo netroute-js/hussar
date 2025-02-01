@@ -5,13 +5,14 @@ import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
+import pl.netroute.hussar.core.domain.StubServiceConfigurer;
 import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.api.ServiceStartupContext;
-import pl.netroute.hussar.core.domain.ServiceTestA;
-import pl.netroute.hussar.core.domain.ServiceTestB;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -51,8 +52,8 @@ public class EnvironmentOrchestratorTest {
         // then
         assertEnvironmentInitialized(environment);
         assertApplicationStarted(configurerProvider.application);
-        assertServiceStarted(configurerProvider.standaloneServiceA);
-        assertServiceStarted(configurerProvider.standaloneServiceB);
+        assertServiceStarted(configurerProvider.standaloneServiceA.getService());
+        assertServiceStarted(configurerProvider.standaloneServiceB.getService());
     }
 
     @Test
@@ -77,8 +78,8 @@ public class EnvironmentOrchestratorTest {
                 .forEach(this::assertEnvironmentInitialized);
 
         assertApplicationStarted(configurerProvider.application);
-        assertServiceStarted(configurerProvider.standaloneServiceA);
-        assertServiceStarted(configurerProvider.standaloneServiceB);
+        assertServiceStarted(configurerProvider.standaloneServiceA.getService());
+        assertServiceStarted(configurerProvider.standaloneServiceB.getService());
     }
 
     private void assertEnvironmentInitialized(Environment environment) {
@@ -106,12 +107,16 @@ public class EnvironmentOrchestratorTest {
         private static final String ENV_VARIABLE_1 = "SOME_ENV_VARIABLE";
         private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
 
-        private final Application application = mock(Application.class);
-        private final ServiceTestA standaloneServiceA = mock(ServiceTestA.class);
-        private final ServiceTestB standaloneServiceB = mock(ServiceTestB.class);
+        private Application application;
+        private StubServiceConfigurer<ServiceTestA> standaloneServiceA;
+        private StubServiceConfigurer<ServiceTestB> standaloneServiceB;
 
         @Override
         public LocalEnvironmentConfigurer provide() {
+            this.application = mock(Application.class);
+            this.standaloneServiceA = new StubServiceConfigurer<>(ServiceTestA.class);
+            this.standaloneServiceB = new StubServiceConfigurer<>(ServiceTestB.class);
+
             return LocalEnvironmentConfigurer
                     .newInstance()
                     .withProperty(PROPERTY_1, PROPERTY_VALUE_1)

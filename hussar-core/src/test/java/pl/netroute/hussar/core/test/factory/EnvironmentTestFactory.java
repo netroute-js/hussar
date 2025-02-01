@@ -27,7 +27,7 @@ public class EnvironmentTestFactory {
     public static Environment create(@NonNull Application application,
                                      @NonNull Set<Service> services) {
         var configurationRegistry = new DefaultConfigurationRegistry();
-        var serviceRegistry = new DefaultServiceRegistry(services);
+        var serviceRegistry = DefaultServiceRegistry.of(services);
 
         return new DefaultEnvironment(application, configurationRegistry, serviceRegistry);
     }

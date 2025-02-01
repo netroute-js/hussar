@@ -3,11 +3,12 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
+import pl.netroute.hussar.core.domain.StubServiceConfigurer;
 import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.domain.ServiceTestA;
-import pl.netroute.hussar.core.domain.ServiceTestB;
 
 import java.util.Set;
 
@@ -26,8 +27,8 @@ public class EnvironmentConfigurerTest {
         var envVariableB = "SOME_ENV_VARIABLE_B";
         var envVariableValueB = "some env variable value B";
 
-        var standaloneServiceA = mock(ServiceTestA.class);
-        var standaloneServiceB = mock(ServiceTestB.class);
+        var standaloneServiceA = new StubServiceConfigurer<>(ServiceTestA.class);
+        var standaloneServiceB = new StubServiceConfigurer<>(ServiceTestB.class);
 
         var application = mock(Application.class);
 
@@ -43,7 +44,7 @@ public class EnvironmentConfigurerTest {
                 .configure();
 
         // then
-        var expectedServices = Set.<Service>of(standaloneServiceA, standaloneServiceB);
+        var expectedServices = Set.<Service>of(standaloneServiceA.getService(), standaloneServiceB.getService());
         var expectedConfigurationEntries = Set.<ConfigurationEntry>of(
                 ConfigurationEntry.property(propertyA, propertyValueA),
                 ConfigurationEntry.envVariable(envVariableB, envVariableValueB)

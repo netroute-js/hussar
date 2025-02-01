@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.nosql.mongodb;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.nosql.mongodb.assertion.MongoDBAssertionHelper;
@@ -24,7 +25,7 @@ public class MongoDBDockerServiceIT {
         databaseService = MongoDBDockerServiceConfigurer
                 .newInstance()
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         databaseService.start(ServiceStartupContext.empty());
@@ -62,7 +63,7 @@ public class MongoDBDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         databaseService.start(ServiceStartupContext.empty());
@@ -89,7 +90,7 @@ public class MongoDBDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         databaseService.start(ServiceStartupContext.empty());

@@ -2,7 +2,6 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerServiceConfigurer;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.MONGODB_PASSWORD_ENV_VARIABLE;
@@ -16,7 +15,7 @@ import static pl.netroute.hussar.junit5.config.ApplicationProperties.MONGODB_ALT
 public class MongoDBServiceFactory {
     public static final String MONGODB_NAME = "mongodb-instance";
 
-    public static MongoDBDockerService create() {
+    public static MongoDBDockerServiceConfigurer create() {
         var dockerImageVersion = "7.0";
 
         return MongoDBDockerServiceConfigurer
@@ -29,8 +28,7 @@ public class MongoDBServiceFactory {
                 .registerUsernameUnderEnvironmentVariable(MONGODB_USERNAME_ENV_VARIABLE)
                 .registerPasswordUnderProperty(MONGODB_ALTERNATIVE_PASSWORD_PROPERTY)
                 .registerPasswordUnderEnvironmentVariable(MONGODB_PASSWORD_ENV_VARIABLE)
-                .done()
-                .configure();
+                .done();
     }
 
 }

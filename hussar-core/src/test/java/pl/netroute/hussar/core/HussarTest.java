@@ -5,14 +5,15 @@ import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
+import pl.netroute.hussar.core.domain.StubServiceConfigurer;
+import pl.netroute.hussar.core.domain.TestApplication;
 import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.environment.api.HussarEnvironment;
 import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.service.api.HussarService;
-import pl.netroute.hussar.core.domain.ServiceTestA;
-import pl.netroute.hussar.core.domain.ServiceTestB;
-import pl.netroute.hussar.core.domain.TestApplication;
 import pl.netroute.hussar.core.test.factory.EnvironmentTestFactory;
 
 import java.lang.reflect.Method;
@@ -55,7 +56,7 @@ public class HussarTest {
         var environmentConfigurerProvider = new TestEnvironmentConfigurerProvider();
         var environment = EnvironmentTestFactory.create(
                 environmentConfigurerProvider.application,
-                Set.of(environmentConfigurerProvider.serviceA, environmentConfigurerProvider.serviceB)
+                Set.of(environmentConfigurerProvider.serviceA.getService(), environmentConfigurerProvider.serviceB.getService())
         );
 
         when(configurerProviderResolver.resolve(testInstance)).thenReturn(Optional.of(environmentConfigurerProvider));
@@ -88,7 +89,7 @@ public class HussarTest {
         var environmentConfigurerProvider = new TestEnvironmentConfigurerProvider();
         var environment = EnvironmentTestFactory.create(
                 environmentConfigurerProvider.application,
-                Set.of(environmentConfigurerProvider.serviceA, environmentConfigurerProvider.serviceB)
+                Set.of(environmentConfigurerProvider.serviceA.getService(), environmentConfigurerProvider.serviceB.getService())
         );
 
         when(environmentRegistry.getEntry(testInstance)).thenReturn(Optional.of(environment));
@@ -109,7 +110,7 @@ public class HussarTest {
         var environmentConfigurerProvider = new TestEnvironmentConfigurerProvider();
         var environment = EnvironmentTestFactory.create(
                 environmentConfigurerProvider.application,
-                Set.of(environmentConfigurerProvider.serviceA, environmentConfigurerProvider.serviceB)
+                Set.of(environmentConfigurerProvider.serviceA.getService(), environmentConfigurerProvider.serviceB.getService())
         );
 
         when(environmentRegistry.getEntry(testInstance)).thenReturn(Optional.of(environment));
@@ -153,8 +154,8 @@ public class HussarTest {
         verify(environmentRegistry).register(testInstance, environment);
 
         assertThat(testInstance.application).isEqualTo(environmentConfigurerProvider.application);
-        assertThat(testInstance.serviceA).isEqualTo(environmentConfigurerProvider.serviceA);
-        assertThat(testInstance.serviceB).isEqualTo(environmentConfigurerProvider.serviceB);
+        assertThat(testInstance.serviceA).isEqualTo(environmentConfigurerProvider.serviceA.getService());
+        assertThat(testInstance.serviceB).isEqualTo(environmentConfigurerProvider.serviceB.getService());
     }
 
     private void assertEnvironmentInitializationSkipped() {
@@ -220,7 +221,7 @@ public class HussarTest {
 
     }
 
-    static class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
+    private static class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
         private static final String PROPERTY_1 = "some.property";
         private static final String PROPERTY_VALUE_1 = "some_property_value";
 
@@ -228,13 +229,13 @@ public class HussarTest {
         private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
 
         private final Application application;
-        private final ServiceTestA serviceA;
-        private final ServiceTestB serviceB;
+        private final StubServiceConfigurer<ServiceTestA> serviceA;
+        private final StubServiceConfigurer<ServiceTestB> serviceB;
 
-        public TestEnvironmentConfigurerProvider() {
+        private TestEnvironmentConfigurerProvider() {
             this.application = new TestApplication();
-            this.serviceA = new ServiceTestA();
-            this.serviceB = new ServiceTestB();
+            this.serviceA = new StubServiceConfigurer<>(ServiceTestA.class);
+            this.serviceB = new StubServiceConfigurer<>(ServiceTestB.class);
         }
 
         @Override

@@ -29,8 +29,7 @@ public class ServiceStarterTest {
         var serviceA = mock(ServiceTestA.class);
         var serviceB = mock(ServiceTestB.class);
         var standaloneServices = Set.<Service>of(serviceA, serviceB);
-
-        var serviceRegistry = new DefaultServiceRegistry(standaloneServices);
+        var serviceRegistry = DefaultServiceRegistry.of(standaloneServices);
 
         // when
         starter.start(serviceRegistry);

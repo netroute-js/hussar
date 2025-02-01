@@ -1,9 +1,11 @@
 package pl.netroute.hussar.service.sql;
 
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.GenericContainerFactory;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.docker.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
@@ -18,7 +20,7 @@ public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceCon
     private static final String SERVICE = "mariadb_service";
     private static final String JDBC_SCHEME = "jdbc:mariadb://";
 
-    public MariaDBDockerService configure() {
+    public MariaDBDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);

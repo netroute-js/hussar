@@ -2,7 +2,6 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.rabbitmq.RabbitMQDockerService;
 import pl.netroute.hussar.service.rabbitmq.RabbitMQDockerServiceConfigurer;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 
@@ -22,7 +21,7 @@ public class RabbitMQServiceFactory {
             .name("hussar.events.stream")
             .build();
 
-    public static RabbitMQDockerService create() {
+    public static RabbitMQDockerServiceConfigurer create() {
         var dockerImageVersion = "3.13.3-management-alpine";
 
         return RabbitMQDockerServiceConfigurer
@@ -36,8 +35,7 @@ public class RabbitMQServiceFactory {
                 .registerUsernameUnderEnvironmentVariable(RABBITMQ_USERNAME_ENV_VARIABLE)
                 .registerPasswordUnderProperty(RABBITMQ_ALTERNATIVE_PASSWORD_PROPERTY)
                 .registerPasswordUnderEnvironmentVariable(RABBITMQ_PASSWORD_ENV_VARIABLE)
-                .done()
-                .configure();
+                .done();
     }
 
 }

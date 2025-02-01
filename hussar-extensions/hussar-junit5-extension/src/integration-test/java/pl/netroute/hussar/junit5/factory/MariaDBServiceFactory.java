@@ -2,7 +2,6 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.sql.MariaDBDockerService;
 import pl.netroute.hussar.service.sql.MariaDBDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
@@ -19,7 +18,7 @@ public class MariaDBServiceFactory {
 
     public static final SQLDatabaseSchema SCHEMA = SQLDatabaseSchema.scriptLess("hussar");
 
-    public static MariaDBDockerService create() {
+    public static MariaDBDockerServiceConfigurer create() {
         var dockerImageVersion = "11.4.2";
 
         return MariaDBDockerServiceConfigurer
@@ -33,8 +32,7 @@ public class MariaDBServiceFactory {
                 .registerUsernameUnderEnvironmentVariable(MARIADB_USERNAME_ENV_VARIABLE)
                 .registerPasswordUnderProperty(MARIADB_ALTERNATIVE_PASSWORD_PROPERTY)
                 .registerPasswordUnderEnvironmentVariable(MARIADB_PASSWORD_ENV_VARIABLE)
-                .done()
-                .configure();
+                .done();
     }
 
 }

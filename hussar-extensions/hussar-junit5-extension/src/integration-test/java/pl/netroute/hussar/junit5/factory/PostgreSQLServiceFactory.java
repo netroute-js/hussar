@@ -2,7 +2,6 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.sql.PostgreSQLDockerService;
 import pl.netroute.hussar.service.sql.PostgreSQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
@@ -19,7 +18,7 @@ public class PostgreSQLServiceFactory {
 
     public static final SQLDatabaseSchema SCHEMA = SQLDatabaseSchema.scriptLess("hussar");
 
-    public static PostgreSQLDockerService create() {
+    public static PostgreSQLDockerServiceConfigurer create() {
         var dockerImageVersion = "16-alpine";
 
         return PostgreSQLDockerServiceConfigurer
@@ -33,8 +32,7 @@ public class PostgreSQLServiceFactory {
                 .registerUsernameUnderEnvironmentVariable(POSTGRESQL_USERNAME_ENV_VARIABLE)
                 .registerPasswordUnderProperty(POSTGRESQL_ALTERNATIVE_PASSWORD_PROPERTY)
                 .registerPasswordUnderEnvironmentVariable(POSTGRESQL_PASSWORD_ENV_VARIABLE)
-                .done()
-                .configure();
+                .done();
     }
 
 }

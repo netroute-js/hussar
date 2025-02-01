@@ -1,5 +1,6 @@
 package pl.netroute.hussar.service.wiremock;
 
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.service.wiremock.assertion.WiremockAssertionHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class WiremockDockerServiceIT {
         wiremockService = WiremockDockerServiceConfigurer
                 .newInstance()
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         wiremockService.start(ServiceStartupContext.empty());
@@ -51,7 +52,7 @@ public class WiremockDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         wiremockService.start(ServiceStartupContext.empty());
@@ -75,7 +76,7 @@ public class WiremockDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         wiremockService.start(ServiceStartupContext.empty());

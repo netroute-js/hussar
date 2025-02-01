@@ -8,6 +8,8 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
 import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.api.ServiceConfigurer;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +29,7 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
     private final Application application;
 
     @Singular
-    private final Set<Service> services;
+    private final Set<ServiceConfigurer<? extends Service>> services;
 
     @Singular
     private final Map<String, String> properties;
@@ -37,7 +39,8 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
 
     @Override
     public Environment configure() {
-        var serviceRegistry = new DefaultServiceRegistry(services);
+        var configuredServices = configureServices();
+        var serviceRegistry = DefaultServiceRegistry.of(configuredServices);
 
         var configurations = mergeConfigurations();
         var configurationRegistry = new DefaultConfigurationRegistry(configurations);
@@ -47,6 +50,13 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
                 configurationRegistry,
                 serviceRegistry
         );
+    }
+
+    private Set<Service> configureServices() {
+        return services
+                .stream()
+                .map(serviceConfigurer -> serviceConfigurer.configure(new ServiceConfigureContext()))
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private Set<ConfigurationEntry> mergeConfigurations() {

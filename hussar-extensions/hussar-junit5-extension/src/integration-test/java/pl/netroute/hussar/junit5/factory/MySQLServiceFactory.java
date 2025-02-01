@@ -2,7 +2,6 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.sql.MySQLDockerService;
 import pl.netroute.hussar.service.sql.MySQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
@@ -19,7 +18,7 @@ public class MySQLServiceFactory {
 
     public static final SQLDatabaseSchema SCHEMA = SQLDatabaseSchema.scriptLess("hussar");
 
-    public static MySQLDockerService create() {
+    public static MySQLDockerServiceConfigurer create() {
         var dockerImageVersion = "8.4.0";
 
         return MySQLDockerServiceConfigurer
@@ -33,8 +32,7 @@ public class MySQLServiceFactory {
                 .registerUsernameUnderEnvironmentVariable(MYSQL_USERNAME_ENV_VARIABLE)
                 .registerPasswordUnderProperty(MYSQL_ALTERNATIVE_PASSWORD_PROPERTY)
                 .registerPasswordUnderEnvironmentVariable(MYSQL_PASSWORD_ENV_VARIABLE)
-                .done()
-                .configure();
+                .done();
     }
 
 }

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.api.ServiceConfigurer;
 
 import java.util.Set;
 

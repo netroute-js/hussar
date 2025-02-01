@@ -2,7 +2,6 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.kafka.KafkaDockerService;
 import pl.netroute.hussar.service.kafka.KafkaDockerServiceConfigurer;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 
@@ -19,7 +18,7 @@ public class KafkaServiceFactory {
             .partitions(5)
             .build();
 
-    public static KafkaDockerService create() {
+    public static KafkaDockerServiceConfigurer create() {
         var dockerImageVersion = "7.5.4";
 
         return KafkaDockerServiceConfigurer
@@ -31,8 +30,7 @@ public class KafkaServiceFactory {
                 .topic(KAFKA_EVENTS_TOPIC)
                 .registerEndpointUnderProperty(KAFKA_ALTERNATIVE_URL_PROPERTY)
                 .registerEndpointUnderEnvironmentVariable(KAFKA_URL_ENV_VARIABLE)
-                .done()
-                .configure();
+                .done();
     }
 
 }

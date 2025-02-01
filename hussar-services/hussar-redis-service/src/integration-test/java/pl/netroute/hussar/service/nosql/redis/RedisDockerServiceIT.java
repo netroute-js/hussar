@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.nosql.redis;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisAssertionHelper;
@@ -24,7 +25,7 @@ public class RedisDockerServiceIT {
         redisService = RedisDockerServiceConfigConfigurer
                 .newInstance()
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         redisService.start(ServiceStartupContext.empty());
@@ -43,7 +44,7 @@ public class RedisDockerServiceIT {
                 .newInstance()
                 .enablePassword(true)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         redisService.start(ServiceStartupContext.empty());
@@ -82,7 +83,7 @@ public class RedisDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         redisService.start(ServiceStartupContext.empty());
@@ -109,7 +110,7 @@ public class RedisDockerServiceIT {
                 .name(name)
                 .dockerImageVersion(dockerVersion)
                 .done()
-                .configure();
+                .configure(new ServiceConfigureContext());
 
         // when
         redisService.start(ServiceStartupContext.empty());

@@ -1,11 +1,13 @@
 package pl.netroute.hussar.service.kafka;
 
+import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.BaseDockerServiceConfigurer;
+import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.docker.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
@@ -39,7 +41,7 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
     protected final Set<KafkaTopic> topics;
 
     @Override
-    public KafkaDockerService configure() {
+    public KafkaDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerImage = DockerImageResolver.resolve(dockerRegistryUrl, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = createContainer(dockerImage);

@@ -23,7 +23,6 @@ public class DefaultServiceRegistryTest {
     public void shouldRegisterTypedService() {
         // given
         var service = new ServiceTestA();
-
         var serviceRegistry = new DefaultServiceRegistry();
 
         // when
@@ -38,14 +37,11 @@ public class DefaultServiceRegistryTest {
         // given
         var service = new ServiceTestA();
         var duplicateService = new ServiceTestA();
-
-        var serviceRegistry = new DefaultServiceRegistry(Set.of(service));
+        var serviceRegistry = DefaultServiceRegistry.of(service);
 
         // when
-        var failure = assertThatThrownBy(() -> serviceRegistry.register(duplicateService));
-
         // then
-        failure
+        assertThatThrownBy(() -> serviceRegistry.register(duplicateService))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Could not register typed service - pl.netroute.hussar.core.domain.ServiceTestA. If you want more services of the same type registered then all of them need to be named");
     }
@@ -54,7 +50,6 @@ public class DefaultServiceRegistryTest {
     public void shouldRegisterNamedService() {
         // given
         var service = new ServiceTestA(FIRST_SERVICE_A_NAME);
-
         var serviceRegistry = new DefaultServiceRegistry();
 
         // when
@@ -89,15 +84,11 @@ public class DefaultServiceRegistryTest {
         // given
         var service = new ServiceTestA(FIRST_SERVICE_A_NAME);
         var duplicateService = new ServiceTestA(FIRST_SERVICE_A_NAME);
-
-        var serviceRegistry = new DefaultServiceRegistry(Set.of(service));
+        var serviceRegistry = DefaultServiceRegistry.of(service);
 
         // when
-        var failure = assertThatThrownBy(() -> serviceRegistry.register(duplicateService));
-
-
         // then
-        failure
+        assertThatThrownBy(() -> serviceRegistry.register(duplicateService))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Could not register named service - %s. There is already a service registered with that name. Service name must be unique", FIRST_SERVICE_A_NAME);
     }
@@ -105,8 +96,8 @@ public class DefaultServiceRegistryTest {
     @Test
     public void shouldReturnEmptyWhenNoTypedServiceExists() {
         // given
-        var serviceRegistry = new DefaultServiceRegistry();
         var typedService = ServiceTestC.class;
+        var serviceRegistry = new DefaultServiceRegistry();
 
         // when
         var foundService = serviceRegistry.findEntryByType(typedService);
@@ -132,8 +123,7 @@ public class DefaultServiceRegistryTest {
     public void shouldReturnTypedService() {
         // given
         var typedService = new ServiceTestB();
-
-        var serviceRegistry = new DefaultServiceRegistry(Set.of(typedService));
+        var serviceRegistry = DefaultServiceRegistry.of(typedService);
 
         // when
         var foundService = serviceRegistry.findEntryByType(typedService.getClass());
@@ -149,7 +139,7 @@ public class DefaultServiceRegistryTest {
         var secondNamedServiceA = new ServiceTestA(SECOND_SERVICE_A_NAME);
         var namedServiceB = new ServiceTestB(FIRST_SERVICE_B_NAME);
 
-        var serviceRegistry = new DefaultServiceRegistry(Set.of(namedServiceA, secondNamedServiceA, namedServiceB));
+        var serviceRegistry = DefaultServiceRegistry.of(Set.of(namedServiceA, secondNamedServiceA, namedServiceB));
 
         // when
         var foundService = serviceRegistry.findEntryByName(SECOND_SERVICE_A_NAME);

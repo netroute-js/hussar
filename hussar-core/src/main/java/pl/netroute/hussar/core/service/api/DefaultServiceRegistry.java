@@ -1,17 +1,17 @@
 package pl.netroute.hussar.core.service.api;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.helper.StringHelper;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An actual implementation of {@link ServiceRegistry}.
  */
-@RequiredArgsConstructor
 public class DefaultServiceRegistry implements ServiceRegistry {
 
     @NonNull
@@ -21,7 +21,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
      * Creates new instance of {@link DefaultServiceRegistry}.
      */
     public DefaultServiceRegistry() {
-        this(new HashSet<>());
+        this.registeredServices = new HashSet<>();
     }
 
     @Override
@@ -99,4 +99,20 @@ public class DefaultServiceRegistry implements ServiceRegistry {
         }
 
     }
+
+    public static DefaultServiceRegistry of(@NonNull Set<Service> services) {
+        var serviceRegistry = new DefaultServiceRegistry();
+        services.forEach(serviceRegistry::register);
+
+        return serviceRegistry;
+    }
+
+    public static DefaultServiceRegistry of(@NonNull Service... services) {
+        var servicesSet = Stream
+                .of(services)
+                .collect(Collectors.toUnmodifiableSet());
+
+        return of(servicesSet);
+    }
+
 }

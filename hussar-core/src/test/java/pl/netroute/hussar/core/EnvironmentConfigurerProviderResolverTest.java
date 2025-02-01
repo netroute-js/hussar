@@ -2,11 +2,13 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.environment.api.HussarEnvironment;
 import pl.netroute.hussar.core.application.api.Application;
+import pl.netroute.hussar.core.domain.ServiceTestA;
+import pl.netroute.hussar.core.domain.ServiceTestB;
+import pl.netroute.hussar.core.domain.StubServiceConfigurer;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.environment.api.HussarEnvironment;
 import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
-import pl.netroute.hussar.core.service.api.Service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -55,11 +57,14 @@ public class EnvironmentConfigurerProviderResolverTest {
         private static final String ENV_VARIABLE_1 = "SOME_ENV_VARIABLE";
         private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
 
-        private final Application application = mock(Application.class);
-        private final Service standaloneServiceA = mock(Service.class);
-        private final Service standaloneServiceB = mock(Service.class);
+        private final Application application;
+        private final StubServiceConfigurer<ServiceTestA> standaloneServiceA;
+        private final StubServiceConfigurer<ServiceTestB> standaloneServiceB;
 
-        public TestEnvironmentConfigurerProvider() {
+        TestEnvironmentConfigurerProvider() {
+            this.application = mock(Application.class);
+            this.standaloneServiceA = new StubServiceConfigurer<>(ServiceTestA.class);
+            this.standaloneServiceB = new StubServiceConfigurer<>(ServiceTestB.class);
         }
 
         @Override
