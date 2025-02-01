@@ -8,7 +8,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
-import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.DefaultRedisCredentials;

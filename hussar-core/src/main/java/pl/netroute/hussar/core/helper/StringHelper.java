@@ -2,10 +2,12 @@ package pl.netroute.hussar.core.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 
 /**
  * A String helper class
  */
+@InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringHelper {
 

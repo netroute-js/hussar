@@ -11,7 +11,7 @@ import pl.netroute.hussar.junit5.factory.PostgreSQLServiceFactory;
 import pl.netroute.hussar.junit5.factory.RabbitMQServiceFactory;
 import pl.netroute.hussar.junit5.factory.RedisServiceFactory;
 import pl.netroute.hussar.junit5.factory.WiremockServiceFactory;
-import pl.netroute.hussar.spring.boot.ClusterSpringBootApplication;
+import pl.netroute.hussar.spring.boot.api.ClusterSpringBootApplication;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.METRICS_URL_ENV_VARIABLE;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.METRICS_URL_PROPERTY_VALUE;

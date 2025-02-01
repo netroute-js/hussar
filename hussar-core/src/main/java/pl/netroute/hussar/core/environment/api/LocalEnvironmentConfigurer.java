@@ -9,7 +9,7 @@ import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.api.DockerRegistry;
 import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceConfigurer;
 
 import java.util.Map;

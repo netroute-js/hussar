@@ -3,8 +3,10 @@ package pl.netroute.hussar.service.nosql.redis;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigConfigurer;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisAssertionHelper;
 
 import java.util.Optional;

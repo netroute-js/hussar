@@ -4,8 +4,9 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.application.api.Application;
-import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.environment.api.Environment;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
+@InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class EnvironmentOrchestrator {
 

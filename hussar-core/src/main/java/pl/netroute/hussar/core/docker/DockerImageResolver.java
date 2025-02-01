@@ -4,11 +4,13 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.testcontainers.utility.DockerImageName;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.api.DockerRegistry;
 
 /**
  * A custom Docker image resolver.
  */
+@InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DockerImageResolver {
     private static final String DOCKER_IMAGE_TEMPLATE = "%s:%s";

@@ -1,10 +1,12 @@
 package pl.netroute.hussar.service.wiremock;
 
-import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
+import pl.netroute.hussar.service.wiremock.api.WiremockDockerService;
+import pl.netroute.hussar.service.wiremock.api.WiremockDockerServiceConfigurer;
 import pl.netroute.hussar.service.wiremock.assertion.WiremockAssertionHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 
 import java.util.Optional;

@@ -2,7 +2,7 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.rabbitmq.RabbitMQDockerServiceConfigurer;
+import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerServiceConfigurer;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.RABBITMQ_PASSWORD_ENV_VARIABLE;

@@ -10,7 +10,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.rabbitmq.RabbitMQDockerService;
+import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerService;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 
 import java.util.List;

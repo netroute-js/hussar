@@ -2,6 +2,7 @@ package pl.netroute.hussar.core.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,6 +12,7 @@ import java.util.stream.IntStream;
 /**
  * A port finder helper.
  */
+@InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PortFinderHelper {
     private static final int START_PORT_SCAN_RANGE = 30000;

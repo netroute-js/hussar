@@ -5,6 +5,7 @@ import pl.netroute.hussar.core.api.Initializable;
 import pl.netroute.hussar.core.api.Restartable;
 import pl.netroute.hussar.core.api.Startable;
 import pl.netroute.hussar.core.api.Stoppable;
+import pl.netroute.hussar.core.application.ApplicationStartupContext;
 
 /**
  * Hussar interface that tags {@link Application}. All the implementations have to implement it.

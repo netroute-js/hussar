@@ -6,7 +6,7 @@ import lombok.NonNull;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
-import pl.netroute.hussar.service.sql.MySQLDockerService;
+import pl.netroute.hussar.service.sql.api.MySQLDockerService;
 
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
 import static pl.netroute.hussar.junit5.assertion.SQLDatabaseAssertionHelper.assertDatabaseReachable;

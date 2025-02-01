@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core;
 
 import lombok.NonNull;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.environment.api.Environment;
 
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@InternalUseOnly
 class EnvironmentRegistry {
     private final Map<Object, Environment> environments;
 

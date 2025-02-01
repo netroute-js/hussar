@@ -6,8 +6,9 @@ import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.environment.api.HussarEnvironment;
 import pl.netroute.hussar.core.service.api.HussarService;
+import pl.netroute.hussar.junit5.api.HussarJUnit5Extension;
 import pl.netroute.hussar.junit5.config.ModuleTestEnvironmentConfigurerProvider;
-import pl.netroute.hussar.service.sql.MySQLDockerService;
+import pl.netroute.hussar.service.sql.api.MySQLDockerService;
 
 import static pl.netroute.hussar.junit5.assertion.ApplicationAssertionHelper.assertApplicationBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.MySQLAssertionHelper.assertMySQLBootstrapped;

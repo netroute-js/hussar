@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core.service.api;
 
 import lombok.NonNull;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
 
 /**
  * Hussar interface responsible for configuring {@link Service}.

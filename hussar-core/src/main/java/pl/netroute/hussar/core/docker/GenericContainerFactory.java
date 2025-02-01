@@ -5,10 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 
 /**
  * A custom GenericContainer factory.
  */
+@InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GenericContainerFactory {
 

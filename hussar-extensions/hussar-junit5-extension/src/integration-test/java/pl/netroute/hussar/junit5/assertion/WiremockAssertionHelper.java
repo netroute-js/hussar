@@ -8,7 +8,7 @@ import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.junit5.client.WiremockClient;
 import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
-import pl.netroute.hussar.service.wiremock.WiremockDockerService;
+import pl.netroute.hussar.service.wiremock.api.WiremockDockerService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;

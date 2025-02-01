@@ -3,6 +3,7 @@ package pl.netroute.hussar.core.helper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.service.api.Service;
@@ -10,6 +11,7 @@ import pl.netroute.hussar.core.service.api.Service;
 /**
  * An {@link Endpoint} helper.
  */
+@InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EndpointHelper {
 

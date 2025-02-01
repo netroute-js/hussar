@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core.lock;
 
 import lombok.NonNull;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +11,7 @@ import java.util.function.Supplier;
 /**
  * A class responsible for controlling the execution of an action.
  */
+@InternalUseOnly
 public class LockedAction {
     private static final boolean FAIR_MODE = true;
 

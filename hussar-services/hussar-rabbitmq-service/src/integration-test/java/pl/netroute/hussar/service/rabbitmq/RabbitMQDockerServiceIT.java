@@ -2,8 +2,10 @@ package pl.netroute.hussar.service.rabbitmq;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
+import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerService;
+import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerServiceConfigurer;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 import pl.netroute.hussar.service.rabbitmq.assertion.RabbitMQAssertionHelper;
 

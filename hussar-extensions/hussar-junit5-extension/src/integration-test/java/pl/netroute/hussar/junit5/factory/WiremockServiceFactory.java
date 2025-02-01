@@ -2,7 +2,7 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.wiremock.WiremockDockerServiceConfigurer;
+import pl.netroute.hussar.service.wiremock.api.WiremockDockerServiceConfigurer;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.WIREMOCK_URL_ENV_VARIABLE;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.WIREMOCK_ALTERNATIVE_URL_PROPERTY;

@@ -7,7 +7,7 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.nosql.redis.RedisDockerService;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.DefaultRedisCredentials;

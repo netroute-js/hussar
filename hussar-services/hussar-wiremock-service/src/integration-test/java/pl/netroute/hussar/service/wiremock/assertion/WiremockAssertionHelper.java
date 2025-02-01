@@ -1,7 +1,7 @@
 package pl.netroute.hussar.service.wiremock.assertion;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import pl.netroute.hussar.service.wiremock.WiremockDockerService;
+import pl.netroute.hussar.service.wiremock.api.WiremockDockerService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.NoHttpResponseException;

@@ -1,8 +1,11 @@
 package pl.netroute.hussar.core.helper;
 
+import pl.netroute.hussar.core.api.InternalUseOnly;
+
 /**
  * A class enumerating a set of schemes.
  */
+@InternalUseOnly
 public class SchemesHelper {
 
     /**

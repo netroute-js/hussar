@@ -3,7 +3,7 @@ package pl.netroute.hussar.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.application.api.Application;
-import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.domain.ServiceTestA;
 import pl.netroute.hussar.core.domain.ServiceTestB;
@@ -12,7 +12,7 @@ import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;

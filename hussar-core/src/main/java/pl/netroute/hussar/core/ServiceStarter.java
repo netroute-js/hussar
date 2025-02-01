@@ -3,15 +3,17 @@ package pl.netroute.hussar.core;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.api.ServiceRegistry;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.FutureHelper;
 
 import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+@InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ServiceStarter {
     private static final Duration SERVICE_STARTUP_TIMEOUT = Duration.ofMinutes(10L);

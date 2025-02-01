@@ -10,7 +10,7 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.kafka.KafkaDockerService;
+import pl.netroute.hussar.service.kafka.api.KafkaDockerService;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 
 import java.time.Duration;

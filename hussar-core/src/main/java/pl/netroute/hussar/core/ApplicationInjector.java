@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.environment.api.Environment;
@@ -12,6 +13,7 @@ import pl.netroute.hussar.core.helper.ReflectionHelper;
 import java.lang.reflect.Field;
 
 @Slf4j
+@InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ApplicationInjector {
     private static final Class<HussarApplication> HUSSAR_APPLICATION_ANNOTATION_CLASS = HussarApplication.class;

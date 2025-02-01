@@ -7,6 +7,7 @@ import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
 import pl.netroute.hussar.core.environment.api.HussarEnvironment;
+import pl.netroute.hussar.junit5.api.HussarJUnit5Extension;
 import pl.netroute.hussar.junit5.client.SimpleApplicationClient;
 import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
 

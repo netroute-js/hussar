@@ -11,7 +11,7 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.sql.SQLDatabaseDockerService;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseDockerService;
 
 import java.util.List;
 import java.util.Optional;

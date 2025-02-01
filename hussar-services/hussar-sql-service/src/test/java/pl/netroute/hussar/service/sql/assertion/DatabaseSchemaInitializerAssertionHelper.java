@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.sql.SQLDatabaseDockerService;
+import pl.netroute.hussar.service.sql.api.SQLDatabaseDockerService;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;

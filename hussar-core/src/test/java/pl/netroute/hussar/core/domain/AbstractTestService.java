@@ -6,7 +6,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 
 import java.util.List;
 import java.util.Objects;

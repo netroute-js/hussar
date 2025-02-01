@@ -3,7 +3,7 @@ package pl.netroute.hussar.core.domain;
 import lombok.Getter;
 import lombok.NonNull;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceConfigurer;
 
 import static org.mockito.Mockito.mock;

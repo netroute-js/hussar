@@ -16,7 +16,7 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.nosql.mongodb.MongoDBDockerService;
+import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerService;
 
 import java.util.concurrent.TimeUnit;
 

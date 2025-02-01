@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
@@ -14,6 +15,7 @@ import java.sql.SQLException;
  * An initializer to create configured SQL DB schema.
  */
 @Slf4j
+@InternalUseOnly
 public class DatabaseSchemaInitializer {
     private static final String CREATE_DATABASE_SQL_TEMPLATE = "CREATE DATABASE %s";
 

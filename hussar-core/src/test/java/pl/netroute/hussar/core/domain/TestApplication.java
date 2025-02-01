@@ -3,7 +3,7 @@ package pl.netroute.hussar.core.domain;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import pl.netroute.hussar.core.application.api.Application;
-import pl.netroute.hussar.core.application.api.ApplicationStartupContext;
+import pl.netroute.hussar.core.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.api.Endpoint;
 
 import java.util.List;

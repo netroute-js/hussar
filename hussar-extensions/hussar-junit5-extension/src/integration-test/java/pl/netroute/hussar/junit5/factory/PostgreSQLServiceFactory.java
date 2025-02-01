@@ -2,7 +2,7 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.sql.PostgreSQLDockerServiceConfigurer;
+import pl.netroute.hussar.service.sql.api.PostgreSQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.POSTGRESQL_PASSWORD_ENV_VARIABLE;

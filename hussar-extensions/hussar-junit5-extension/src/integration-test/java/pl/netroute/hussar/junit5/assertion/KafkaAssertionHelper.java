@@ -10,7 +10,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
-import pl.netroute.hussar.service.kafka.KafkaDockerService;
+import pl.netroute.hussar.service.kafka.api.KafkaDockerService;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 
 import java.time.Duration;

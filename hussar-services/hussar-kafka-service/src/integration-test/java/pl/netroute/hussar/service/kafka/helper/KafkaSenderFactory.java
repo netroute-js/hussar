@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.kafka.KafkaDockerService;
+import pl.netroute.hussar.service.kafka.api.KafkaDockerService;
 
 import java.time.Duration;
 import java.util.Map;

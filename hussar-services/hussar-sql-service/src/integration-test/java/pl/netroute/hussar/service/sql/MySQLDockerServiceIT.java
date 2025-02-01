@@ -2,9 +2,11 @@ package pl.netroute.hussar.service.sql;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.service.api.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.api.ServiceStartupContext;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.service.sql.api.MySQLDockerService;
+import pl.netroute.hussar.service.sql.api.MySQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 

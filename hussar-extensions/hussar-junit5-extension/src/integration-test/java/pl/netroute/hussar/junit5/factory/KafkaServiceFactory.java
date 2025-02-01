@@ -2,7 +2,7 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.kafka.KafkaDockerServiceConfigurer;
+import pl.netroute.hussar.service.kafka.api.KafkaDockerServiceConfigurer;
 import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.KAFKA_URL_ENV_VARIABLE;

@@ -2,7 +2,7 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.nosql.redis.RedisDockerServiceConfigConfigurer;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigConfigurer;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.REDIS_PASSWORD_ENV_VARIABLE;
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.REDIS_URL_ENV_VARIABLE;

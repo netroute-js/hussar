@@ -3,6 +3,7 @@ package pl.netroute.hussar.core.helper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import pl.netroute.hussar.core.api.InternalUseOnly;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -13,6 +14,7 @@ import java.util.Objects;
 /**
  * A simple Reflection helper.
  */
+@InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReflectionHelper {
 
