@@ -52,7 +52,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
 - [Examples](#examples)
   - [JUnit5 & Spring Boot](#junit5-springboot-basic-example)
   - [JUnit5 & Spring Boot - advanced](#junit5-springboot-advanced-example)
-  - [JUnit5 & Replicated Spring Boot [TO BE RELEASED in 1.5]](#junit5-replicated-springboot-example)
+  - [JUnit5 & Replicated Spring Boot](#junit5-replicated-springboot-example)
   - [JUnit5 & Module Application](#junit5-module-example)
   - [Dynamic binding of application configurations - environment variables](#dynamic-binding-app-config-environment-variable-example)
   - [Dynamic binding of application configurations - properties](#dynamic-binding-app-config-properties-example)
@@ -60,7 +60,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
   - [Reference Hussar Service](#reference-hussar-service-example)
   - [Share environment between multiple tests](#share-multiple-environments-example)
   - [Multiple Environments](#multiple-test-environments-example)
-  - [Restarting application [TO BE RELEASED in 1.5]](#restarting-application-example)
+  - [Restarting application](#restarting-application-example)
   - [WireMock configuration](#wiremock-configuration-example)
   - [MySQL configuration](#mysql-configuration-example)
   - [MariaDB configuration](#mariadb-configuration-example)
@@ -612,8 +612,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >      var wiremockService = WiremockDockerServiceConfigurer
 >            .newInstance()
 >            .registerEndpointUnderProperty("application.client.payment.url") // the given property will be overridden with actual URL of WireMock service 
->            .done()
->            .configure();
+>            .done();
 >
 >      var mongoDBService = MongoDBDockerServiceConfigurer
 >            .newInstance()
@@ -621,8 +620,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerEndpointUnderEnvironmentVariable("MONGODB_URL") // the given environment variable will be overridden with actual URL of MongoDB service
 >            .registerUsernameUnderEnvironmentVariable("MONGODB_USERNAME") // the given environment variable will be overridden with actual username of MongoDB service
 >            .registerPasswordUnderEnvironmentVariable("MONGODB_PASSWORD") // the given environment variable will be overridden with actual password of MongoDB service
->            .done()
->            .configure();
+>            .done();
 >    
 >      return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -639,7 +637,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >
 > This is all you need to configure to have **Hussar / Junit5 / Spring Boot** combination.
 ---
-> **JUnit5 & Replicated Spring Boot [TO BE RELEASED in 1.5]** <a id="junit5-replicated-springboot-example"/>
+> **JUnit5 & Replicated Spring Boot** <a id="junit5-replicated-springboot-example"/>
 >
 > Modern software development predominantly involves distributed systems. Frequently, multiple replicas are deployed in production environments. Hussar simplifies the process of testing replicated scenarios, enabling integration tests to closely mirror production conditions.
 >
@@ -727,13 +725,12 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .name("mysql-service") // it sets the name of the service. It's optional parameter.
 >            .dockerImageVersion("8.2.0") // it sets the docker image version. It's optional parameter.
 >            .databaseSchema(databaseSchema) // it sets the database schema that should be created and initialized. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >    
 >      return LocalEnvironmentConfigurer
 >            .newInstance()
 >            .withApplication(application) // it adds the Module application to the environment configuration
->            .withService(wiremockService) // it adds MySQL service to the environment configuration
+>            .withService(mySQLService) // it adds MySQL service to the environment configuration
 >            .done();
 >  }
 >
@@ -763,8 +760,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >    .registerEndpointUnderEnvironmentVariable("MYSQL_URL") // the given environment variable will be overridden with actual URL of MYSQL service
 >    .registerUsernameUnderEnvironmentVariable("MYSQL_USERNAME") // the given environment variable will be overridden with actual username of MySQL service
 >    .registerPasswordUnderEnvironmentVariable("MYSQL_PASSWORD") // the given environment variable will be overridden with actual password of MySQL service
->    .done()
->    .configure();
+>    .done();
 >```
 >
 > In the above example, once the Hussar environment is initialized and started then the configurations are going to be bound with the real values of **MySQLDockerService** - URL, username, password respectively.
@@ -804,8 +800,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >    .registerEndpointUnderProperty("application.mysql.url") // the given property will be overridden with actual URL of MySQL service
 >    .registerUsernameUnderProperty("application.mysql.username") // the given property will be overridden with actual username of MySQL service
 >    .registerPasswordUnderProperty("application.mysql.password") // the given property will be overridden with actual password of MySQL service
->    .done()
->    .configure();
+>    .done();
 >```
 >
 > In the above example, once the Hussar environment is initialized and started then the configurations are going to be bound with the real values of **MySQLDockerService** - URL, username, password respectively.
@@ -926,7 +921,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >
 > In such situation Hussar will initialize and start two environments, so they can co-exist together and each test class will use its own instance.
 ---
-> **Restarting application [TO BE RELEASED in 1.5]** <a id="restarting-application-example"/>
+> **Restarting application** <a id="restarting-application-example"/>
 >
 > In some test scenarios, it may be required to reset the application under the test to a clean state. To enforce a fresh application state, annotate the test method with @HussarApplicationRestart. See the example below:
 >
@@ -985,8 +980,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .dockerImageVersion("3.9.1") // it sets the docker image version. It's optional parameter.
 >            .registerEndpointUnderProperty("application.http.client.url") // it registers service's URL under following property. It's optional parameter.  
 >            .registerEndpointUnderEnvironmentVariable("HTTP_CLIENT_URL") // it registers service's URL under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1048,8 +1042,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerUsernameUnderEnvironmentVariable("MYSQL_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.mysql.password") // it registers service's password under following property. It's optional parameter.
 >            .registerPasswordUnderEnvironmentVariable("MYSQL_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1111,8 +1104,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerUsernameUnderEnvironmentVariable("MARIADB_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.mariadb.password") // it registers service's password under following property. It's optional parameter.
 >            .registerPasswordUnderEnvironmentVariable("MARIADB_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1174,8 +1166,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerUsernameUnderEnvironmentVariable("POSTGRESQL_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.postgresql.password") // it registers service's password under following property. It's optional parameter.
 >            .registerPasswordUnderEnvironmentVariable("POSTGRESQL_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
->            .done() // creates service configurer.
->            .configure(); // configures service.
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1234,8 +1225,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerUsernameUnderEnvironmentVariable("MONGODB_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.mongodb.password") // it registers service's password under following property. It's optional parameter.
 >            .registerPasswordUnderEnvironmentVariable("MONGODB_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1295,8 +1285,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerUsernameUnderEnvironmentVariable("REDIS_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.redis.password") // it registers service's password under following property. It's optional parameter.
 >            .registerPasswordUnderEnvironmentVariable("REDIS_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1358,8 +1347,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .registerUsernameUnderEnvironmentVariable("RABBITMQ_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.rabbitmq.password") // it registers service's password under following property. It's optional parameter.
 >            .registerPasswordUnderEnvironmentVariable("RABBITMQ_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1420,8 +1408,7 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .topicAutoCreation(true) // it enables topic auto creation. It's optional parameter.
 >            .registerEndpointUnderProperty("application.kafka.url") // it registers service's URL under following property. It's optional parameter.
 >            .registerEndpointUnderEnvironmentVariable("KAFKA_URL") // it registers service's URL under following environment variable. It's optional parameter.
->            .done()
->            .configure();
+>            .done();
 >
 >    return LocalEnvironmentConfigurer
 >            .newInstance()
@@ -1438,17 +1425,16 @@ This section provides a comprehensive collection of **examples** demonstrating t
 > **Setting custom Docker Registry** <a id="setting-custom-docker-registry-example"/>
 >
 > Let's say that you would like to change the Docker Registry, so that the Docker image is going to be fetched from there - for example your company's private Docker registry.
-> Every Hussar Docker service can be configured to use custom Docker Registry.
->
-> For the sake of this example, let's take Hussar's WireMock service:
+> To configure custom Docker registry URL, all you need to do is to inform EnvironmentConfigurer about that. Below you can find an example:
 >
 >```java
-> var wireMockService = WiremockDockerServiceConfigurer
->   .newInstance()
->   .dockerImageVersion("3.9.1") // it sets the docker image version. It's optional parameter.
->   .dockerRegistryUrl("custom-registry.netroute.pl") // it sets the custom Docker Registry for this specific image. It's optional parameter.
->   .done()
->   .configure();
+> var dockerRegistry = new DockerRegistry("custom-registry.netroute.pl"); // it sets DockerRegistry URL to custom-registry.netroute.pl
+>
+> return LocalEnvironmentConfigurer
+>          .newInstance()
+>          .withDockerRegistry(dockerRegistry) // it sets custom DockerRegistry
+>          ... // more configuration
+>          .done();
 >```
 
 <a id="contributors"></a>
