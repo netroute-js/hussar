@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.helper.FutureHelper;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.api.ServiceRegistry;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.FutureHelper;
 
 import java.time.Duration;
 import java.util.Set;
@@ -26,10 +26,12 @@ class ServiceStarter {
     }
 
     private void startStandaloneServices(Set<Service> services) {
-        services
+        var startTasks = services
                 .stream()
                 .map(service -> executorService.submit(() -> service.start(ServiceStartupContext.defaultContext())))
-                .forEach(task -> FutureHelper.waitForTaskCompletion(task, SERVICE_STARTUP_TIMEOUT));
+                .toList();
+
+        startTasks.forEach(task -> FutureHelper.waitForTaskCompletion(task, SERVICE_STARTUP_TIMEOUT));
     }
 
 }
