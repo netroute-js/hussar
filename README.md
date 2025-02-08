@@ -912,7 +912,6 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >    // test methods
 >}
 >
->@ExtendWith(HussarJUnit5Extension.class) // it glues Hussar and JUnit5 together. It's basically everything you need to make them work together
 >@HussarEnvironment(configurerProvider = SecondEnvironmentConfigurerProvider.class) // it provides Hussar tests environment configuration
 >public class SecondJUnit5IT { // a test class which needs its own test environment configuration
 >  // test methods
