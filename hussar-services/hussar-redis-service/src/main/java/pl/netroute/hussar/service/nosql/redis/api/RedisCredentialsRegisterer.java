@@ -8,6 +8,8 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 
+import java.util.Optional;
+
 @InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class RedisCredentialsRegisterer {
@@ -24,9 +26,10 @@ class RedisCredentialsRegisterer {
 
     void registerPasswordUnderProperty(@NonNull RedisCredentials credentials,
                                        @NonNull String passwordProperty) {
-        var property = new PropertyConfigurationEntry(passwordProperty, credentials.password());
-
-        configurationRegistry.register(property);
+        Optional
+                .ofNullable(credentials.password())
+                .map(password -> new PropertyConfigurationEntry(passwordProperty, password))
+                .ifPresent(configurationRegistry::register);
     }
 
     void registerUsernameUnderEnvironmentVariable(@NonNull RedisCredentials credentials,
@@ -38,8 +41,10 @@ class RedisCredentialsRegisterer {
 
     void registerPasswordUnderEnvironmentVariable(@NonNull RedisCredentials credentials,
                                                   @NonNull String passwordEnvVariable) {
-        var envVariable = new EnvVariableConfigurationEntry(passwordEnvVariable, credentials.password());
-
-        configurationRegistry.register(envVariable);
+        Optional
+                .ofNullable(credentials.password())
+                .map(password -> new EnvVariableConfigurationEntry(passwordEnvVariable, password))
+                .ifPresent(configurationRegistry::register);
     }
+
 }

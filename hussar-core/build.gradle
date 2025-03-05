@@ -1,6 +1,7 @@
 plugins {
 	id "hussar.java-conventions"
 	id "hussar.publish-conventions"
+	id "hussar.test-fixtures-conventions"
 }
 
 description = "Provides core Hussar features"
@@ -11,4 +12,7 @@ dependencies {
 
 	testImplementation libs.logback.classic
 	testImplementation libs.bundles.testing
+
+	testFixturesImplementation libs.bundles.testing
+	testFixturesImplementation libs.testcontainers
 }

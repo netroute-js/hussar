@@ -24,6 +24,11 @@ public class ServiceAssertionHelper {
         assertThat(service.getEndpoints()).containsExactly(expectedEndpoint);
     }
 
+    public static void assertMultipleEndpoints(@NonNull Service service,
+                                               @NonNull List<Endpoint> expectedEndpoints) {
+        assertThat(service.getEndpoints()).containsExactlyInAnyOrderElementsOf(expectedEndpoints);
+    }
+
     public static void assertEntriesRegistered(@NonNull Service service,
                                                @NonNull List<ConfigurationEntry> expectedEntries) {
         var registry = service.getConfigurationRegistry();

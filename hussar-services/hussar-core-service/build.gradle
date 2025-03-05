@@ -1,7 +1,7 @@
 plugins {
 	id "hussar.java-conventions"
 	id "hussar.publish-conventions"
-	id "java-test-fixtures"
+	id "hussar.test-fixtures-conventions"
 }
 
 description = "Provides core Hussar services features"

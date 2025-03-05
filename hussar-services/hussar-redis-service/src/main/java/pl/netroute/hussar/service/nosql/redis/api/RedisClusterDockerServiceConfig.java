@@ -14,7 +14,7 @@ import java.util.Set;
 @SuperBuilder
 @InternalUseOnly
 @EqualsAndHashCode(callSuper = true)
-class RedisDockerServiceConfig extends BaseDockerServiceConfig {
+class RedisClusterDockerServiceConfig extends BaseDockerServiceConfig {
     boolean enablePassword;
 
     @NonNull
@@ -29,7 +29,7 @@ class RedisDockerServiceConfig extends BaseDockerServiceConfig {
     @NonNull
     Set<String> registerPasswordUnderEnvironmentVariables;
 
-    protected RedisDockerServiceConfig(@NonNull RedisDockerServiceConfig.RedisDockerServiceConfigBuilder<?, ?> builder) {
+    protected RedisClusterDockerServiceConfig(@NonNull RedisClusterDockerServiceConfig.RedisClusterDockerServiceConfigBuilder<?, ?> builder) {
         super(builder);
 
         if(isPasswordConfigurationValid(builder)) {
@@ -43,7 +43,7 @@ class RedisDockerServiceConfig extends BaseDockerServiceConfig {
         this.registerPasswordUnderEnvironmentVariables = builder.registerPasswordUnderEnvironmentVariables;
     }
 
-    private boolean isPasswordConfigurationValid(RedisDockerServiceConfig.RedisDockerServiceConfigBuilder<?, ?> builder) {
+    private boolean isPasswordConfigurationValid(RedisClusterDockerServiceConfig.RedisClusterDockerServiceConfigBuilder<?, ?> builder) {
         var enablePassword = builder.enablePassword;
         var registerPasswordUnderProperties = builder.registerPasswordUnderProperties;
         var registerPasswordUnderEnvironmentVariables = builder.registerPasswordUnderEnvironmentVariables;

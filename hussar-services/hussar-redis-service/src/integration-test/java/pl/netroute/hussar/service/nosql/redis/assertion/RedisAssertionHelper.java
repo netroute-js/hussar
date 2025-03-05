@@ -39,6 +39,7 @@ public class RedisAssertionHelper {
 
         try(var client = createClient(endpoint)) {
             var result = client.ping();
+
             assertThat(result).isEqualTo(PING_RESULT);
         }
     }

@@ -11,8 +11,8 @@ import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
 @Slf4j
 @InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-class RedisPasswordConfigurer {
-    private static final String CONFIGURE_PASSWORD_COMMAND = "redis-cli -h %s -p %d CONFIG SET requirepass %s";
+class RedisClusterReplicationPasswordConfigurer {
+    private static final String CONFIGURE_PASSWORD_REPLICATION_COMMAND = "redis-cli -h %s -p %d CONFIG SET masterauth %s";
 
     private final DockerCommandLineRunner commandLineRunner;
 
@@ -22,17 +22,17 @@ class RedisPasswordConfigurer {
 
         container
                 .getExposedPorts()
-                .forEach(port -> configureInstancePassword(host, port, credentials, container));
+                .forEach(port -> configureInstanceReplicationPassword(host, port, credentials, container));
     }
 
-    private void configureInstancePassword(String host,
-                                           int port,
-                                           RedisCredentials credentials,
-                                           GenericContainer<?> container) {
-        log.info("Configuring Redis[{}:{}] security credentials - {}", host, port, credentials);
+    private void configureInstanceReplicationPassword(String host,
+                                                      int port,
+                                                      RedisCredentials credentials,
+                                                      GenericContainer<?> container) {
+        log.info("Configuring Redis[{}:{}] replication password to {}", host, port, credentials);
 
         var password = credentials.password();
-        var command = CONFIGURE_PASSWORD_COMMAND.formatted(host, port, password);
+        var command = CONFIGURE_PASSWORD_REPLICATION_COMMAND.formatted(host, port, password);
 
         commandLineRunner.run(command, container);
     }

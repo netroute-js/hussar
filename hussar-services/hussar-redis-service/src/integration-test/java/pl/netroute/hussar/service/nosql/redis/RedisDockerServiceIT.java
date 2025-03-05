@@ -6,7 +6,7 @@ import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
-import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigConfigurer;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisAssertionHelper;
 
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class RedisDockerServiceIT {
     @Test
     public void shouldStartRedisService() {
         // given
-        redisService = RedisDockerServiceConfigConfigurer
+        redisService = RedisDockerServiceConfigurer
                 .newInstance()
                 .done()
                 .configure(ServiceConfigureContext.defaultContext());
@@ -42,7 +42,7 @@ public class RedisDockerServiceIT {
     @Test
     public void shouldStartSecuredRedisService() {
         // given
-        redisService = RedisDockerServiceConfigConfigurer
+        redisService = RedisDockerServiceConfigurer
                 .newInstance()
                 .enablePassword(true)
                 .done()
@@ -73,7 +73,7 @@ public class RedisDockerServiceIT {
         var passwordProperty = "redis.password";
         var passwordEnvVariable = "REDIS_PASSWORD";
 
-        redisService = RedisDockerServiceConfigConfigurer
+        redisService = RedisDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -107,7 +107,7 @@ public class RedisDockerServiceIT {
         var name = "redis-instance";
         var dockerVersion = "6.2";
 
-        redisService = RedisDockerServiceConfigConfigurer
+        redisService = RedisDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)

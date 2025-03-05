@@ -1,5 +1,6 @@
 package pl.netroute.hussar.service.nosql.redis.api;
 
+import lombok.Getter;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
@@ -8,17 +9,23 @@ import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
+import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_LISTENING_PORT;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_PASSWORD;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_USERNAME;
+
 /**
  * Hussar Docker {@link Service} representing Redis.
  */
 public class RedisDockerService extends BaseDockerService<RedisDockerServiceConfig> {
-    private static final int LISTENING_PORT = 6379;
 
-    private static final String REDIS_USERNAME = "default";
-    private static final String REDIS_PASSWORD = "test";
-
+    @Getter
+    @NonNull
     private final RedisCredentials credentials;
+
+    @NonNull
     private final RedisCredentialsRegisterer credentialsRegisterer;
+
+    @NonNull
     private final RedisPasswordConfigurer passwordConfigurer;
 
     /**
@@ -53,7 +60,7 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
     protected void configureContainer(GenericContainer<?> container) {
         super.configureContainer(container);
 
-        container.withExposedPorts(LISTENING_PORT);
+        container.withExposedPorts(REDIS_LISTENING_PORT);
     }
 
     @Override
@@ -66,15 +73,6 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
 
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
-    }
-
-    /**
-     * Returns {@link RedisCredentials}.
-     *
-     * @return the actual {@link RedisCredentials}.
-     */
-    public RedisCredentials getCredentials() {
-        return credentials;
     }
 
     private boolean isPasswordEnabled() {
