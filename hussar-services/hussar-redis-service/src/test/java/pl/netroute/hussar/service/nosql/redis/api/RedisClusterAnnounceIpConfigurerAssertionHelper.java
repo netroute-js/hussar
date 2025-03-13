@@ -3,7 +3,7 @@ package pl.netroute.hussar.service.nosql.redis.api;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -15,7 +15,7 @@ class RedisClusterAnnounceIpConfigurerAssertionHelper {
 
     static void assertClusterAnnounceIpConfigured(@NonNull RedisClusterAnnounceIpConfigurer clusterAnnounceIpConfigurer,
                                                   @NonNull String clusterAnnounceIp,
-                                                  @NonNull GenericContainer<?> container) {
+                                                  @NonNull FixedHostPortGenericContainer<?> container) {
         verify(clusterAnnounceIpConfigurer).configure(clusterAnnounceIp, container);
     }
 

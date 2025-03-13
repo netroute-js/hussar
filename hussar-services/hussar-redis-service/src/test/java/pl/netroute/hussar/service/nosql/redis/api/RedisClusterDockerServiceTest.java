@@ -7,6 +7,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
+import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.GenericContainerStubHelper.GenericContainerAccessibility;
@@ -41,6 +42,8 @@ import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.givenConta
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterAnnounceIpConfigurerAssertionHelper.assertClusterAnnounceIpConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterAnnounceIpConfigurerAssertionHelper.assertNoClusterAnnounceIpConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterAnnounceIpConfigurerStubHelper.givenClusterAnnounceIpConfigurationFails;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterNoProtectionConfigurerAssertionHelper.assertClusterNoProtectionConfigured;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterNoProtectionConfigurerStubHelper.givenNoProtectionConfigurationFails;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterReplicationPasswordConfigurerAssertionHelper.assertNoReplicationPasswordConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterReplicationPasswordConfigurerAssertionHelper.assertReplicationPasswordConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterReplicationPasswordConfigurerStubHelper.givenReplicationPasswordConfigurationFails;
@@ -60,7 +63,6 @@ import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_PAS
 
 public class RedisClusterDockerServiceTest {
     private static final String REDIS_CLUSTER_HOST = "localhost";
-    private static final String REDIS_CLUSTER_SCHEME = "redis://";
     private static final List<Integer> REDIS_CLUSTER_LISTENING_PORTS = List.of(7000, 7001, 7002, 7003, 7004, 7005);
 
     private static final String REDIS_CLUSTER_SERVICE_NAME = "redis-cluster-service";
@@ -70,6 +72,7 @@ public class RedisClusterDockerServiceTest {
 
     private RedisClusterAnnounceIpConfigurer clusterAnnounceIpConfigurer;
     private RedisClusterReplicationPasswordConfigurer clusterReplicationPasswordConfigurer;
+    private RedisClusterNoProtectionConfigurer clusterNoProtectionConfigurer;
     private RedisClusterWaitStrategy clusterWaitStrategy;
     private RedisPasswordConfigurer passwordConfigurer;
     private DockerHostResolver dockerHostResolver;
@@ -78,6 +81,7 @@ public class RedisClusterDockerServiceTest {
     public void setup() {
         clusterAnnounceIpConfigurer = mock(RedisClusterAnnounceIpConfigurer.class);
         clusterReplicationPasswordConfigurer = mock(RedisClusterReplicationPasswordConfigurer.class);
+        clusterNoProtectionConfigurer = mock(RedisClusterNoProtectionConfigurer.class);
         clusterWaitStrategy = mock(RedisClusterWaitStrategy.class);
         passwordConfigurer = mock(RedisPasswordConfigurer.class);
         dockerHostResolver = mock(DockerHostResolver.class);
@@ -100,7 +104,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
@@ -139,6 +143,7 @@ public class RedisClusterDockerServiceTest {
         assertNoPasswordConfigured(passwordConfigurer);
         assertNoReplicationPasswordConfigured(clusterReplicationPasswordConfigurer);
         assertNoClusterAnnounceIpConfigured(clusterAnnounceIpConfigurer);
+        assertClusterNoProtectionConfigured(clusterNoProtectionConfigurer, container);
     }
 
     @Test
@@ -157,7 +162,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of(endpointsProperty))
                 .registerEndpointUnderEnvironmentVariables(Set.of(endpointsEnvVariable))
@@ -217,6 +222,7 @@ public class RedisClusterDockerServiceTest {
         assertPasswordConfigured(passwordConfigurer, credentials, container);
         assertReplicationPasswordConfigured(clusterReplicationPasswordConfigurer, credentials, container);
         assertNoClusterAnnounceIpConfigured(clusterAnnounceIpConfigurer);
+        assertClusterNoProtectionConfigured(clusterNoProtectionConfigurer, container);
     }
 
     @Test
@@ -226,7 +232,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
@@ -265,6 +271,7 @@ public class RedisClusterDockerServiceTest {
         assertNoPasswordConfigured(passwordConfigurer);
         assertNoReplicationPasswordConfigured(clusterReplicationPasswordConfigurer);
         assertClusterAnnounceIpConfigured(clusterAnnounceIpConfigurer, NON_LOCALHOST, container);
+        assertClusterNoProtectionConfigured(clusterNoProtectionConfigurer, container);
     }
 
     @Test
@@ -274,7 +281,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -305,7 +312,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -336,7 +343,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
@@ -360,13 +367,43 @@ public class RedisClusterDockerServiceTest {
     }
 
     @Test
+    public void shouldFailStartingServiceWhenClusterNoProtectionConfigurationFailed() {
+        // given
+        var config = RedisClusterDockerServiceConfig
+                .builder()
+                .name(REDIS_CLUSTER_SERVICE_NAME)
+                .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
+                .registerEndpointUnderProperties(Set.of())
+                .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerUsernameUnderProperties(Set.of())
+                .registerUsernameUnderEnvironmentVariables(Set.of())
+                .registerPasswordUnderProperties(Set.of())
+                .registerPasswordUnderEnvironmentVariables(Set.of())
+                .build();
+
+        var container = createStubFixedHostPortGenericContainer();
+        var service = createRedisClusterService(config, container);
+
+        givenContainerAccessible(container, containerAccessibility);
+        givenDockerNonLocalhost(dockerHostResolver);
+        givenNoProtectionConfigurationFails(clusterNoProtectionConfigurer, container);
+
+        // when
+        // then
+        assertThatThrownBy(() -> service.start(ServiceStartupContext.defaultContext()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Docker command has failed with [-1] code");
+    }
+
+    @Test
     public void shouldShutdownService() {
         // given
         var config = RedisClusterDockerServiceConfig
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
@@ -396,7 +433,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
@@ -422,7 +459,7 @@ public class RedisClusterDockerServiceTest {
                 .builder()
                 .name(REDIS_CLUSTER_SERVICE_NAME)
                 .dockerImage(REDIS_CLUSTER_SERVICE_IMAGE)
-                .scheme(REDIS_CLUSTER_SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -457,6 +494,7 @@ public class RedisClusterDockerServiceTest {
                 passwordConfigurer,
                 clusterReplicationPasswordConfigurer,
                 clusterAnnounceIpConfigurer,
+                clusterNoProtectionConfigurer,
                 clusterWaitStrategy,
                 dockerHostResolver
         );
@@ -465,7 +503,7 @@ public class RedisClusterDockerServiceTest {
     private List<Endpoint> getRedisClusterNodes() {
         return REDIS_CLUSTER_LISTENING_PORTS
                 .stream()
-                .map(port -> Endpoint.of(REDIS_CLUSTER_SCHEME, REDIS_CLUSTER_HOST, port))
+                .map(port -> Endpoint.schemeLess(REDIS_CLUSTER_HOST, port))
                 .toList();
     }
 

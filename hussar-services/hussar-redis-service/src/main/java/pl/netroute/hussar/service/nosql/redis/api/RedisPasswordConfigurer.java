@@ -4,9 +4,12 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
+
+import java.util.List;
 
 @Slf4j
 @InternalUseOnly
@@ -20,9 +23,7 @@ class RedisPasswordConfigurer {
                    @NonNull GenericContainer<?> container) {
         var host = container.getHost();
 
-        container
-                .getExposedPorts()
-                .forEach(port -> configureInstancePassword(host, port, credentials, container));
+        getPorts(container).forEach(port -> configureInstancePassword(host, port, credentials, container));
     }
 
     private void configureInstancePassword(String host,
@@ -35,6 +36,13 @@ class RedisPasswordConfigurer {
         var command = CONFIGURE_PASSWORD_COMMAND.formatted(host, port, password);
 
         commandLineRunner.run(command, container);
+    }
+
+    private List<Integer> getPorts(GenericContainer<?> container) {
+        return switch(container) {
+            case FixedHostPortGenericContainer fixedContainer -> fixedContainer.getBoundPortNumbers();
+            default -> container.getExposedPorts();
+        };
     }
 
 }

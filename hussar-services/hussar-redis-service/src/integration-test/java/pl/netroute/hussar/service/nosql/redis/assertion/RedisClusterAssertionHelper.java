@@ -13,7 +13,7 @@ import redis.clients.jedis.JedisCluster;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,16 +42,19 @@ public class RedisClusterAssertionHelper {
         }
     }
 
-    private JedisCluster createClient(List<Endpoint> endpoints) {
-        // remove redis:// ???
-//        var nodes = endpoints
-//                .stream()
-//                .map(endpoint -> new HostAndPort(endpoint.host(), endpoint.port()))
-//                .collect(Collectors.toUnmodifiableSet());
+    public void assertNoEntriesRegistered() {
+        var entriesRegistered = redisCluster
+                .getConfigurationRegistry()
+                .getEntries();
 
-        var nodes = Set.of(
-                new HostAndPort("localhost", 7000)
-        );
+        assertThat(entriesRegistered).isEmpty();
+    }
+
+    private JedisCluster createClient(List<Endpoint> endpoints) {
+        var nodes = endpoints
+                .stream()
+                .map(endpoint -> new HostAndPort(endpoint.host(), endpoint.port()))
+                .collect(Collectors.toUnmodifiableSet());
 
         var timeout = (int) TIMEOUT.toMillis();
         var credentials = redisCluster.getCredentials();
@@ -77,4 +80,5 @@ public class RedisClusterAssertionHelper {
 
         return new DefaultRedisCredentials(username, passwordChars);
     }
+
 }

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
@@ -17,11 +18,11 @@ class RedisClusterAnnounceIpConfigurer {
     private final DockerCommandLineRunner commandLineRunner;
 
     void configure(@NonNull String clusterAnnounceIp,
-                   @NonNull GenericContainer<?> container) {
+                   @NonNull FixedHostPortGenericContainer<?> container) {
         var host = container.getHost();
 
         container
-                .getExposedPorts()
+                .getBoundPortNumbers()
                 .forEach(port -> configureInstanceClusterAnnounceIp(host, port, clusterAnnounceIp, container));
     }
 

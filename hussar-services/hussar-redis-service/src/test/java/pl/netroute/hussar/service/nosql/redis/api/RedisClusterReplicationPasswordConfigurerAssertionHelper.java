@@ -3,7 +3,7 @@ package pl.netroute.hussar.service.nosql.redis.api;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -14,7 +14,7 @@ class RedisClusterReplicationPasswordConfigurerAssertionHelper {
 
     static void assertReplicationPasswordConfigured(@NonNull RedisClusterReplicationPasswordConfigurer clusterReplicationPasswordConfigurer,
                                                     @NonNull RedisCredentials credentials,
-                                                    @NonNull GenericContainer<?> container) {
+                                                    @NonNull FixedHostPortGenericContainer<?> container) {
         verify(clusterReplicationPasswordConfigurer).configure(credentials, container);
     }
 

@@ -10,6 +10,7 @@ import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
 import pl.netroute.hussar.core.docker.DockerImageResolver;
+import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
@@ -24,7 +25,6 @@ import java.util.Set;
 public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfigurer<RedisClusterDockerService> {
     private static final String DOCKER_IMAGE = "grokzen/redis-cluster";
     private static final String SERVICE = "redis_cluster_service";
-    private static final String SCHEME = "redis://";
 
     /**
      * Shall run RedisCluster in password less mode.
@@ -68,6 +68,7 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
         var passwordConfigurer = new RedisPasswordConfigurer(dockerCommandLineRunner);
         var clusterReplicationPasswordConfigurer = new RedisClusterReplicationPasswordConfigurer(dockerCommandLineRunner);
         var clusterAnnounceIpConfigurer = new RedisClusterAnnounceIpConfigurer(dockerCommandLineRunner);
+        var clusterNoProtectionConfigurer = new RedisClusterNoProtectionConfigurer(dockerCommandLineRunner);
         var clusterWaitStrategy = new RedisClusterWaitStrategy(dockerCommandLineRunner);
         var dockerHostResolver = new DockerHostResolver();
 
@@ -80,6 +81,7 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
                 passwordConfigurer,
                 clusterReplicationPasswordConfigurer,
                 clusterAnnounceIpConfigurer,
+                clusterNoProtectionConfigurer,
                 clusterWaitStrategy,
                 dockerHostResolver
         );
@@ -92,7 +94,7 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
-                .scheme(SCHEME)
+                .scheme(SchemesHelper.EMPTY_SCHEME)
                 .enablePassword(enablePassword)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)
                 .registerUsernameUnderEnvironmentVariables(registerUsernameUnderEnvironmentVariables)

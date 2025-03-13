@@ -51,6 +51,9 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
     private final RedisClusterAnnounceIpConfigurer redisClusterAnnounceIpConfigurer;
 
     @NonNull
+    private final RedisClusterNoProtectionConfigurer redisClusterNoProtectionConfigurer;
+
+    @NonNull
     private final RedisClusterWaitStrategy clusterWaitStrategy;
 
     @NonNull
@@ -64,6 +67,7 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
                               @NonNull RedisPasswordConfigurer passwordConfigurer,
                               @NonNull RedisClusterReplicationPasswordConfigurer clusterReplicationPasswordConfigurer,
                               @NonNull RedisClusterAnnounceIpConfigurer clusterAnnounceIpConfigurer,
+                              @NonNull RedisClusterNoProtectionConfigurer redisClusterNoProtectionConfigurer,
                               @NonNull RedisClusterWaitStrategy clusterWaitStrategy,
                               @NonNull DockerHostResolver dockerHostResolver) {
         super(container, config, configurationRegistry, endpointRegisterer);
@@ -78,6 +82,7 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
         this.passwordConfigurer = passwordConfigurer;
         this.clusterReplicationPasswordConfigurer = clusterReplicationPasswordConfigurer;
         this.redisClusterAnnounceIpConfigurer = clusterAnnounceIpConfigurer;
+        this.redisClusterNoProtectionConfigurer = redisClusterNoProtectionConfigurer;
         this.clusterWaitStrategy = clusterWaitStrategy;
         this.dockerHostResolver = dockerHostResolver;
     }
@@ -118,13 +123,17 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
     protected void doAfterServiceStartup(ServiceStartupContext context) {
         super.doAfterServiceStartup(context);
 
+        var fixedHostPortContainer = (FixedHostPortGenericContainer<?>) container;
+
         if(!dockerHostResolver.isLocalHost()) {
-            configureClusterAvailability(container);
+            configureClusterAvailability(fixedHostPortContainer);
         }
 
         if(isClusterPasswordEnabled()) {
-            configureClusterPassword(container, credentials);
+            configureClusterPassword(fixedHostPortContainer, credentials);
         }
+
+        disableProtectionMode(fixedHostPortContainer);
 
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
@@ -145,16 +154,20 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
         container.withExtraHost(dockerHost, REDIS_CLUSTER_LOOP_BACK_IP);
     }
 
-    private void configureClusterAvailability(GenericContainer<?> container) {
+    private void configureClusterAvailability(FixedHostPortGenericContainer<?> container) {
         var dockerHost = dockerHostResolver.getHost();
 
         redisClusterAnnounceIpConfigurer.configure(dockerHost, container);
     }
 
-    private void configureClusterPassword(GenericContainer<?> container,
+    private void configureClusterPassword(FixedHostPortGenericContainer<?> container,
                                           RedisCredentials credentials) {
         passwordConfigurer.configure(credentials, container);
         clusterReplicationPasswordConfigurer.configure(credentials, container);
+    }
+
+    private void disableProtectionMode(FixedHostPortGenericContainer<?> container) {
+        redisClusterNoProtectionConfigurer.configure(container);
     }
 
     private void configureClusterNodesPorts(FixedHostPortGenericContainer<?> container) {

@@ -27,6 +27,7 @@ public class RedisClusterDockerServiceIT {
         // given
         redisClusterService = RedisClusterDockerServiceConfigurer
                 .newInstance()
+                .enablePassword(true)
                 .done()
                 .configure(ServiceConfigureContext.defaultContext());
 
@@ -37,6 +38,7 @@ public class RedisClusterDockerServiceIT {
         var redisClusterAssertion = new RedisClusterAssertionHelper(redisClusterService);
         redisClusterAssertion.assertMultipleEndpoints();
         redisClusterAssertion.asserRedisClusterAccessible();
+        redisClusterAssertion.assertNoEntriesRegistered();
     }
 
 }

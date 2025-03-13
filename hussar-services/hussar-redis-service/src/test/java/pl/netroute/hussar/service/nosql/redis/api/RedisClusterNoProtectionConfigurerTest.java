@@ -13,16 +13,16 @@ import static org.mockito.Mockito.verify;
 import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.createStubFixedHostPortGenericContainer;
 import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.givenContainerAccessible;
 
-public class RedisClusterAnnounceIpConfigurerTest {
+public class RedisClusterNoProtectionConfigurerTest {
     private static final String REDIS_HOST = "localhost";
     private static final int REDIS_FIRST_REPLICA_PORT = 7000;
     private static final int REDIS_SECOND_REPLICA_PORT = 7001;
 
-    private static final String CONFIGURE_CLUSTER_ANNOUNCE_IP_COMMAND = "redis-cli -h %s -p %d CONFIG SET cluster-announce-ip %s";
+    private static final String DISABLE_PROTECTION_MODE_COMMAND = "redis-cli -h %s -p %d CONFIG SET protection-mode no";
 
     private GenericContainerAccessibility containerAccessibility;
     private DockerCommandLineRunner commandLineRunner;
-    private RedisClusterAnnounceIpConfigurer configurer;
+    private RedisClusterNoProtectionConfigurer configurer;
 
     @BeforeEach
     public void setup() {
@@ -34,30 +34,29 @@ public class RedisClusterAnnounceIpConfigurerTest {
                 .exposedPorts(List.of(REDIS_FIRST_REPLICA_PORT, REDIS_SECOND_REPLICA_PORT))
                 .build();
 
-        configurer = new RedisClusterAnnounceIpConfigurer(commandLineRunner);
+        configurer = new RedisClusterNoProtectionConfigurer(commandLineRunner);
     }
 
     @Test
-    public void shouldConfigureClusterAnnounceIp() {
+    public void shouldConfigureNoProtectionMode() {
         // given
-        var clusterAnnounceIp = "docker";
         var container = createStubFixedHostPortGenericContainer();
 
         givenContainerAccessible(container, containerAccessibility);
 
         // when
-        configurer.configure(clusterAnnounceIp, container);
+        configurer.configure(container);
 
         // then
-        var expectedFirstReplicaCommandExecuted = CONFIGURE_CLUSTER_ANNOUNCE_IP_COMMAND.formatted(REDIS_HOST, REDIS_FIRST_REPLICA_PORT, clusterAnnounceIp);
-        var expectedSecondReplicaCommandExecuted = CONFIGURE_CLUSTER_ANNOUNCE_IP_COMMAND.formatted(REDIS_HOST, REDIS_SECOND_REPLICA_PORT, clusterAnnounceIp);
+        var expectedFirstReplicaCommandExecuted = DISABLE_PROTECTION_MODE_COMMAND.formatted(REDIS_HOST, REDIS_FIRST_REPLICA_PORT);
+        var expectedSecondReplicaCommandExecuted = DISABLE_PROTECTION_MODE_COMMAND.formatted(REDIS_HOST, REDIS_SECOND_REPLICA_PORT);
 
-        assertClusterAnnounceIpConfigured(expectedFirstReplicaCommandExecuted, container);
-        assertClusterAnnounceIpConfigured(expectedSecondReplicaCommandExecuted, container);
+        assertProtectionModeDisabled(expectedFirstReplicaCommandExecuted, container);
+        assertProtectionModeDisabled(expectedSecondReplicaCommandExecuted, container);
     }
 
-    private void assertClusterAnnounceIpConfigured(String expectedCommandExecuted,
-                                                   GenericContainer<?> container) {
+    private void assertProtectionModeDisabled(String expectedCommandExecuted,
+                                              GenericContainer<?> container) {
         verify(commandLineRunner).run(expectedCommandExecuted, container);
     }
 
