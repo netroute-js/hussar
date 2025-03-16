@@ -6,11 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
-import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+
+import java.util.List;
 
 /**
  * A base class with default implementation/template for all Hussar {@link Service}.
@@ -95,10 +96,10 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
      * @param context - the context used to pass additional data.
      */
     protected void doAfterServiceStartup(ServiceStartupContext context) {
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(this);
+        var endpoints = getEndpoints();
 
-        registerEndpointUnderProperties(endpoint);
-        registerEndpointUnderEnvironmentVariables(endpoint);
+        registerEndpointUnderProperties(endpoints);
+        registerEndpointUnderEnvironmentVariables(endpoints);
     }
 
     /**
@@ -113,16 +114,16 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
     protected void doAfterServiceShutdown() {
     }
 
-    private void registerEndpointUnderProperties(Endpoint endpoint) {
+    private void registerEndpointUnderProperties(List<Endpoint> endpoints) {
         config
                 .getRegisterEndpointUnderProperties()
-                .forEach(endpointProperty -> endpointRegisterer.registerUnderProperty(endpoint, endpointProperty));
+                .forEach(endpointProperty -> endpointRegisterer.registerUnderProperty(endpoints, endpointProperty));
     }
 
-    private void registerEndpointUnderEnvironmentVariables(Endpoint endpoint) {
+    private void registerEndpointUnderEnvironmentVariables(List<Endpoint> endpoints) {
         config
                 .getRegisterEndpointUnderEnvironmentVariables()
-                .forEach(endpointEnvVariable -> endpointRegisterer.registerUnderEnvironmentVariable(endpoint, endpointEnvVariable));
+                .forEach(endpointEnvVariable -> endpointRegisterer.registerUnderEnvironmentVariable(endpoints, endpointEnvVariable));
     }
 
     /**

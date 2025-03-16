@@ -6,91 +6,96 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
-import pl.netroute.hussar.core.helper.EndpointHelper;
-import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
+import pl.netroute.hussar.service.nosql.redis.api.RedisClusterDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.DefaultRedisCredentials;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.exceptions.JedisConnectionException;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.exceptions.JedisClusterOperationException;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-public class RedisAssertionHelper {
-    private static final int SINGLE = 1;
+public class RedisClusterAssertionHelper {
+    private static final int ENDPOINTS = 6;
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(5L);
+    private static final Duration TIMEOUT = Duration.ofSeconds(20L);
 
     private static final String PING_RESULT = "PONG";
+    private static final String ENDPOINTS_JOIN_DELIMITER = ",";
 
     @NonNull
-    private final RedisDockerService redis;
+    private final RedisClusterDockerService redisCluster;
 
-    public void assertSingleEndpoint() {
-        assertThat(redis.getEndpoints()).hasSize(SINGLE);
+    public void assertMultipleEndpoints() {
+        assertThat(redisCluster.getEndpoints()).hasSize(ENDPOINTS);
     }
 
-    public void asserRedisAccessible() {
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(redis);
+    public void asserRedisClusterAccessible() {
+        var endpoints = redisCluster.getEndpoints();
 
-        try(var client = createClient(endpoint)) {
+        try(var client = createClient(endpoints)) {
             var result = client.ping();
 
             assertThat(result).isEqualTo(PING_RESULT);
         }
     }
 
-    public void asserRedisNotAccessible(@NonNull Endpoint endpoint) {
-        try(var client = createClient(endpoint)) {
-            throw new AssertionError("Expected JedisConnectionException");
-        } catch (JedisConnectionException ex) {
+    public void assertRedisClusterNotAccessible(@NonNull List<Endpoint> endpoints) {
+        try(var client = createClient(endpoints)) {
+            throw new AssertionError("Expected JedisClusterOperationException");
+        } catch (JedisClusterOperationException ex) {
         } catch (Exception ex) {
-            throw new AssertionError("Expected JedisConnectionException");
+            throw new AssertionError("Expected JedisClusterOperationException");
         }
     }
 
-    public void assertRegisteredEndpointUnderProperty(@NonNull String registeredProperty) {
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(redis);
+    public void assertRegisteredEndpointsUnderProperty(@NonNull String registeredProperty) {
+        var endpoints = redisCluster.getEndpoints();
+        var squashedEndpoints = squashEndpoints(endpoints);
 
-        assertRegisteredEntryInConfigRegistry(registeredProperty, endpoint.address(), PropertyConfigurationEntry.class);
+        assertRegisteredEntryInConfigRegistry(registeredProperty, squashedEndpoints, PropertyConfigurationEntry.class);
     }
 
-    public void assertRegisteredEndpointUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(redis);
+    public void assertRegisteredEndpointsUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
+        var endpoints = redisCluster.getEndpoints();
+        var squashedEndpoints = squashEndpoints(endpoints);
 
-        assertRegisteredEntryInConfigRegistry(registeredEnvVariable, endpoint.address(), EnvVariableConfigurationEntry.class);
+        assertRegisteredEntryInConfigRegistry(registeredEnvVariable, squashedEndpoints, EnvVariableConfigurationEntry.class);
     }
 
     public void assertRegisteredUsernameUnderProperty(@NonNull String registeredProperty) {
-        var credentials = redis.getCredentials();
+        var credentials = redisCluster.getCredentials();
 
         assertRegisteredEntryInConfigRegistry(registeredProperty, credentials.username(), PropertyConfigurationEntry.class);
     }
 
     public void assertRegisteredUsernameUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
-        var credentials = redis.getCredentials();
+        var credentials = redisCluster.getCredentials();
 
         assertRegisteredEntryInConfigRegistry(registeredEnvVariable, credentials.username(), EnvVariableConfigurationEntry.class);
     }
 
     public void assertRegisteredPasswordUnderProperty(@NonNull String registeredProperty) {
-        var credentials = redis.getCredentials();
+        var credentials = redisCluster.getCredentials();
 
         assertRegisteredEntryInConfigRegistry(registeredProperty, credentials.password(), PropertyConfigurationEntry.class);
     }
 
     public void assertRegisteredPasswordUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
-        var credentials = redis.getCredentials();
+        var credentials = redisCluster.getCredentials();
 
         assertRegisteredEntryInConfigRegistry(registeredEnvVariable, credentials.password(), EnvVariableConfigurationEntry.class);
     }
 
     public void assertNoEntriesRegistered() {
-        var entriesRegistered = redis
+        var entriesRegistered = redisCluster
                 .getConfigurationRegistry()
                 .getEntries();
 
@@ -98,7 +103,7 @@ public class RedisAssertionHelper {
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {
-        var configRegistry = redis.getConfigurationRegistry();
+        var configRegistry = redisCluster.getConfigurationRegistry();
 
         configRegistry
                 .getEntries()
@@ -112,11 +117,14 @@ public class RedisAssertionHelper {
                 );
     }
 
-    private Jedis createClient(Endpoint endpoint) {
-        var host = endpoint.host();
-        var port = endpoint.port();
+    private JedisCluster createClient(List<Endpoint> endpoints) {
+        var nodes = endpoints
+                .stream()
+                .map(endpoint -> new HostAndPort(endpoint.host(), endpoint.port()))
+                .collect(Collectors.toUnmodifiableSet());
+
         var timeout = (int) TIMEOUT.toMillis();
-        var credentials = redis.getCredentials();
+        var credentials = redisCluster.getCredentials();
 
         var configBuilder = DefaultJedisClientConfig
                 .builder()
@@ -130,7 +138,7 @@ public class RedisAssertionHelper {
                 .map(this::createCredentials)
                 .ifPresent(configBuilder::credentials);
 
-        return new Jedis(host, port, configBuilder.build());
+        return new JedisCluster(nodes, configBuilder.build());
     }
 
     private redis.clients.jedis.RedisCredentials createCredentials(RedisCredentials credentials) {
@@ -138,6 +146,13 @@ public class RedisAssertionHelper {
         var passwordChars = credentials.password().toCharArray();
 
         return new DefaultRedisCredentials(username, passwordChars);
+    }
+
+    private String squashEndpoints(List<Endpoint> endpoints) {
+        return endpoints
+                .stream()
+                .map(Endpoint::address)
+                .collect(Collectors.joining(ENDPOINTS_JOIN_DELIMITER));
     }
 
 }

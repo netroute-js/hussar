@@ -2,7 +2,7 @@ package pl.netroute.hussar.junit5.factory;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigConfigurer;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigurer;
 
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.REDIS_PASSWORD_ENV_VARIABLE;
 import static pl.netroute.hussar.junit5.config.ApplicationEnvironmentVariables.REDIS_URL_ENV_VARIABLE;
@@ -15,10 +15,10 @@ import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_ALTER
 public class RedisServiceFactory {
     public static final String REDIS_NAME = "redis-instance";
 
-    public static RedisDockerServiceConfigConfigurer create() {
+    public static RedisDockerServiceConfigurer create() {
         var dockerImageVersion = "7.2.5";
 
-        return RedisDockerServiceConfigConfigurer
+        return RedisDockerServiceConfigurer
                 .newInstance()
                 .name(REDIS_NAME)
                 .dockerImageVersion(dockerImageVersion)

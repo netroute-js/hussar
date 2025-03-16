@@ -1,24 +1,22 @@
 package pl.netroute.hussar.service.nosql.redis.api;
 
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.core.stub.GenericContainerStubHelper.GenericContainerAccessibility;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerCommandExecuted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNoEnvVariablesConfigured;
@@ -29,10 +27,17 @@ import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.a
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.createStubGenericContainer;
+import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.givenContainerAccessible;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisPasswordConfigurerAssertionHelper.assertNoPasswordConfigured;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisPasswordConfigurerAssertionHelper.assertPasswordConfigured;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisPasswordConfigurerStubHelper.givenPasswordConfigurationFails;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_LISTENING_PORT;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_PASSWORD;
+import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_USERNAME;
 
 public class RedisDockerServiceTest {
     private static final String REDIS_HOST = "localhost";
-    private static final int REDIS_LISTENING_PORT = 6379;
     private static final int REDIS_MAPPED_PORT = 7000;
 
     private static final String REDIS_SERVICE_NAME = "redis-service";
@@ -40,14 +45,21 @@ public class RedisDockerServiceTest {
 
     private static final String REDIS_SCHEME = "redis://";
 
-    private static final String REDIS_USERNAME = "default";
-    private static final String REDIS_PASSWORD = "test";
+    private GenericContainerAccessibility containerAccessibility;
 
-    private static final String CONFIGURE_REDIS_PASSWORD_COMMAND = "redis-cli -h %s -p %d config set requirepass %s"
-            .formatted(REDIS_HOST, REDIS_LISTENING_PORT, REDIS_PASSWORD);
+    private RedisPasswordConfigurer passwordConfigurer;
 
-    private static final int CONTAINER_COMMAND_FAILED_CODE = -1;
-    private static final String CONTAINER_COMMAND_SPLITTER = " ";
+    @BeforeEach
+    public void setup() {
+        passwordConfigurer = mock(RedisPasswordConfigurer.class);
+
+        containerAccessibility = GenericContainerAccessibility
+                .builder()
+                .host(REDIS_HOST)
+                .exposedPort(REDIS_LISTENING_PORT)
+                .mappedPort(REDIS_LISTENING_PORT, REDIS_MAPPED_PORT)
+                .build();
+    }
 
     @Test
     public void shouldStartMinimalService() {
@@ -65,10 +77,10 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -84,6 +96,7 @@ public class RedisDockerServiceTest {
         assertName(service, REDIS_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
         assertNoEntriesRegistered(service);
+        assertNoPasswordConfigured(passwordConfigurer);
     }
 
     @Test
@@ -112,10 +125,10 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -140,15 +153,17 @@ public class RedisDockerServiceTest {
                 passwordEnvVariableEntry
         );
 
+        var credentials = new RedisCredentials(REDIS_USERNAME, REDIS_PASSWORD);
+
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
         assertContainerLoggingConfigured(container);
-        assertContainerCommandExecuted(container, CONFIGURE_REDIS_PASSWORD_COMMAND);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
         assertEntriesRegistered(service, registeredEntries);
+        assertPasswordConfigured(passwordConfigurer, credentials, container);
     }
 
     @Test
@@ -171,18 +186,17 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container);
-        givenContainerPasswordSetupFailed(container);
+        givenContainerAccessible(container, containerAccessibility);
+        givenPasswordConfigurationFails(passwordConfigurer, container);
 
         // when
         // then
-        Assertions
-                .assertThatThrownBy(() -> service.start(ServiceStartupContext.defaultContext()))
+        assertThatThrownBy(() -> service.start(ServiceStartupContext.defaultContext()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Could not configure Redis credentials");
+                .hasMessage("Docker command has failed with [-1] code");
     }
 
     @Test
@@ -201,10 +215,10 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -230,7 +244,7 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var service = createRedisService(config, container);
 
         // when
@@ -257,7 +271,7 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var service = createRedisService(config, container);
 
         // when
@@ -272,31 +286,8 @@ public class RedisDockerServiceTest {
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new RedisCredentialsRegisterer(configurationRegistry);
-        var passwordConfigurer = new RedisPasswordConfigurer();
 
         return new RedisDockerService(container, config, configurationRegistry, endpointRegisterer, credentialsRegisterer, passwordConfigurer);
-    }
-
-    private GenericContainer<?> createStubContainer() {
-        return mock(GenericContainer.class, RETURNS_DEEP_STUBS);
-    }
-
-    private void givenContainerAccessible(GenericContainer<?> container) {
-        when(container.getHost()).thenReturn(REDIS_HOST);
-        when(container.getExposedPorts()).thenReturn(List.of(REDIS_LISTENING_PORT));
-        when(container.getMappedPort(REDIS_LISTENING_PORT)).thenReturn(REDIS_MAPPED_PORT);
-    }
-
-    private void givenContainerPasswordSetupFailed(GenericContainer<?> container) {
-        try {
-            var result = mock(Container.ExecResult.class);
-            when(result.getExitCode()).thenReturn(CONTAINER_COMMAND_FAILED_CODE);
-
-            when(container.execInContainer(CONFIGURE_REDIS_PASSWORD_COMMAND.split(CONTAINER_COMMAND_SPLITTER))).thenReturn(result);
-        } catch (Exception ex) {
-            throw new AssertionError("Should not happen", ex);
-        }
-
     }
 
     private void assertPasswordLessCredentials(RedisCredentials credentials) {
@@ -308,4 +299,5 @@ public class RedisDockerServiceTest {
         assertThat(credentials.username()).isEqualTo(REDIS_USERNAME);
         assertThat(credentials.password()).isEqualTo(REDIS_PASSWORD);
     }
+
 }

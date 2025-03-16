@@ -3,12 +3,14 @@ package pl.netroute.hussar.core.service.assertion;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,7 +31,22 @@ public class GenericContainerAssertionHelper {
 
     public static void assertContainerExposedPortConfigured(@NonNull GenericContainer<?> container,
                                                             @NonNull Integer... exposedPorts) {
-        verify(container).withExposedPorts(exposedPorts);
+        if(container instanceof FixedHostPortGenericContainer fixedContainer) {
+            Stream.of(exposedPorts)
+                  .forEach(port -> fixedContainer.withFixedExposedPort(port, port));
+        } else {
+            verify(container).withExposedPorts(exposedPorts);
+        }
+    }
+
+    public static void assertContainerExtraHostConfigured(@NonNull GenericContainer<?> container,
+                                                          @NonNull String hostName,
+                                                          @NonNull String ipAddress) {
+        verify(container).withExtraHost(hostName, ipAddress);
+    }
+
+    public static void assertNoContainerExtraHostConfigured(@NonNull GenericContainer<?> container) {
+        verify(container, never()).withExtraHost(anyString(), anyString());
     }
 
     public static void assertContainerWaitStrategyConfigured(@NonNull GenericContainer<?> container,

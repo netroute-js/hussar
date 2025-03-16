@@ -1,46 +1,48 @@
 package pl.netroute.hussar.service.nosql.redis.api;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
+
+import java.util.List;
 
 @Slf4j
 @InternalUseOnly
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class RedisPasswordConfigurer {
-    private static final String CONFIGURE_PASSWORD_COMMAND = "redis-cli -h %s -p %d config set requirepass %s";
-    private static final String COMMAND_SPLITTER = " ";
+    private static final String CONFIGURE_PASSWORD_COMMAND = "redis-cli -h %s -p %d CONFIG SET requirepass %s";
+
+    private final DockerCommandLineRunner commandLineRunner;
 
     void configure(@NonNull RedisCredentials credentials,
                    @NonNull GenericContainer<?> container) {
-        container
-                .getExposedPorts()
-                .forEach(port -> configureInstancePassword(port, credentials, container));
+        var host = container.getHost();
+
+        getPorts(container).forEach(port -> configureInstancePassword(host, port, credentials, container));
     }
 
-    private void configureInstancePassword(int port,
+    private void configureInstancePassword(String host,
+                                           int port,
                                            RedisCredentials credentials,
                                            GenericContainer<?> container) {
-        log.info("Configuring Redis[{}] credentials - {}", port, credentials);
+        log.info("Configuring Redis[{}:{}] security credentials - {}", host, port, credentials);
 
-        var host = container.getHost();
         var password = credentials.password();
-        var command = CONFIGURE_PASSWORD_COMMAND
-                .formatted(host, port, password)
-                .split(COMMAND_SPLITTER);
+        var command = CONFIGURE_PASSWORD_COMMAND.formatted(host, port, password);
 
-        try {
-            var result = container.execInContainer(command);
-            if(result.getExitCode() != 0) {
-                var errorMessage = "Failed to configure Redis[%d] credentials - %s".formatted(port, result.getStderr());
+        commandLineRunner.run(command, container);
+    }
 
-                throw new IllegalStateException(errorMessage);
-            }
-        } catch (Exception ex) {
-            throw new IllegalStateException("Could not configure Redis credentials", ex);
-        }
+    private List<Integer> getPorts(GenericContainer<?> container) {
+        return switch(container) {
+            case FixedHostPortGenericContainer fixedContainer -> fixedContainer.getBoundPortNumbers();
+            default -> container.getExposedPorts();
+        };
     }
 
 }
