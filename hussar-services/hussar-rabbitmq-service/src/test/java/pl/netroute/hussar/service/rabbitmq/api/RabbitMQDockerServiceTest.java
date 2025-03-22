@@ -1,15 +1,17 @@
 package pl.netroute.hussar.service.rabbitmq.api;
 
 import com.rabbitmq.client.ConnectionFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.core.stub.GenericContainerStubHelper.GenericContainerAccessibility;
 
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static pl.netroute.hussar.core.helper.SchemesHelper.EMPTY_SCHEME;
+import static pl.netroute.hussar.core.helper.SchemesHelper.HTTP_SCHEME;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
@@ -35,6 +37,8 @@ import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.a
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.createStubGenericContainer;
+import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.givenContainerAccessible;
 
 public class RabbitMQDockerServiceTest {
     private static final String RABBITMQ_HOST = "localhost";
@@ -47,6 +51,7 @@ public class RabbitMQDockerServiceTest {
 
     private static final String RABBITMQ_KAFKA_SERVICE_NAME = "rabbitmq-service";
     private static final String RABBITMQ_SERVICE_IMAGE = "rabbitmq";
+    private static final String RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE = "rabbitmq:3.12.14-management-alpine";
 
     private static final String RABBITMQ_DEFAULT_USER_ENV = "RABBITMQ_DEFAULT_USER";
     private static final String RABBITMQ_DEFAULT_PASS_ENV = "RABBITMQ_DEFAULT_PASS";
@@ -57,6 +62,18 @@ public class RabbitMQDockerServiceTest {
     private static final boolean DURABLE = false;
     private static final boolean EXCLUSIVE = false;
     private static final boolean AUTO_DELETE = false;
+
+    private GenericContainerAccessibility containerAccessibility;
+
+    @BeforeEach
+    public void setup() {
+        containerAccessibility = GenericContainerAccessibility
+                .builder()
+                .host(RABBITMQ_HOST)
+                .exposedPort(RABBITMQ_LISTENING_PORT)
+                .mappedPort(RABBITMQ_LISTENING_PORT, RABBITMQ_MAPPED_PORT)
+                .build();
+    }
 
     @Test
     public void shouldStartMinimalService() {
@@ -73,13 +90,15 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
                 .registerPasswordUnderEnvironmentVariables(Set.of())
+                .registerManagementEndpointUnderProperties(Set.of())
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -105,12 +124,10 @@ public class RabbitMQDockerServiceTest {
     @Test
     public void shouldStartMinimalServiceWithManagementApi() {
         // given
-        var dockerImage = "rabbitmq:3.12.14-management-alpine";
-
         var config = RabbitMQDockerServiceConfig
                 .builder()
                 .name(RABBITMQ_KAFKA_SERVICE_NAME)
-                .dockerImage(dockerImage)
+                .dockerImage(RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE)
                 .scheme(EMPTY_SCHEME)
                 .queues(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -119,13 +136,21 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
                 .registerPasswordUnderEnvironmentVariables(Set.of())
+                .registerManagementEndpointUnderProperties(Set.of())
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
-        givenContainerAccessible(container);
+        containerAccessibility = containerAccessibility
+                .toBuilder()
+                .exposedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT)
+                .mappedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_MAPPED_PORT)
+                .build();
+
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -154,6 +179,9 @@ public class RabbitMQDockerServiceTest {
         var endpointProperty = "endpoint.url";
         var endpointEnvVariable = "ENDPOINT_URL";
 
+        var managementEndpointProperty = "management.endpoint.url";
+        var managementEndpointEnvVariable = "MANAGEMENT_ENDPOINT_URL";
+
         var usernameProperty = "redis.username";
         var usernameEnvVariable = "REDIS_USERNAME";
 
@@ -174,7 +202,7 @@ public class RabbitMQDockerServiceTest {
         var config = RabbitMQDockerServiceConfig
                 .builder()
                 .name(RABBITMQ_KAFKA_SERVICE_NAME)
-                .dockerImage(RABBITMQ_SERVICE_IMAGE)
+                .dockerImage(RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE)
                 .scheme(EMPTY_SCHEME)
                 .queues(queues)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
@@ -183,13 +211,21 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of(usernameEnvVariable))
                 .registerPasswordUnderProperties(Set.of(passwordProperty))
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
+                .registerManagementEndpointUnderProperties(Set.of(managementEndpointProperty))
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of(managementEndpointEnvVariable))
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
-        givenContainerAccessible(container);
+        containerAccessibility = containerAccessibility
+                .toBuilder()
+                .exposedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT)
+                .mappedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_MAPPED_PORT)
+                .build();
+
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -198,6 +234,10 @@ public class RabbitMQDockerServiceTest {
         var endpoint = Endpoint.of(EMPTY_SCHEME, RABBITMQ_HOST, RABBITMQ_MAPPED_PORT);
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
+
+        var managementEndpoint = Endpoint.of(HTTP_SCHEME, RABBITMQ_HOST, RABBITMQ_MANAGEMENT_API_MAPPED_PORT);
+        var managementEndpointPropertyEntry = ConfigurationEntry.property(managementEndpointProperty, managementEndpoint.address());
+        var managementEndpointEnvVariableEntry = ConfigurationEntry.envVariable(managementEndpointEnvVariable, managementEndpoint.address());
 
         var usernamePropertyEntry = ConfigurationEntry.property(usernameProperty, RABBITMQ_USERNAME);
         var usernameEnvVariableEntry = ConfigurationEntry.envVariable(usernameEnvVariable, RABBITMQ_USERNAME);
@@ -208,6 +248,8 @@ public class RabbitMQDockerServiceTest {
         var registeredEntries = List.<ConfigurationEntry>of(
                 endpointPropertyEntry,
                 endpointEnvVariableEntry,
+                managementEndpointPropertyEntry,
+                managementEndpointEnvVariableEntry,
                 usernamePropertyEntry,
                 usernameEnvVariableEntry,
                 passwordPropertyEntry,
@@ -220,7 +262,7 @@ public class RabbitMQDockerServiceTest {
         );
 
         assertContainerStarted(container);
-        assertContainerExposedPortConfigured(container, RABBITMQ_LISTENING_PORT);
+        assertContainerExposedPortConfigured(container, RABBITMQ_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -245,13 +287,15 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
                 .registerPasswordUnderEnvironmentVariables(Set.of())
+                .registerManagementEndpointUnderProperties(Set.of())
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -276,9 +320,11 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
                 .registerPasswordUnderEnvironmentVariables(Set.of())
+                .registerManagementEndpointUnderProperties(Set.of())
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
@@ -292,12 +338,10 @@ public class RabbitMQDockerServiceTest {
     @Test
     public void shouldReturnManagementApiEndpoint() {
         // given
-        var dockerImage = "rabbitmq:3.12.14-management-alpine";
-
         var config = RabbitMQDockerServiceConfig
                 .builder()
                 .name(RABBITMQ_KAFKA_SERVICE_NAME)
-                .dockerImage(dockerImage)
+                .dockerImage(RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE)
                 .scheme(EMPTY_SCHEME)
                 .queues(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -306,13 +350,21 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
                 .registerPasswordUnderEnvironmentVariables(Set.of())
+                .registerManagementEndpointUnderProperties(Set.of())
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
-        givenContainerWithManagementApiAccessible(container);
+        containerAccessibility = containerAccessibility
+                .toBuilder()
+                .exposedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT)
+                .mappedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_MAPPED_PORT)
+                .build();
+
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -338,13 +390,15 @@ public class RabbitMQDockerServiceTest {
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
                 .registerPasswordUnderEnvironmentVariables(Set.of())
+                .registerManagementEndpointUnderProperties(Set.of())
+                .registerManagementEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
+        var container = createStubGenericContainer();
         var queueConfigurer = createQueueConfigurer();
         var service = createRabbitMQService(config, container, queueConfigurer);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         var managementEndpoint = service.getManagementEndpoint();
@@ -370,25 +424,8 @@ public class RabbitMQDockerServiceTest {
         );
     }
 
-    private GenericContainer<?> createStubContainer() {
-        return mock(GenericContainer.class, RETURNS_DEEP_STUBS);
-    }
-
     private RabbitMQQueueConfigurer createQueueConfigurer() {
         return mock(RabbitMQQueueConfigurer.class, RETURNS_DEEP_STUBS);
-    }
-
-    private void givenContainerAccessible(GenericContainer<?> container) {
-        when(container.getHost()).thenReturn(RABBITMQ_HOST);
-        when(container.getExposedPorts()).thenReturn(List.of(RABBITMQ_LISTENING_PORT));
-        when(container.getMappedPort(RABBITMQ_LISTENING_PORT)).thenReturn(RABBITMQ_MAPPED_PORT);
-    }
-
-    private void givenContainerWithManagementApiAccessible(GenericContainer<?> container) {
-        when(container.getHost()).thenReturn(RABBITMQ_HOST);
-        when(container.getExposedPorts()).thenReturn(List.of(RABBITMQ_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_LISTENING_PORT));
-        when(container.getMappedPort(RABBITMQ_LISTENING_PORT)).thenReturn(RABBITMQ_MAPPED_PORT);
-        when(container.getMappedPort(RABBITMQ_MANAGEMENT_API_LISTENING_PORT)).thenReturn(RABBITMQ_MANAGEMENT_API_MAPPED_PORT);
     }
 
     private void assertQueuesCreated(RabbitMQQueueConfigurer queueConfigurer,

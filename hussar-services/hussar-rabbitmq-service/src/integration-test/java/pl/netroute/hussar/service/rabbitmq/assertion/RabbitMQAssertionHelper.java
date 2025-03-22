@@ -91,8 +91,24 @@ public class RabbitMQAssertionHelper {
         assertRegisteredEntryInConfigRegistry(registeredProperty, endpoint.address(), PropertyConfigurationEntry.class);
     }
 
+    public void assertRegisteredManagementEndpointUnderProperty(@NonNull String registeredProperty) {
+        var endpoint = rabbitMQ
+                .getManagementEndpoint()
+                .orElseThrow(() -> new IllegalStateException("Expected RabbitMQ ManagementAPI"));
+
+        assertRegisteredEntryInConfigRegistry(registeredProperty, endpoint.address(), PropertyConfigurationEntry.class);
+    }
+
     public void assertRegisteredEndpointUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(rabbitMQ);
+
+        assertRegisteredEntryInConfigRegistry(registeredEnvVariable, endpoint.address(), EnvVariableConfigurationEntry.class);
+    }
+
+    public void assertRegisteredManagementEndpointUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
+        var endpoint = rabbitMQ
+                .getManagementEndpoint()
+                .orElseThrow(() -> new IllegalStateException("Expected RabbitMQ ManagementAPI"));
 
         assertRegisteredEntryInConfigRegistry(registeredEnvVariable, endpoint.address(), EnvVariableConfigurationEntry.class);
     }

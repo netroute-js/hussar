@@ -5,12 +5,11 @@ import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.helper.SchemesHelper;
-import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
+import pl.netroute.hussar.core.docker.DockerImageResolver;
 import pl.netroute.hussar.core.docker.GenericContainerFactory;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.docker.DockerImageResolver;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 import java.util.Set;
@@ -22,36 +21,49 @@ import java.util.Set;
 public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer<RabbitMQDockerService> {
     private static final String DOCKER_IMAGE = "rabbitmq";
     private static final String SERVICE = "rabbitmq_service";
+    private static final String SCHEME = "amqp://";
 
     /**
      * Set of queues to be created on RabbitMQ startup.
      */
     @Singular
-    protected final Set<RabbitMQQueue> queues;
+    private final Set<RabbitMQQueue> queues;
 
     /**
      * Set of properties to be used to register RabbitMQ username under.
      */
     @Singular
-    protected final Set<String> registerUsernameUnderProperties;
+    private final Set<String> registerUsernameUnderProperties;
 
     /**
      * Set of environment variables to be used to register RabbitMQ username under.
      */
     @Singular
-    protected final Set<String> registerUsernameUnderEnvironmentVariables;
+    private final Set<String> registerUsernameUnderEnvironmentVariables;
 
     /**
      * Set of properties to be used to register RabbitMQ password under.
      */
     @Singular
-    protected final Set<String> registerPasswordUnderProperties;
+    private final Set<String> registerPasswordUnderProperties;
 
     /**
      * Set of environment variables to be used to register RabbitMQ password under.
      */
     @Singular
-    protected final Set<String> registerPasswordUnderEnvironmentVariables;
+    private final Set<String> registerPasswordUnderEnvironmentVariables;
+
+    /**
+     * Set of properties to be used to register RabbitMQ management endpoint under.
+     */
+    @Singular
+    private final Set<String> registerManagementEndpointUnderProperties;
+
+    /**
+     * Set of environment variables to be used to register RabbitMQ management endpoint under.
+     */
+    @Singular
+    private final Set<String> registerManagementEndpointUnderEnvironmentVariables;
 
     @Override
     public RabbitMQDockerService configure(@NonNull ServiceConfigureContext context) {
@@ -81,7 +93,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
-                .scheme(SchemesHelper.EMPTY_SCHEME)
+                .scheme(SCHEME)
                 .queues(queues)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)
                 .registerUsernameUnderEnvironmentVariables(registerUsernameUnderEnvironmentVariables)
@@ -89,6 +101,8 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
                 .registerPasswordUnderEnvironmentVariables(registerPasswordUnderEnvironmentVariables)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
                 .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)
+                .registerManagementEndpointUnderProperties(registerManagementEndpointUnderProperties)
+                .registerManagementEndpointUnderEnvironmentVariables(registerManagementEndpointUnderEnvironmentVariables)
                 .build();
     }
 }

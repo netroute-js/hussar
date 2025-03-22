@@ -60,6 +60,9 @@ public class RabbitMQDockerServiceIT {
         var endpointProperty = "rabbitmq.url";
         var endpointEnvVariable = "RABBITMQ_URL";
 
+        var managementEndpointProperty = "rabbitmq.management.url";
+        var managementEndpointEnvVariable = "RABBITMQ_MANAGEMENT_URL";
+
         var usernameProperty = "rabbitmq.username";
         var usernameEnvVariable = "RABBITMQ_USERNAME";
 
@@ -78,6 +81,8 @@ public class RabbitMQDockerServiceIT {
                 .registerUsernameUnderEnvironmentVariable(usernameEnvVariable)
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
+                .registerManagementEndpointUnderProperty(managementEndpointProperty)
+                .registerManagementEndpointUnderEnvironmentVariable(managementEndpointEnvVariable)
                 .done()
                 .configure(ServiceConfigureContext.defaultContext());
 
@@ -91,6 +96,8 @@ public class RabbitMQDockerServiceIT {
         rabbitMQAssertion.assertQueuesCreated(List.of(queueA, queueB));
         rabbitMQAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
         rabbitMQAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+        rabbitMQAssertion.assertRegisteredManagementEndpointUnderProperty(managementEndpointProperty);
+        rabbitMQAssertion.assertRegisteredManagementEndpointUnderEnvironmentVariable(managementEndpointEnvVariable);
         rabbitMQAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
         rabbitMQAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
         rabbitMQAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);

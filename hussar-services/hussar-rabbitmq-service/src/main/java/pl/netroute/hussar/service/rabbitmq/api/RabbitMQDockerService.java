@@ -29,8 +29,6 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
     private static final String RABBITMQ_USERNAME = "guest";
     private static final String RABBITMQ_PASSWORD = "password";
 
-    private static final String RABBITMQ_MANAGEMENT_VERSION = "management";
-
     private final RabbitMQCredentialsRegisterer credentialsRegisterer;
     private final RabbitMQQueueConfigurer queueConfigurer;
     private final RabbitMQCredentials credentials;
@@ -63,7 +61,7 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
     public List<Endpoint> getEndpoints() {
         var endpoints = super.getEndpoints();
 
-        if(isManagementApiSupported()) {
+        if(ManagementApiResolver.isSupported(config)) {
             var managementApiPort = container.getMappedPort(MANAGEMENT_API_LISTENING_PORT);
 
             return endpoints
@@ -95,6 +93,8 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
 
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
+        registerManagementEndpointUnderProperties();
+        registerManagementEndpointUnderEnvironmentVariables();
     }
 
     /**
@@ -112,7 +112,7 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
      * @return the management endpoint
      */
     public Optional<Endpoint> getManagementEndpoint() {
-        if(isManagementApiSupported()) {
+        if(ManagementApiResolver.isSupported(config)) {
             var host = container.getHost();
             var port = container.getMappedPort(MANAGEMENT_API_LISTENING_PORT);
             var endpoint = Endpoint.of(SchemesHelper.HTTP_SCHEME, host, port);
@@ -145,7 +145,7 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
         var exposedPorts = new ArrayList<Integer>();
         exposedPorts.add(LISTENING_PORT);
 
-        if(isManagementApiSupported()) {
+        if(ManagementApiResolver.isSupported(config)) {
             exposedPorts.add(MANAGEMENT_API_LISTENING_PORT);
         }
 
@@ -154,24 +154,40 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
 
     private void registerCredentialsUnderProperties() {
         config.getRegisterUsernameUnderProperties()
-                .forEach(usernameProperty -> credentialsRegisterer.registerUsernameUnderProperty(credentials, usernameProperty));
+              .forEach(usernameProperty -> credentialsRegisterer.registerUsernameUnderProperty(credentials, usernameProperty));
 
         config.getRegisterPasswordUnderProperties()
-                .forEach(passwordProperty -> credentialsRegisterer.registerPasswordUnderProperty(credentials, passwordProperty));
+              .forEach(passwordProperty -> credentialsRegisterer.registerPasswordUnderProperty(credentials, passwordProperty));
     }
 
     private void registerCredentialsUnderEnvironmentVariables() {
         config.getRegisterUsernameUnderEnvironmentVariables()
-                .forEach(usernameEnvVariable -> credentialsRegisterer.registerUsernameUnderEnvironmentVariable(credentials, usernameEnvVariable));
+              .forEach(usernameEnvVariable -> credentialsRegisterer.registerUsernameUnderEnvironmentVariable(credentials, usernameEnvVariable));
 
         config.getRegisterPasswordUnderEnvironmentVariables()
-                .forEach(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
+              .forEach(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
     }
 
-    private boolean isManagementApiSupported() {
-        var dockerImage = config.getDockerImage();
+    private void registerManagementEndpointUnderProperties() {
+        if(ManagementApiResolver.isSupported(config)) {
+            var endpoints = getManagementEndpoint()
+                    .map(List::of)
+                    .orElse(List.of());
 
-        return dockerImage.contains(RABBITMQ_MANAGEMENT_VERSION);
+            config.getRegisterManagementEndpointUnderProperties()
+                  .forEach(endpointProperty -> endpointRegisterer.registerUnderProperty(endpoints, endpointProperty));
+        }
+    }
+
+    private void registerManagementEndpointUnderEnvironmentVariables() {
+        if(ManagementApiResolver.isSupported(config)) {
+            var endpoints = getManagementEndpoint()
+                    .map(List::of)
+                    .orElse(List.of());
+
+            config.getRegisterManagementEndpointUnderEnvironmentVariables()
+                  .forEach(endpointEnvVariable -> endpointRegisterer.registerUnderEnvironmentVariable(endpoints, endpointEnvVariable));
+        }
     }
 
 }

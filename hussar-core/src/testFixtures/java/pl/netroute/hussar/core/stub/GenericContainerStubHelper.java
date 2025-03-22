@@ -22,7 +22,7 @@ public class GenericContainerStubHelper {
                                                 @NonNull GenericContainerAccessibility accessibility) {
         when(container.getHost()).thenReturn(accessibility.host());
 
-        if(container instanceof FixedHostPortGenericContainer fixedContainer) {
+        if(container instanceof FixedHostPortGenericContainer<?> fixedContainer) {
             configureFixedHostPortContainer(fixedContainer, accessibility);
         } else {
             configureGenericContainer(container, accessibility);
@@ -38,7 +38,7 @@ public class GenericContainerStubHelper {
         return mock(FixedHostPortGenericContainer.class, RETURNS_DEEP_STUBS);
     }
 
-    private static void configureFixedHostPortContainer(FixedHostPortGenericContainer container,
+    private static void configureFixedHostPortContainer(FixedHostPortGenericContainer<?> container,
                                                         GenericContainerAccessibility accessibility) {
         var exposedPorts = accessibility.exposedPorts();
 
@@ -54,7 +54,7 @@ public class GenericContainerStubHelper {
                 .forEach((containerPort, hostPort) -> when(container.getMappedPort(containerPort)).thenReturn(hostPort));
     }
 
-    @Builder
+    @Builder(toBuilder = true)
     public record GenericContainerAccessibility(@NonNull String host,
                                                 @NonNull @Singular List<Integer> exposedPorts,
                                                 @NonNull @Singular Map<Integer, Integer> mappedPorts) {

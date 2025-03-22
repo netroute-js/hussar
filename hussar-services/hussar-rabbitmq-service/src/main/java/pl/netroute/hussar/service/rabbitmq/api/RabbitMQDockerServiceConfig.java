@@ -30,4 +30,30 @@ class RabbitMQDockerServiceConfig extends BaseDockerServiceConfig {
     @NonNull
     Set<String> registerPasswordUnderEnvironmentVariables;
 
+    @NonNull
+    Set<String> registerManagementEndpointUnderProperties;
+
+    @NonNull
+    Set<String> registerManagementEndpointUnderEnvironmentVariables;
+
+    RabbitMQDockerServiceConfig(@NonNull RabbitMQDockerServiceConfig.RabbitMQDockerServiceConfigBuilder<?, ?> builder) {
+        super(builder);
+
+        if(!ManagementApiResolver.isSupported(this) && isManagementApiConfigurationPresent(builder)) {
+            throw new IllegalArgumentException("Management API is disabled but Management API registration is required");
+        }
+
+        this.queues = builder.queues;
+        this.registerUsernameUnderProperties = builder.registerUsernameUnderProperties;
+        this.registerUsernameUnderEnvironmentVariables = builder.registerUsernameUnderEnvironmentVariables;
+        this.registerPasswordUnderProperties = builder.registerPasswordUnderProperties;
+        this.registerPasswordUnderEnvironmentVariables = builder.registerPasswordUnderEnvironmentVariables;
+        this.registerManagementEndpointUnderProperties = builder.registerManagementEndpointUnderProperties;
+        this.registerManagementEndpointUnderEnvironmentVariables = builder.registerManagementEndpointUnderEnvironmentVariables;
+    }
+
+    private boolean isManagementApiConfigurationPresent(RabbitMQDockerServiceConfig.RabbitMQDockerServiceConfigBuilder<?, ?> builder) {
+        return !builder.registerManagementEndpointUnderProperties.isEmpty() || !builder.registerManagementEndpointUnderEnvironmentVariables.isEmpty();
+    }
+
 }

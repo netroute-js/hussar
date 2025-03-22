@@ -14,6 +14,7 @@ dependencies {
 
 	testImplementation libs.logback.classic
 	testImplementation libs.bundles.testing
+	testImplementation testFixtures(project(":hussar-core"))
 	testImplementation testFixtures(project(":hussar-services:hussar-core-service"))
 
 	integrationTestImplementation libs.rabbitmq.http.client
