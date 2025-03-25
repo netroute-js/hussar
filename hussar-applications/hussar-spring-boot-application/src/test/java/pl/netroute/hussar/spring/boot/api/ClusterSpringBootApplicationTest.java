@@ -14,12 +14,14 @@ import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionH
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.METRICS_URL_ENV_VARIABLE_VALUE;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.SERVER_AUTH_PROPERTY;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.SERVER_AUTH_PROPERTY_VALUE;
+import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationDependencyInjector;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationInitialized;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationMultipleEndpointsExists;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationNotInitialized;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationPingEndpointAccessible;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationPropertiesConfigured;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertApplicationRestarted;
+import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertNoApplicationDependencyInjector;
 import static pl.netroute.hussar.spring.boot.api.SpringBootApplicationAssertionHelper.assertNoApplicationEndpointsExist;
 
 public class ClusterSpringBootApplicationTest {
@@ -52,6 +54,7 @@ public class ClusterSpringBootApplicationTest {
         assertApplicationMultipleEndpointsExists(application, REPLICAS);
         assertApplicationPingEndpointAccessible(application);
         assertApplicationPropertiesConfigured(application);
+        assertApplicationDependencyInjector(application);
     }
 
     @Test
@@ -146,6 +149,14 @@ public class ClusterSpringBootApplicationTest {
         // when
         // then
         assertNoApplicationEndpointsExist(application);
+    }
+
+    @Test
+    public void shouldReturnNoDependencyInjectorWhenApplicationNotStarted() {
+        // given
+        // when
+        // then
+        assertNoApplicationDependencyInjector(application);
     }
 
 }

@@ -75,6 +75,7 @@ public class Hussar {
         cacheEnvironment(testObject, environment);
         injectServices(testObject, environment);
         injectApplication(testObject, environment);
+        injectDependencies(testObject, environment);
     }
 
     private void restartApplication(Application application) {
@@ -93,6 +94,11 @@ public class Hussar {
     private void injectApplication(Object testObject, Environment environment) {
         var applicationInjector = ApplicationInjector.newInstance(environment);
         applicationInjector.inject(testObject);
+    }
+
+    private void injectDependencies(Object testObject, Environment environment) {
+        var dependencyInjector = environment.application().getDependencyInjector();
+        dependencyInjector.injectDependencies(testObject);
     }
 
     /**

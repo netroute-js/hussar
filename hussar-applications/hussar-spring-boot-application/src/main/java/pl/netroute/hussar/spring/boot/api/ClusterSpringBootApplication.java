@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.ApplicationStartupContext;
+import pl.netroute.hussar.core.dependency.api.DependencyInjector;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +50,13 @@ public class ClusterSpringBootApplication implements Application {
     @Override
     public void restart() {
         applications.forEach(Application::restart);
+    }
+
+    @Override
+    public DependencyInjector getDependencyInjector() {
+        return applications
+                .getFirst()
+                .getDependencyInjector();
     }
 
     /**

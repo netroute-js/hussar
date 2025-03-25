@@ -1,7 +1,9 @@
 package pl.netroute.hussar.junit5;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.environment.api.HussarEnvironment;
@@ -18,6 +20,7 @@ import pl.netroute.hussar.service.sql.api.PostgreSQLDockerService;
 import pl.netroute.hussar.service.wiremock.api.WiremockDockerService;
 
 import static pl.netroute.hussar.junit5.assertion.ApplicationAssertionHelper.assertApplicationBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.ApplicationAssertionHelper.assertApplicationDependencyInjected;
 import static pl.netroute.hussar.junit5.assertion.KafkaAssertionHelper.assertKafkaBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.MariaDBAssertionHelper.assertMariaDBBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.MongoDBAssertionHelper.assertMongoDBBootstrapped;
@@ -66,12 +69,16 @@ public class HussarClusterSpringJUnit5IT {
     @HussarService(name = POSTGRESQL_NAME)
     PostgreSQLDockerService postgreSQLService;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Test
     public void shouldStartupEnvironment() {
         // given
         // when
         // then
         assertApplicationBootstrapped(application);
+        assertApplicationDependencyInjected(objectMapper);
         assertWiremockBootstrapped(wiremockService, application);
         assertRedisBootstrapped(redisService, application);
         assertRabbitMQBootstrapped(rabbitMQService, application);

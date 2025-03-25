@@ -29,6 +29,10 @@ public class ApplicationAssertionHelper {
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(METRICS_URL_PROPERTY, METRICS_URL_PROPERTY_VALUE, applicationClient));
     }
 
+    public static void assertApplicationDependencyInjected(Object dependency) {
+        assertThat(dependency).isNotNull();
+    }
+
     private static void assertApplicationInitialized(@NonNull Application application) {
         assertThat(application.isInitialized()).isTrue();
     }

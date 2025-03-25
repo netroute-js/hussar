@@ -6,6 +6,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.ApplicationStartupContext;
+import pl.netroute.hussar.core.dependency.api.DependencyInjector;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
@@ -24,6 +25,7 @@ public class SpringBootApplication implements Application {
 
     private ConfigurableApplicationContext applicationContext;
     private ApplicationStartupContext applicationStartupContext;
+    private SpringBootDependencyInjector dependencyInjector;
 
     private SpringBootApplication(@NonNull Class<?> applicationClass,
                                   @NonNull CommandLineArgumentConfigurer argumentConfigurer) {
@@ -80,6 +82,11 @@ public class SpringBootApplication implements Application {
         );
     }
 
+    @Override
+    public DependencyInjector getDependencyInjector() {
+        return dependencyInjector;
+    }
+
     private Endpoint resolveEndpoint() {
         var port = applicationContext
                 .getEnvironment()
@@ -100,6 +107,7 @@ public class SpringBootApplication implements Application {
     private void doStart(ApplicationStartupContext context) {
         this.applicationStartupContext = context;
         this.applicationContext = initializeApplication(context);
+        this.dependencyInjector = new SpringBootDependencyInjector(applicationContext);
     }
 
     private void doShutdown(ConfigurableApplicationContext applicationContext) {

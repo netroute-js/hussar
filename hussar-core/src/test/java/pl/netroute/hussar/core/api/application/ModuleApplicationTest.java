@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.application.api.ModuleApplication;
+import pl.netroute.hussar.core.dependency.NoOpDependencyInjector;
+import pl.netroute.hussar.core.dependency.api.DependencyInjector;
 
 import java.util.List;
 import java.util.Set;
@@ -71,6 +73,16 @@ public class ModuleApplicationTest {
         assertNoEndpointExists(endpoints);
     }
 
+    @Test
+    public void shouldReturnDependencyInjector() {
+        // given
+        // when
+        var dependencyInjector = application.getDependencyInjector();
+
+        // then
+        assertDependencyInjector(dependencyInjector);
+    }
+
     private void assertInitialized(boolean initialized) {
         assertThat(initialized).isTrue();
     }
@@ -78,4 +90,9 @@ public class ModuleApplicationTest {
     private void assertNoEndpointExists(List<Endpoint> endpoints) {
         assertThat(endpoints).isEmpty();
     }
+
+    private void assertDependencyInjector(DependencyInjector dependencyInjector) {
+        assertThat(dependencyInjector).isInstanceOf(NoOpDependencyInjector.class);
+    }
+
 }

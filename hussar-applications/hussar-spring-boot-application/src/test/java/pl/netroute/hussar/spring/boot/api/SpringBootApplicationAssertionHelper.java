@@ -84,6 +84,19 @@ public class SpringBootApplicationAssertionHelper {
         runOnApplicationClient(application, client -> assertThat(client.getVersion()).isEqualTo(INITIAL_VERSION));
     }
 
+    public static void assertApplicationDependencyInjector(@NonNull Application application) {
+        var dependencyInjector = application.getDependencyInjector();
+
+        assertThat(dependencyInjector).isNotNull();
+        assertThat(dependencyInjector).isInstanceOf(SpringBootDependencyInjector.class);
+    }
+
+    public static void assertNoApplicationDependencyInjector(@NonNull Application application) {
+        var dependencyInjector = application.getDependencyInjector();
+
+        assertThat(dependencyInjector).isNull();
+    }
+
     private static void runOnApplicationClient(Application application, Consumer<SimpleApplicationClient> onApplicationClient) {
         application
                 .getEndpoints()
