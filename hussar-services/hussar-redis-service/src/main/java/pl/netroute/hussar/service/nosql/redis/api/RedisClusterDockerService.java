@@ -162,8 +162,8 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
 
     private void configureClusterPassword(FixedHostPortGenericContainer<?> container,
                                           RedisCredentials credentials) {
-        passwordConfigurer.configure(credentials, container);
         clusterReplicationPasswordConfigurer.configure(credentials, container);
+        passwordConfigurer.configure(credentials, container);
     }
 
     private void disableProtectionMode(FixedHostPortGenericContainer<?> container) {
