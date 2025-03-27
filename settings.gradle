@@ -36,6 +36,7 @@ dependencyResolutionManagement {
             def mockitoVersion = version("mockito", "5.14.2")
             def assertjVersion = version("assertj", "3.22.0")
             def junit5Version = version("junit", "5.8.2")
+            def junit5PlatformVersion = version("junitPlatform", "1.12.1")
 
             library("spring-boot-starter", "org.springframework.boot", "spring-boot-starter").versionRef(springBootVersion)
             library("spring-boot-starter-web", "org.springframework.boot", "spring-boot-starter-web").versionRef(springBootVersion)
@@ -73,6 +74,7 @@ dependencyResolutionManagement {
             library("wiremock", "org.wiremock", "wiremock").versionRef(wiremockVersion)
 
             library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").versionRef(junit5Version)
+            library("junit-platform", "org.junit.platform", "junit-platform-launcher").versionRef(junit5PlatformVersion)
             library("assertj-core", "org.assertj", "assertj-core").versionRef(assertjVersion)
             library("mockito-core", "org.mockito", "mockito-core").versionRef(mockitoVersion)
 

@@ -9,6 +9,7 @@ dependencies {
 	implementation project(":hussar-core")
 	implementation libs.slf4j.api
 	implementation libs.junit.jupiter
+	implementation libs.junit.platform
 
 	testImplementation project(":hussar-applications:hussar-spring-boot-application")
 	testImplementation project(":hussar-services:hussar-core-service")
