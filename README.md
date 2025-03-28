@@ -46,6 +46,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
     - [PostgreSQL](#postgresql-service-component)
     - [MongoDB](#mongodb-service-component)
     - [Redis](#redis-service-component)
+    - [Redis Cluster](#redis-cluster-service-component)
     - [RabbitMQ](#rabbitmq-service-component)
     - [Kafka](#kafka-service-component)
     - [Custom](#custom-service-component)
@@ -67,6 +68,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
   - [PostgreSQL configuration](#postgresql-configuration-example)
   - [MongoDB configuration](#mongodb-configuration-example)
   - [Redis configuration](#redis-configuration-example)
+  - [Redis Cluster configuration](#redis-cluster-configuration-example)
   - [RabbitMQ configuration](#rabbitmq-configuration-example)
   - [Kafka configuration](#kafka-configuration-example)
   - [Setting custom Docker Registry](#setting-custom-docker-registry-example)
@@ -255,7 +257,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|-----------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	  | Sets the name of Hussar WireMock service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	  | Sets the docker image version of WireMock.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                           | Sets custom docker registry URL.                                                              | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	  | Dynamically registers WireMock's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	  | Dynamically registers WireMock's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `done`                                     	  | Finishes configuring WireMock's configurer.                                                 	 | N/A                     	 |
@@ -273,7 +274,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar MySQL service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of MySQL.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                           | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers MySQL's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers MySQL's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers MySQL's username under given property(ies).                          | Empty Set.                |
@@ -297,7 +297,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar MariaDB service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of MariaDB.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                             | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers MariaDB's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers MariaDB's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers MariaDB's username under given property(ies).                          | Empty Set.                |
@@ -321,7 +320,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar PostgreSQL service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of PostgreSQL.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                                | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers PostgreSQL's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers PostgreSQL's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers PostgreSQL's username under given property(ies).                          | Empty Set.                |
@@ -345,7 +343,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar MongoDB service.                                      	             | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of MongoDB.                                     	             | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                            | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers MongoDB's endpoint under given property(ies).           	             | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers MongoDB's endpoint under given environment variable(s). 	             | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers MongoDB's username under given property(ies).                         | Empty Set.                |
@@ -368,7 +365,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar Redis service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of Redis.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                           | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers Redis's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers Redis's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers Redis's username under given property(ies).                          | Empty Set.                |
@@ -380,6 +376,31 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > If you want to see a proper example, you can find it under [Redis configuration](#redis-configuration-example) section.
 ---
+> **Redis Cluster** <a id="redis-cluster-service-component"/>
+>
+> Redis is an in-memory data structure store used as a database, cache, and message broker. Known for its high performance and versatility, Redis supports various data structures such as strings, hashes, lists, sets, and more, making it a popular choice for real-time applications.
+>
+> The Hussar's Redis Cluster service is docker based. The image used under the hood is [**redis-cluster**](https://hub.docker.com/r/grokzen/redis-cluster).
+> 
+> The Redis Cluster is made of 3 masters and 3 replicas.
+>
+> The table below shows the most important methods that you can use to configure **Redis Cluster**:
+>
+>| Method                                   	             | Description                                                                    	                 | Default                 	 |
+>|--------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	           | Sets the name of Hussar Redis Cluster service.                                      	            | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	           | Sets the docker image version of Redis Cluster.                                     	            | Latest.                 	 |
+>| `registerEndpointUnderProperty`            	           | Dynamically registers Redis Cluster's endpoint under given property(ies).           	            | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	           | Dynamically registers Redis Cluster's endpoint under given environment variable(s). 	            | Empty Set.              	 |
+>| `registerUsernameUnderProperty`                        | Dynamically registers Redis Cluster's username under given property(ies).                        | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`            | Dynamically registers Redis Cluster's username under given environment variable(s).              | Empty Set.                |
+>| `registerPasswordUnderProperties`                      | Dynamically registers Redis Cluster's password under given property(ies).                        | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`            | Dynamically registers Redis Cluster's password under given environment variable(s).              | Empty Set.                |
+>| `enablePassword`                                       | Enable/Disable password.                                                                         | False.                    |
+>| `done`                                     	           | Finishes configuring Redis Cluster's configurer.                                                 | N/A                     	 |
+>
+> If you want to see a proper example, you can find it under [Redis Cluster configuration](#redis-cluster-configuration-example) section.
+___
 > **RabbitMQ** <a id="rabbitmq-service-component"/>
 >
 > RabbitMQ is a robust message broker that facilitates communication between distributed systems by implementing the Advanced Message Queuing Protocol (AMQP). It is designed for reliability, scalability, and flexibility, making it an essential tool for building scalable and resilient applications.
@@ -392,9 +413,10 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar RabbitMQ service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of RabbitMQ.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                              | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers RabbitMQ's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers RabbitMQ's endpoint under given environment variable(s). 	              | Empty Set.              	 |
+>| `registerManagementEndpointUnderProperty`              | Dynamically registers RabbitMQ's management endpoint under given property(ies).           	   | Empty Set.              	 |
+>| `registerManagementEndpointUnderEnvironmentVariable`   | Dynamically registers RabbitMQ's management endpoint under given environment variable(s). 	   | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers RabbitMQ's username under given property(ies).                          | Empty Set.                |
 >| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers RabbitMQ's username under given environment variable(s).                | Empty Set.                |
 >| `registerPasswordUnderProperties`            | Dynamically registers RabbitMQ's password under given property(ies).                          | Empty Set.                |
@@ -416,7 +438,6 @@ This section provides a detailed overview of all **supported Hussar services** t
 >|----------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------|
 >| `name`                                     	 | Sets the name of Hussar Kafka service.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of Kafka.                                     	              | Latest.                 	 |
->| `dockerRegistryUrl`                          | Sets custom docker registry URL.                                                           | Docker Hub.               |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers Kafka's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers Kafka's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `topic`                                      | Creates topic(s).                                                                          | Empty Set.                |
@@ -497,6 +518,9 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >    
 >    @HussarApplication // it injects the Hussar's application
 >    private Application application;
+>
+>    @Autowired // it's possible to inject Spring Application's beans into the test instance
+>    private ObjectMapper objectMapper;
 >
 >    // you can use application's object method to get the physical endpoint - i.e. EndpointHelper.getAnyEndpointOrFail(application)
 >
@@ -586,6 +610,9 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >
 >    @HussarService // it injects the Hussar's MongoDB service
 >    private MongoDBDockerService mongoDB;
+>
+>    @Autowired // it's possible to inject Spring Application's beans into the test instance
+>    private ObjectMapper objectMapper;
 >
 >    // you can use application's object method to get the physical endpoint - i.e. EndpointHelper.getAnyEndpointOrFail(application)
 >    // you can use WireMock's object method to get the physical endpoint - i.e. EndpointHelper.getAnyEndpointOrFail(wireMock)
@@ -1298,6 +1325,66 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >
 > This is all you need to do to configure Hussar's Redis service. To get more details about this service go to [Redis section](#redis-service-component).
 ---
+> **Redis Cluster configuration** <a id="redis-cluster-configuration-example"/>
+>
+>This section shows how to configure Hussar's Redis Cluster service in your project.
+>
+>To use it, first of all you need to add a Gradle/Maven dependencies to your project.
+>
+>```
+>Gradle
+>implementation pl.netroute:hussar-core-service:${version}
+>implementation pl.netroute:hussar-redis-service:${version}
+>```
+>
+>```
+>Maven
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-core-service</artifactId>
+>    <version>${version}</version>
+></dependency>
+><dependency>
+>    <groupId>pl.netroute</groupId>
+>    <artifactId>hussar-redis-service</artifactId>
+>    <version>${version}</version>
+></dependency>
+>```
+>
+> Once you've got the dependency attached to your project, the next step is to properly configure it:
+>
+>```java
+>public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider { // to provide Hussar's tests environment configuration, you need to implement this interface
+>
+>  @Override
+>  public LocalEnvironmentConfigurer provide() { // to provide Hussar's tests environment, you need to implement this method and provide the setup you wish to have
+>    var application = SpringApplication.newApplication(SimpleSpringApplication.class); // in our example, we want to test SpringBoot application
+>    
+>    var redisClusterService = RedisClusterDockerServiceConfigConfigurer
+>            .newInstance()
+>            .name("redis-cluster-service") // it sets the name of the service. It's optional parameter.
+>            .dockerImageVersion("7.2.5") // it sets the docker image version. It's optional parameter.
+>            .enablePassword(true) // it enables password protection. It's optional parameter.
+>            .registerEndpointUnderProperty("application.redis.cluster.url") // it registers service's URL under following property. It's optional parameter.
+>            .registerEndpointUnderEnvironmentVariable("REDIS_CLUSTER_URL") // it registers service's URL under following environment variable. It's optional parameter.
+>            .registerUsernameUnderProperty("application.redis.cluster.username") // it registers service's username under following property. It's optional parameter.
+>            .registerUsernameUnderEnvironmentVariable("REDIS_CLUSTER_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
+>            .registerPasswordUnderProperty("application.redis.cluster.password") // it registers service's password under following property. It's optional parameter.
+>            .registerPasswordUnderEnvironmentVariable("REDIS_CLUSTER_PASSWORD") // it registers service's password under following environment variable. It's optional parameter.
+>            .done();
+>
+>    return LocalEnvironmentConfigurer
+>            .newInstance()
+>            .withApplication(application) // it adds the SpringBoot application to the environment configuration
+>            .withService(redisClusterService) // it adds Redis Cluster service to the environment configuration
+>            .done();
+>  }
+>
+>}
+>```
+>
+> This is all you need to do to configure Hussar's Redis service. To get more details about this service go to [Redis section](#redis-service-component).
+---
 > **RabbitMQ configuration** <a id="rabbitmq-configuration-example"/>
 >
 >This section shows how to configure Hussar's RabbitMQ service in your project.
@@ -1338,10 +1425,12 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >    var rabbitMQService = RabbitMQDockerServiceConfigurer
 >            .newInstance()
 >            .name("rabbitmq-service") // it sets the name of the service. It's optional parameter.
->            .dockerImageVersion("3.13.6") // it sets the docker image version. It's optional parameter.
+>            .dockerImageVersion("4.0.7-management") // it sets the docker image version. It's optional parameter.
 >            .queue(queue) // it sets the queue that should be created. It's optional parameter.
 >            .registerEndpointUnderProperty("application.rabbitmq.url") // it registers service's URL under following property. It's optional parameter.
 >            .registerEndpointUnderEnvironmentVariable("RABBITMQ_URL") // it registers service's URL under following environment variable. It's optional parameter.
+>            .registerManagementEndpointUnderProperty("application.rabbitmq.management.url") // it registers service's management URL under following property. It's optional parameter.
+>            .registerManagementEndpointUnderEnvironmentVariable("RABBITMQ_MANAGEMENT_URL") // it registers service's management URL under following environment variable. It's optional parameter.
 >            .registerUsernameUnderProperty("application.rabbitmq.username") // it registers service's username under following property. It's optional parameter.
 >            .registerUsernameUnderEnvironmentVariable("RABBITMQ_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.rabbitmq.password") // it registers service's password under following property. It's optional parameter.
