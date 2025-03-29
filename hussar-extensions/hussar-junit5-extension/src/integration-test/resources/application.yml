@@ -12,6 +12,13 @@ application.redis.alternative.username:
 application.redis.password: ${REDIS_PASSWORD}
 application.redis.alternative.password: test-password
 
+application.redis.cluster.url: ${REDIS_CLUSTER_URL}
+application.redis.cluster.alternative.url: redis://hussar.redis.cluster.dev
+application.redis.cluster.username: ${REDIS_CLUSTER_USERNAME}
+application.redis.cluster.alternative.username:
+application.redis.cluster.password: ${REDIS_CLUSTER_PASSWORD}
+application.redis.cluster.alternative.password: test-password
+
 application.rabbitmq.url: ${RABBITMQ_URL}
 application.rabbitmq.alternative.url: hussar.rabbitmq.dev
 application.rabbitmq.username: ${RABBITMQ_USERNAME}

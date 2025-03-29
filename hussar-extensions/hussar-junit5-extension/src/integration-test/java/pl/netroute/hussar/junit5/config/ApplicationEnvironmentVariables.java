@@ -13,6 +13,10 @@ public class ApplicationEnvironmentVariables {
     public static final String REDIS_USERNAME_ENV_VARIABLE = "REDIS_USERNAME";
     public static final String REDIS_PASSWORD_ENV_VARIABLE = "REDIS_PASSWORD";
 
+    public static final String REDIS_CLUSTER_URL_ENV_VARIABLE = "REDIS_CLUSTER_URL";
+    public static final String REDIS_CLUSTER_USERNAME_ENV_VARIABLE = "REDIS_CLUSTER_USERNAME";
+    public static final String REDIS_CLUSTER_PASSWORD_ENV_VARIABLE = "REDIS_CLUSTER_PASSWORD";
+
     public static final String RABBITMQ_URL_ENV_VARIABLE = "RABBITMQ_URL";
     public static final String RABBITMQ_USERNAME_ENV_VARIABLE = "RABBITMQ_USERNAME";
     public static final String RABBITMQ_PASSWORD_ENV_VARIABLE = "RABBITMQ_PASSWORD";

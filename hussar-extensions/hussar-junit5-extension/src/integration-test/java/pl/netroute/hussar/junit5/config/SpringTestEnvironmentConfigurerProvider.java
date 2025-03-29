@@ -9,6 +9,7 @@ import pl.netroute.hussar.junit5.factory.MongoDBServiceFactory;
 import pl.netroute.hussar.junit5.factory.MySQLServiceFactory;
 import pl.netroute.hussar.junit5.factory.PostgreSQLServiceFactory;
 import pl.netroute.hussar.junit5.factory.RabbitMQServiceFactory;
+import pl.netroute.hussar.junit5.factory.RedisClusterServiceFactory;
 import pl.netroute.hussar.junit5.factory.RedisServiceFactory;
 import pl.netroute.hussar.junit5.factory.WiremockServiceFactory;
 import pl.netroute.hussar.spring.boot.api.SpringBootApplication;
@@ -26,6 +27,7 @@ public class SpringTestEnvironmentConfigurerProvider implements EnvironmentConfi
 
         var wiremockService = WiremockServiceFactory.create();
         var redisService = RedisServiceFactory.create();
+        var redisClusterService = RedisClusterServiceFactory.create();
         var rabbitMQService = RabbitMQServiceFactory.create();
         var kafkaService = KafkaServiceFactory.create();
         var mongoDBService = MongoDBServiceFactory.create();
@@ -40,6 +42,7 @@ public class SpringTestEnvironmentConfigurerProvider implements EnvironmentConfi
                 .withApplication(application)
                 .withService(wiremockService)
                 .withService(redisService)
+                .withService(redisClusterService)
                 .withService(rabbitMQService)
                 .withService(kafkaService)
                 .withService(mongoDBService)

@@ -20,6 +20,13 @@ public class ApplicationProperties {
     public static final String REDIS_PASSWORD_PROPERTY = "application.redis.password";
     public static final String REDIS_ALTERNATIVE_PASSWORD_PROPERTY = "application.redis.alternative.password";
 
+    public static final String REDIS_CLUSTER_URL_PROPERTY = "application.redis.cluster.url";
+    public static final String REDIS_CLUSTER_ALTERNATIVE_URL_PROPERTY = "application.redis.cluster.alternative.url";
+    public static final String REDIS_CLUSTER_USERNAME_PROPERTY = "application.redis.cluster.username";
+    public static final String REDIS_CLUSTER_ALTERNATIVE_USERNAME_PROPERTY = "application.redis.cluster.alternative.username";
+    public static final String REDIS_CLUSTER_PASSWORD_PROPERTY = "application.redis.cluster.password";
+    public static final String REDIS_CLUSTER_ALTERNATIVE_PASSWORD_PROPERTY = "application.redis.cluster.alternative.password";
+
     public static final String RABBITMQ_URL_PROPERTY = "application.rabbitmq.url";
     public static final String RABBITMQ_ALTERNATIVE_URL_PROPERTY = "application.rabbitmq.alternative.url";
     public static final String RABBITMQ_USERNAME_PROPERTY = "application.rabbitmq.username";

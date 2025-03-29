@@ -27,7 +27,6 @@ public class RedisClusterDockerServiceIT {
         // given
         redisClusterService = RedisClusterDockerServiceConfigurer
                 .newInstance()
-                .enablePassword(true)
                 .done()
                 .configure(ServiceConfigureContext.defaultContext());
 

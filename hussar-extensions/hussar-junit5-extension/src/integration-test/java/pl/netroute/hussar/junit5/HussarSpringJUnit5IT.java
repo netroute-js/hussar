@@ -12,6 +12,7 @@ import pl.netroute.hussar.junit5.api.HussarJUnit5Extension;
 import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
 import pl.netroute.hussar.service.kafka.api.KafkaDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerService;
+import pl.netroute.hussar.service.nosql.redis.api.RedisClusterDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerService;
 import pl.netroute.hussar.service.sql.api.MariaDBDockerService;
@@ -28,6 +29,7 @@ import static pl.netroute.hussar.junit5.assertion.MySQLAssertionHelper.assertMyS
 import static pl.netroute.hussar.junit5.assertion.PostgreSQLAssertionHelper.assertPostgreSQLBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.RabbitMQAssertionHelper.assertRabbitMQBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.RedisAssertionHelper.assertRedisBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.RedisClusterAssertionHelper.assertRedisClusterBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.WiremockAssertionHelper.assertWiremockBootstrapped;
 import static pl.netroute.hussar.junit5.factory.KafkaServiceFactory.KAFKA_NAME;
 import static pl.netroute.hussar.junit5.factory.MariaDBServiceFactory.MARIA_DB_NAME;
@@ -35,6 +37,7 @@ import static pl.netroute.hussar.junit5.factory.MongoDBServiceFactory.MONGODB_NA
 import static pl.netroute.hussar.junit5.factory.MySQLServiceFactory.MYSQL_NAME;
 import static pl.netroute.hussar.junit5.factory.PostgreSQLServiceFactory.POSTGRESQL_NAME;
 import static pl.netroute.hussar.junit5.factory.RabbitMQServiceFactory.RABBITMQ_NAME;
+import static pl.netroute.hussar.junit5.factory.RedisClusterServiceFactory.REDIS_CLUSTER_NAME;
 import static pl.netroute.hussar.junit5.factory.RedisServiceFactory.REDIS_NAME;
 import static pl.netroute.hussar.junit5.factory.WiremockServiceFactory.WIREMOCK_NAME;
 
@@ -50,6 +53,9 @@ public class HussarSpringJUnit5IT {
 
     @HussarService(name = REDIS_NAME)
     RedisDockerService redisService;
+
+    @HussarService(name = REDIS_CLUSTER_NAME)
+    RedisClusterDockerService redisClusterService;
 
     @HussarService(name = RABBITMQ_NAME)
     RabbitMQDockerService rabbitMQService;
@@ -81,6 +87,7 @@ public class HussarSpringJUnit5IT {
         assertApplicationDependencyInjected(objectMapper);
         assertWiremockBootstrapped(wiremockService, application);
         assertRedisBootstrapped(redisService, application);
+        assertRedisClusterBootstrapped(redisClusterService, application);
         assertRabbitMQBootstrapped(rabbitMQService, application);
         assertKafkaBootstrapped(kafkaService, application);
         assertMongoDBBootstrapped(mongoDBService, application);

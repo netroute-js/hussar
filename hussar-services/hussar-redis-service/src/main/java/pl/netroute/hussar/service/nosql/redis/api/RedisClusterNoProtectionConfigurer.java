@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
 
@@ -12,11 +12,11 @@ import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
 @InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class RedisClusterNoProtectionConfigurer {
-    private static final String DISABLE_PROTECTION_MODE_COMMAND = "redis-cli -h %s -p %d CONFIG SET protection-mode no";
+    private static final String DISABLE_PROTECTION_MODE_COMMAND = "redis-cli -h %s -p %d CONFIG SET protected-mode no";
 
     private final DockerCommandLineRunner commandLineRunner;
 
-    void configure(@NonNull GenericContainer<?> container) {
+    void configure(@NonNull FixedHostPortGenericContainer<?> container) {
         var host = container.getHost();
 
         container
@@ -26,7 +26,7 @@ class RedisClusterNoProtectionConfigurer {
 
     private void disableClusterInstanceProtectionMode(String host,
                                                       int port,
-                                                      GenericContainer<?> container) {
+                                                      FixedHostPortGenericContainer<?> container) {
         log.info("Disabling Redis[{}:{}] protection mode", host, port);
 
         var command = DISABLE_PROTECTION_MODE_COMMAND.formatted(host, port);

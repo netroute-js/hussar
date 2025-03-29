@@ -18,7 +18,7 @@ public class RedisClusterNoProtectionConfigurerTest {
     private static final int REDIS_FIRST_REPLICA_PORT = 7000;
     private static final int REDIS_SECOND_REPLICA_PORT = 7001;
 
-    private static final String DISABLE_PROTECTION_MODE_COMMAND = "redis-cli -h %s -p %d CONFIG SET protection-mode no";
+    private static final String DISABLE_PROTECTION_MODE_COMMAND = "redis-cli -h %s -p %d CONFIG SET protected-mode no";
 
     private GenericContainerAccessibility containerAccessibility;
     private DockerCommandLineRunner commandLineRunner;
