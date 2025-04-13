@@ -5,35 +5,19 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.api.InternalUseOnly;
-import pl.netroute.hussar.core.application.api.Application;
-import pl.netroute.hussar.core.application.ApplicationStartupContext;
-import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
-import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.environment.EnvironmentStartupContext;
 import pl.netroute.hussar.core.environment.api.Environment;
+import pl.netroute.hussar.core.environment.EnvironmentConfigurerContext;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.api.ServiceRegistry;
-import pl.netroute.hussar.core.helper.CollectionHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Slf4j
 @InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class EnvironmentOrchestrator {
-
-    @NonNull
-    private final ServiceStarter serviceStarter;
-
-    @NonNull
-    private final ServiceStopper serviceStopper;
-
     private final LockedAction lockedAction = new LockedAction();
     private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments = new ConcurrentHashMap<>();
 
@@ -49,7 +33,7 @@ class EnvironmentOrchestrator {
         lockedAction.exclusiveAction(() -> {
             initializedEnvironments
                     .values()
-                    .forEach(this::shutdownEnvironment);
+                    .forEach(Environment::shutdown);
 
             initializedEnvironments.clear();
         });
@@ -60,61 +44,11 @@ class EnvironmentOrchestrator {
 
         var environment = provider
                 .provide()
-                .configure();
+                .configure(EnvironmentConfigurerContext.defaultContext());
 
-        var serviceRegistry = environment.serviceRegistry();
-        var application = environment.application();
-
-        startServices(serviceRegistry);
-        startApplication(application, environment);
+        environment.start(EnvironmentStartupContext.defaultContext());
 
         return environment;
-    }
-
-    private void shutdownEnvironment(Environment setup) {
-        var services = setup.serviceRegistry();
-        var application = setup.application();
-
-        shutdownApplication(application);
-        shutdownServices(services);
-    }
-
-    private void startServices(ServiceRegistry serviceRegistry) {
-        serviceStarter.start(serviceRegistry);
-    }
-
-    private void shutdownServices(ServiceRegistry serviceRegistry) {
-        serviceStopper.stop(serviceRegistry);
-    }
-
-    private void startApplication(Application application, Environment environment) {
-        var externalConfigurations = extractExternalConfiguration(environment);
-        var startupContext = new ApplicationStartupContext(externalConfigurations);
-
-        log.info("Starting application {}. Configuration {}", application.getClass().getCanonicalName(), startupContext.externalConfigurations());
-        application.start(startupContext);
-    }
-
-    private Set<ConfigurationEntry> extractExternalConfiguration(Environment environment) {
-        var staticConfigurations = environment
-                .configurationRegistry()
-                .getEntries();
-
-        var servicesConfigurations = environment
-                .serviceRegistry()
-                .getEntries()
-                .stream()
-                .map(Service::getConfigurationRegistry)
-                .filter(Objects::nonNull)
-                .map(ConfigurationRegistry::getEntries)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toUnmodifiableSet());
-
-        return CollectionHelper.mergeSets(staticConfigurations, servicesConfigurations);
-    }
-
-    private void shutdownApplication(Application application) {
-        application.shutdown();
     }
 
 }

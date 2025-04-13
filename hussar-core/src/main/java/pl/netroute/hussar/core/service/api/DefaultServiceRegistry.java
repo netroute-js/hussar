@@ -1,5 +1,6 @@
 package pl.netroute.hussar.core.service.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import pl.netroute.hussar.core.helper.StringHelper;
 
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 /**
  * An actual implementation of {@link ServiceRegistry}.
  */
+@EqualsAndHashCode
 public class DefaultServiceRegistry implements ServiceRegistry {
 
     @NonNull

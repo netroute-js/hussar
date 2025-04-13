@@ -7,9 +7,13 @@ import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.api.DockerRegistry;
+import pl.netroute.hussar.core.environment.EnvironmentConfigurerContext;
+import pl.netroute.hussar.core.environment.LocalEnvironment;
+import pl.netroute.hussar.core.network.ProxyNetworkOperator;
+import pl.netroute.hussar.core.network.api.NetworkOperator;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.ServiceConfigurer;
 
 import java.util.Map;
@@ -43,22 +47,25 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
     private final Map<String, String> environmentVariables;
 
     @Override
-    public Environment configure() {
-        var configuredServices = configureServices();
+    public Environment configure(@NonNull EnvironmentConfigurerContext context) {
+        var networkOperator = ProxyNetworkOperator.newInstance();
+        var configuredServices = configureServices(networkOperator);
         var serviceRegistry = DefaultServiceRegistry.of(configuredServices);
 
         var configurations = mergeConfigurations();
         var configurationRegistry = new DefaultConfigurationRegistry(configurations);
 
-        return new DefaultEnvironment(
+        return new LocalEnvironment(
                 application,
                 configurationRegistry,
-                serviceRegistry
+                serviceRegistry,
+                networkOperator
         );
     }
 
-    private Set<Service> configureServices() {
-        var context = new ServiceConfigureContext(dockerRegistry);
+    private Set<Service> configureServices(NetworkOperator networkOperator) {
+        var networkConfigurer = networkOperator.getNetworkConfigurer();
+        var context = new ServiceConfigureContext(dockerRegistry, networkConfigurer);
 
         return services
                 .stream()

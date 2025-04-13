@@ -7,7 +7,6 @@ import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * The main Hussar facade responsible for environment lifecycle management.
@@ -64,7 +63,7 @@ public class Hussar {
     }
 
     private void executeBeforeTest(Method testMethod, Environment environment) {
-        var application = environment.application();
+        var application = environment.getApplication();
 
         annotationDetector.detect(testMethod, HussarApplicationRestart.class, annotation -> restartApplication(application));
     }
@@ -97,7 +96,7 @@ public class Hussar {
     }
 
     private void injectDependencies(Object testObject, Environment environment) {
-        var dependencyInjector = environment.application().getDependencyInjector();
+        var dependencyInjector = environment.getApplication().getDependencyInjector();
         dependencyInjector.injectDependencies(testObject);
     }
 
@@ -108,16 +107,18 @@ public class Hussar {
      */
     public static Hussar newInstance() {
         var environmentConfigurerResolver = new EnvironmentConfigurerProviderResolver();
-        var environmentOrchestrator = new EnvironmentOrchestrator(
-                new ServiceStarter(ForkJoinPool.commonPool()),
-                new ServiceStopper(ForkJoinPool.commonPool())
-        );
-
+        var environmentOrchestrator = new EnvironmentOrchestrator();
         var environmentRegistry = new EnvironmentRegistry();
         var applicationRestarter = new ApplicationRestarter();
         var annotationDetector = new AnnotationDetector();
 
-        return new Hussar(environmentConfigurerResolver, environmentOrchestrator, environmentRegistry, applicationRestarter, annotationDetector);
+        return new Hussar(
+                environmentConfigurerResolver,
+                environmentOrchestrator,
+                environmentRegistry,
+                applicationRestarter,
+                annotationDetector
+        );
     }
 
 }

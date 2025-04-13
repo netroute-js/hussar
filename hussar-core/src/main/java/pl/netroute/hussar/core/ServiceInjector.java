@@ -83,8 +83,9 @@ class ServiceInjector {
     }
 
     static ServiceInjector newInstance(@NonNull Environment environment) {
-        var serviceRegistry = environment.serviceRegistry();
+        var serviceRegistry = environment.getServiceRegistry();
 
         return new ServiceInjector(serviceRegistry);
     }
+
 }

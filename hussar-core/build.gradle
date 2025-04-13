@@ -9,6 +9,7 @@ description = "Provides core Hussar features"
 dependencies {
 	implementation libs.slf4j.api
 	implementation libs.testcontainers
+	implementation libs.toxiproxy.testcontainers
 
 	testImplementation libs.logback.classic
 	testImplementation libs.bundles.testing

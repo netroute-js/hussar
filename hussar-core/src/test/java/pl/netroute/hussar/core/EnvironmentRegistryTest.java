@@ -2,7 +2,8 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.environment.api.Environment;
-import pl.netroute.hussar.core.test.factory.EnvironmentTestFactory;
+import pl.netroute.hussar.core.test.HussarAwareTest;
+import pl.netroute.hussar.core.test.stub.EnvironmentStub;
 
 import java.util.Map;
 import java.util.Optional;
@@ -15,9 +16,9 @@ public class EnvironmentRegistryTest {
     @Test
     public void shouldRegisterEnvironment() {
         // given
-        var testInstance = new Object();
-        var environment = EnvironmentTestFactory.create();
+        var testInstance = new HussarAwareTest();
         var registry = new EnvironmentRegistry();
+        var environment = EnvironmentStub.defaultStub();
 
         // when
         registry.register(testInstance, environment);
@@ -30,10 +31,8 @@ public class EnvironmentRegistryTest {
     public void shouldSkipRegisteringEnvironmentIfAlreadyPresent() {
         // given
         var testInstance = new Object();
-
-        var environmentA = EnvironmentTestFactory.create();
-        var environmentB = EnvironmentTestFactory.create();
-
+        var environmentA = EnvironmentStub.defaultStub();
+        var environmentB = EnvironmentStub.defaultStub();
         var registry = new EnvironmentRegistry(Map.of(testInstance, environmentA));
 
         // when
@@ -47,7 +46,7 @@ public class EnvironmentRegistryTest {
     public void shouldReturnRegisteredEnvironment() {
         // given
         var testInstance = new Object();
-        var environment = EnvironmentTestFactory.create();
+        var environment = EnvironmentStub.defaultStub();
         var registry = new EnvironmentRegistry(Map.of(testInstance, environment));
 
         // when

@@ -10,6 +10,7 @@ public record Endpoint(@NonNull String scheme,
                        @NonNull String host,
                        int port) {
     private static final String ADDRESS_FORMAT = "%s%s:%d";
+    private static final String HOST_PORT_FORMAT = "%s:%d";
 
     /**
      * Creates new instance of {@link Endpoint}.
@@ -31,6 +32,15 @@ public record Endpoint(@NonNull String scheme,
      */
     public String address() {
         return ADDRESS_FORMAT.formatted(scheme, host, port);
+    }
+
+    /**
+     * Returns formatted address with host and port.
+     *
+     * @return the formatted address.
+     */
+    public String hostPort() {
+        return String.format(HOST_PORT_FORMAT, host, port);
     }
 
     /**

@@ -3,26 +3,21 @@ package pl.netroute.hussar.core.api;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.service.api.DefaultServiceRegistry;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.domain.ServiceTestA;
-import pl.netroute.hussar.core.domain.ServiceTestB;
-import pl.netroute.hussar.core.domain.ServiceTestC;
+import pl.netroute.hussar.core.test.stub.ServiceStubA;
+import pl.netroute.hussar.core.test.stub.ServiceStubB;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DefaultServiceRegistryTest {
-    private static final String FIRST_SERVICE_A_NAME = "first-serviceA-name";
-    private static final String SECOND_SERVICE_A_NAME = "second-serviceA-name";
-
-    private static final String FIRST_SERVICE_B_NAME = "first-serviceB-name";
+    private static final String NO_SERVICE_NAME = null;
 
     @Test
     public void shouldRegisterTypedService() {
         // given
-        var service = new ServiceTestA();
+        var service = ServiceStubA.defaultStub();
         var serviceRegistry = new DefaultServiceRegistry();
 
         // when
@@ -35,21 +30,21 @@ public class DefaultServiceRegistryTest {
     @Test
     public void shouldFailRegisteringDuplicatedTypedService() {
         // given
-        var service = new ServiceTestA();
-        var duplicateService = new ServiceTestA();
+        var service = ServiceStubA.newStub(NO_SERVICE_NAME);
+        var duplicateService = ServiceStubA.newStub(NO_SERVICE_NAME);
         var serviceRegistry = DefaultServiceRegistry.of(service);
 
         // when
         // then
         assertThatThrownBy(() -> serviceRegistry.register(duplicateService))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Could not register typed service - pl.netroute.hussar.core.domain.ServiceTestA. If you want more services of the same type registered then all of them need to be named");
+                .hasMessage("Could not register typed service - pl.netroute.hussar.core.test.stub.ServiceStubA. If you want more services of the same type registered then all of them need to be named");
     }
 
     @Test
     public void shouldRegisterNamedService() {
         // given
-        var service = new ServiceTestA(FIRST_SERVICE_A_NAME);
+        var service = ServiceStubA.defaultStub();
         var serviceRegistry = new DefaultServiceRegistry();
 
         // when
@@ -62,9 +57,9 @@ public class DefaultServiceRegistryTest {
     @Test
     public void shouldRegisterMoreNamedServices() {
         // given
-        var firstServiceA = new ServiceTestA(FIRST_SERVICE_A_NAME);
-        var secondServiceA = new ServiceTestA(SECOND_SERVICE_A_NAME);
-        var serviceB = new ServiceTestB(FIRST_SERVICE_B_NAME);
+        var firstServiceA = ServiceStubA.defaultStub();
+        var secondServiceA = ServiceStubA.defaultStub();
+        var serviceB = ServiceStubB.defaultStub();
 
         var serviceRegistry = new DefaultServiceRegistry();
 
@@ -82,21 +77,22 @@ public class DefaultServiceRegistryTest {
     @Test
     public void shouldFailRegisteringDuplicatedNamedService() {
         // given
-        var service = new ServiceTestA(FIRST_SERVICE_A_NAME);
-        var duplicateService = new ServiceTestA(FIRST_SERVICE_A_NAME);
+        var serviceName = "serviceA";
+        var service = ServiceStubA.newStub(serviceName);
+        var duplicateService = ServiceStubA.newStub(serviceName);
         var serviceRegistry = DefaultServiceRegistry.of(service);
 
         // when
         // then
         assertThatThrownBy(() -> serviceRegistry.register(duplicateService))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Could not register named service - %s. There is already a service registered with that name. Service name must be unique", FIRST_SERVICE_A_NAME);
+                .hasMessage("Could not register named service - %s. There is already a service registered with that name. Service name must be unique", serviceName);
     }
 
     @Test
     public void shouldReturnEmptyWhenNoTypedServiceExists() {
         // given
-        var typedService = ServiceTestC.class;
+        var typedService = ServiceStubA.class;
         var serviceRegistry = new DefaultServiceRegistry();
 
         // when
@@ -110,10 +106,10 @@ public class DefaultServiceRegistryTest {
     public void shouldReturnEmptyWhenNoNamedServiceExists() {
         // given
         var serviceRegistry = new DefaultServiceRegistry();
-        var namedService = "some-name";
+        var serviceName = "serviceA";
 
         // when
-        var foundService = serviceRegistry.findEntryByName(namedService);
+        var foundService = serviceRegistry.findEntryByName(serviceName);
 
         // then
         assertNoServiceFound(foundService);
@@ -122,7 +118,7 @@ public class DefaultServiceRegistryTest {
     @Test
     public void shouldReturnTypedService() {
         // given
-        var typedService = new ServiceTestB();
+        var typedService = ServiceStubB.defaultStub();
         var serviceRegistry = DefaultServiceRegistry.of(typedService);
 
         // when
@@ -135,14 +131,13 @@ public class DefaultServiceRegistryTest {
     @Test
     public void shouldReturnNamedService() {
         // given
-        var namedServiceA = new ServiceTestA(FIRST_SERVICE_A_NAME);
-        var secondNamedServiceA = new ServiceTestA(SECOND_SERVICE_A_NAME);
-        var namedServiceB = new ServiceTestB(FIRST_SERVICE_B_NAME);
-
-        var serviceRegistry = DefaultServiceRegistry.of(Set.of(namedServiceA, secondNamedServiceA, namedServiceB));
+        var namedServiceA = ServiceStubA.defaultStub();
+        var secondNamedServiceA = ServiceStubA.defaultStub();
+        var namedServiceB = ServiceStubB.defaultStub();
+        var serviceRegistry = DefaultServiceRegistry.of(namedServiceA, secondNamedServiceA, namedServiceB);
 
         // when
-        var foundService = serviceRegistry.findEntryByName(SECOND_SERVICE_A_NAME);
+        var foundService = serviceRegistry.findEntryByName(secondNamedServiceA.getName());
 
         // then
         assertNamedServiceFound(foundService, secondNamedServiceA);

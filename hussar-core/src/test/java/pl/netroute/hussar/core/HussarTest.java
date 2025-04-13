@@ -2,95 +2,72 @@ package pl.netroute.hussar.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.application.api.Application;
-import pl.netroute.hussar.core.application.api.HussarApplication;
-import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
-import pl.netroute.hussar.core.domain.ServiceTestA;
-import pl.netroute.hussar.core.domain.ServiceTestB;
-import pl.netroute.hussar.core.domain.StubServiceConfigurer;
-import pl.netroute.hussar.core.domain.TestApplication;
-import pl.netroute.hussar.core.environment.api.Environment;
-import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
-import pl.netroute.hussar.core.environment.api.HussarEnvironment;
-import pl.netroute.hussar.core.environment.api.LocalEnvironmentConfigurer;
-import pl.netroute.hussar.core.service.api.HussarService;
-import pl.netroute.hussar.core.test.factory.EnvironmentTestFactory;
+import pl.netroute.hussar.core.test.HussarAwareTest;
+import pl.netroute.hussar.core.test.PlainTest;
+import pl.netroute.hussar.core.test.TestEnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.test.stub.EnvironmentStub;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
-import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class HussarTest {
-    private EnvironmentConfigurerProviderResolver configurerProviderResolver;
     private EnvironmentOrchestrator environmentOrchestrator;
     private EnvironmentRegistry environmentRegistry;
-    private ApplicationRestarter applicationRestarter;
-    private AnnotationDetector annotationDetector;
     private Hussar hussar;
+    private HussarVerifier verifier;
 
     @BeforeEach
     public void setup() {
-        configurerProviderResolver = mock(EnvironmentConfigurerProviderResolver.class);
+        var configurerProviderResolver = spy(EnvironmentConfigurerProviderResolver.class);
+        var applicationRestarter = spy(ApplicationRestarter.class);
+        var annotationDetector = spy(AnnotationDetector.class);
+
         environmentOrchestrator = mock(EnvironmentOrchestrator.class);
-        environmentRegistry = mock(EnvironmentRegistry.class);
-        applicationRestarter = spy(ApplicationRestarter.class);
-        annotationDetector = spy(AnnotationDetector.class);
+        environmentRegistry = spy(EnvironmentRegistry.class);
 
         hussar = new Hussar(configurerProviderResolver, environmentOrchestrator, environmentRegistry, applicationRestarter, annotationDetector);
+
+        verifier = new HussarVerifier(environmentOrchestrator, environmentRegistry, applicationRestarter);
     }
 
     @Test
     public void shouldInitializeEnvironment() {
         // given
-        var testInstance = new ConfigurerAwareTest();
-        var environmentConfigurerProvider = new TestEnvironmentConfigurerProvider();
-        var environment = EnvironmentTestFactory.create(
-                environmentConfigurerProvider.application,
-                Set.of(environmentConfigurerProvider.serviceA.getService(), environmentConfigurerProvider.serviceB.getService())
-        );
+        var testInstance = new HussarAwareTest();
+        var environment = EnvironmentStub.defaultStub();
 
-        when(configurerProviderResolver.resolve(testInstance)).thenReturn(Optional.of(environmentConfigurerProvider));
         when(environmentOrchestrator.initialize(isA(TestEnvironmentConfigurerProvider.class))).thenReturn(environment);
 
         // when
         hussar.initializeFor(testInstance);
 
         // then
-        assertEnvironmentInitialized(testInstance, environment, environmentConfigurerProvider);
+        verifier.verifyEnvironmentInitialized(testInstance, environment);
     }
 
     @Test
     public void shouldSkipInitializingEnvironmentWhenTestObjectIsNotHussarAware() {
         // given
-        var testInstance = new NoConfigurerAwareTest();
+        var testInstance = new PlainTest();
 
         // when
         hussar.initializeFor(testInstance);
 
         // then
-        assertEnvironmentInitializationSkipped();
+        verifier.verifyEnvironmentInitializationSkipped();
     }
 
     @Test
     public void shouldInterceptTestMethodAndRestartApplication() throws Exception {
         // given
-        var testInstance = new ConfigurerAwareTest();
-        var testMethod = getTestMethod(testInstance, ConfigurerAwareTest.TEST_RESTART_METHOD_NAME);
-        var environmentConfigurerProvider = new TestEnvironmentConfigurerProvider();
-        var environment = EnvironmentTestFactory.create(
-                environmentConfigurerProvider.application,
-                Set.of(environmentConfigurerProvider.serviceA.getService(), environmentConfigurerProvider.serviceB.getService())
-        );
+        var testInstance = new HussarAwareTest();
+        var testMethod = getTestMethod(testInstance, HussarAwareTest.TEST_RESTART_METHOD_NAME);
+        var environment = EnvironmentStub.defaultStub();
 
         when(environmentRegistry.getEntry(testInstance)).thenReturn(Optional.of(environment));
 
@@ -98,20 +75,15 @@ public class HussarTest {
         hussar.interceptTest(testInstance, testMethod);
 
         // then
-        assertMethodScannedForApplicationRestart(testMethod);
-        assertApplicationRestarted(environment);
+        verifier.verifyApplicationRestarted(environment);
     }
 
     @Test
     public void shouldInterceptTestMethodAndSkipRestartingApplication() throws Exception{
         // given
-        var testInstance = new ConfigurerAwareTest();
-        var testMethod = getTestMethod(testInstance, ConfigurerAwareTest.TEST_METHOD_NAME);
-        var environmentConfigurerProvider = new TestEnvironmentConfigurerProvider();
-        var environment = EnvironmentTestFactory.create(
-                environmentConfigurerProvider.application,
-                Set.of(environmentConfigurerProvider.serviceA.getService(), environmentConfigurerProvider.serviceB.getService())
-        );
+        var testInstance = new HussarAwareTest();
+        var testMethod = getTestMethod(testInstance, HussarAwareTest.TEST_METHOD_NAME);
+        var environment = EnvironmentStub.defaultStub();
 
         when(environmentRegistry.getEntry(testInstance)).thenReturn(Optional.of(environment));
 
@@ -119,22 +91,20 @@ public class HussarTest {
         hussar.interceptTest(testInstance, testMethod);
 
         // then
-        assertMethodScannedForApplicationRestart(testMethod);
-        assertApplicationNotRestarted();
+        verifier.verifyApplicationNotRestarted();
     }
 
     @Test
     public void shouldSilentlySkipInterceptingTestMethodWhenTestObjectIsNotHussarAware() throws Exception {
         // given
-        var testInstance = new NoConfigurerAwareTest();
-        var testMethod = getTestMethod(testInstance, NoConfigurerAwareTest.TEST_METHOD_NAME);
+        var testInstance = new PlainTest();
+        var testMethod = getTestMethod(testInstance, PlainTest.TEST_METHOD_NAME);
 
         // when
         hussar.interceptTest(testInstance, testMethod);
 
         // then
-        assertNoMethodScanning();
-        assertApplicationNotRestarted();
+        verifier.verifyApplicationNotRestarted();
     }
 
     @Test
@@ -144,111 +114,11 @@ public class HussarTest {
         hussar.shutdown();
 
         // then
-        assertEnvironmentsShutdown();
-    }
-
-    private void assertEnvironmentInitialized(ConfigurerAwareTest testInstance,
-                                              Environment environment,
-                                              TestEnvironmentConfigurerProvider environmentConfigurerProvider) {
-        verify(environmentOrchestrator).initialize(environmentConfigurerProvider);
-        verify(environmentRegistry).register(testInstance, environment);
-
-        assertThat(testInstance.application).isEqualTo(environmentConfigurerProvider.application);
-        assertThat(testInstance.serviceA).isEqualTo(environmentConfigurerProvider.serviceA.getService());
-        assertThat(testInstance.serviceB).isEqualTo(environmentConfigurerProvider.serviceB.getService());
-    }
-
-    private void assertEnvironmentInitializationSkipped() {
-        verify(environmentOrchestrator, never()).initialize(any());
-    }
-
-    private void assertEnvironmentsShutdown() {
-        verify(environmentOrchestrator).shutdown();
-        verify(environmentRegistry).deleteEntries();
-    }
-
-    private void assertMethodScannedForApplicationRestart(Method testMethod) {
-        verify(annotationDetector).detect(eq(testMethod), eq(HussarApplicationRestart.class), any());
-    }
-
-    private void assertApplicationRestarted(Environment environment) {
-        verify(applicationRestarter).restart(environment.application());
-    }
-
-    private void assertApplicationNotRestarted() {
-        verify(applicationRestarter, never()).restart(any());
-    }
-
-    private void assertNoMethodScanning() {
-        verify(annotationDetector, never()).detect(any(), any(), any());
+        verifier.verifyEnvironmentsShutdown();
     }
 
     private Method getTestMethod(Object testInstance, String methodName) throws NoSuchMethodException {
         return testInstance.getClass().getMethod(methodName);
     }
 
-    static class NoConfigurerAwareTest {
-        private static final String TEST_METHOD_NAME = "test";
-
-        @Test
-        public void test() {
-        }
-
-    }
-
-    @HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class)
-    static class ConfigurerAwareTest {
-        private static final String TEST_METHOD_NAME = "test";
-        private static final String TEST_RESTART_METHOD_NAME = "testRestart";
-
-        @HussarApplication
-        Application application;
-
-        @HussarService
-        ServiceTestA serviceA;
-
-        @HussarService
-        ServiceTestB serviceB;
-
-        @Test
-        public void test() {
-        }
-
-        @Test
-        @HussarApplicationRestart
-        public void testRestart() {
-        }
-
-    }
-
-    private static class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
-        private static final String PROPERTY_1 = "some.property";
-        private static final String PROPERTY_VALUE_1 = "some_property_value";
-
-        private static final String ENV_VARIABLE_1 = "SOME_ENV_VARIABLE";
-        private static final String ENV_VARIABLE_VALUE_1 = "some_env_variable_value";
-
-        private final Application application;
-        private final StubServiceConfigurer<ServiceTestA> serviceA;
-        private final StubServiceConfigurer<ServiceTestB> serviceB;
-
-        private TestEnvironmentConfigurerProvider() {
-            this.application = new TestApplication();
-            this.serviceA = new StubServiceConfigurer<>(ServiceTestA.class);
-            this.serviceB = new StubServiceConfigurer<>(ServiceTestB.class);
-        }
-
-        @Override
-        public LocalEnvironmentConfigurer provide() {
-            return LocalEnvironmentConfigurer
-                    .newInstance()
-                    .withProperty(PROPERTY_1, PROPERTY_VALUE_1)
-                    .withEnvironmentVariable(ENV_VARIABLE_1, ENV_VARIABLE_VALUE_1)
-                    .withApplication(application)
-                    .withService(serviceA)
-                    .withService(serviceB)
-                    .done();
-        }
-
-    }
 }

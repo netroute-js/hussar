@@ -34,7 +34,7 @@ class ApplicationInjector {
     }
 
     static ApplicationInjector newInstance(@NonNull Environment environment) {
-        var application = environment.application();
+        var application = environment.getApplication();
 
         return new ApplicationInjector(application);
     }
