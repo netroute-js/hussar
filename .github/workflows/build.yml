@@ -26,4 +26,4 @@ jobs:
         if: always()
         with:
           name: build-reports
-          path: **/build/reports/
+          path: build/reports/
