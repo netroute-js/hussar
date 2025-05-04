@@ -3,6 +3,7 @@ package pl.netroute.hussar.service.sql.api;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
@@ -26,6 +27,7 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
      * @param config - the configuration <C> used by this {@link BaseDatabaseDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link BaseDatabaseDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link BaseDatabaseDockerService}.
+     * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link BaseDatabaseDockerService}.
      * @param credentialsRegisterer - the {@link DatabaseCredentialsRegisterer} used by this {@link BaseDatabaseDockerService}.
      * @param credentials - the {@link SQLDatabaseCredentials} used by this {@link BaseDatabaseDockerService}.
      * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link BaseDatabaseDockerService}.
@@ -34,10 +36,11 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
                               @NonNull C config,
                               @NonNull ConfigurationRegistry configurationRegistry,
                               @NonNull EndpointRegisterer endpointRegisterer,
+                              @NonNull NetworkConfigurer networkConfigurer,
                               @NonNull DatabaseCredentialsRegisterer credentialsRegisterer,
                               @NonNull SQLDatabaseCredentials credentials,
                               @NonNull DatabaseSchemaInitializer schemaInitializer) {
-        super(container, config, configurationRegistry, endpointRegisterer);
+        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.credentialsRegisterer = credentialsRegisterer;
         this.credentials = credentials;

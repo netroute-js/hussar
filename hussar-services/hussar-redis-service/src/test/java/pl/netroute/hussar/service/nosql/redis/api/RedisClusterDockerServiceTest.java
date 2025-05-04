@@ -8,9 +8,11 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
 import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.stub.GenericContainerStubHelper.GenericContainerAccessibility;
+import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,9 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
+import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
+import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_BRIDGE_HOST;
+import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_HOST_GATEWAY;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExtraHostConfigured;
@@ -32,13 +36,14 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertMultipleEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
 import static pl.netroute.hussar.core.service.registerer.EndpointRegisterer.JOIN_DELIMITER;
-import static pl.netroute.hussar.core.stub.DockerHostResolverStubHelper.NON_LOCALHOST;
-import static pl.netroute.hussar.core.stub.DockerHostResolverStubHelper.givenDockerLocalhost;
-import static pl.netroute.hussar.core.stub.DockerHostResolverStubHelper.givenDockerNonLocalhost;
-import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.createStubFixedHostPortGenericContainer;
-import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.givenContainerAccessible;
+import static pl.netroute.hussar.core.stub.helper.DockerHostResolverStubHelper.NON_LOCALHOST;
+import static pl.netroute.hussar.core.stub.helper.DockerHostResolverStubHelper.givenDockerLocalhost;
+import static pl.netroute.hussar.core.stub.helper.DockerHostResolverStubHelper.givenDockerNonLocalhost;
+import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
+import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterAnnounceIpConfigurerAssertionHelper.assertClusterAnnounceIpConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterAnnounceIpConfigurerAssertionHelper.assertNoClusterAnnounceIpConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterAnnounceIpConfigurerStubHelper.givenClusterAnnounceIpConfigurationFails;
@@ -68,8 +73,7 @@ public class RedisClusterDockerServiceTest {
     private static final String REDIS_CLUSTER_SERVICE_NAME = "redis-cluster-service";
     private static final String REDIS_CLUSTER_SERVICE_IMAGE = "grokzen/redis-cluster";
 
-    private GenericContainerAccessibility containerAccessibility;
-
+    private NetworkConfigurer networkConfigurer;
     private RedisClusterAnnounceIpConfigurer clusterAnnounceIpConfigurer;
     private RedisClusterReplicationPasswordConfigurer clusterReplicationPasswordConfigurer;
     private RedisClusterNoProtectionConfigurer clusterNoProtectionConfigurer;
@@ -77,14 +81,17 @@ public class RedisClusterDockerServiceTest {
     private RedisPasswordConfigurer passwordConfigurer;
     private DockerHostResolver dockerHostResolver;
 
+    private GenericContainerAccessibility containerAccessibility;
+
     @BeforeEach
     public void setup() {
-        clusterAnnounceIpConfigurer = mock(RedisClusterAnnounceIpConfigurer.class);
-        clusterReplicationPasswordConfigurer = mock(RedisClusterReplicationPasswordConfigurer.class);
-        clusterNoProtectionConfigurer = mock(RedisClusterNoProtectionConfigurer.class);
-        clusterWaitStrategy = mock(RedisClusterWaitStrategy.class);
-        passwordConfigurer = mock(RedisPasswordConfigurer.class);
-        dockerHostResolver = mock(DockerHostResolver.class);
+        networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
+        clusterAnnounceIpConfigurer = StubHelper.defaultStub(RedisClusterAnnounceIpConfigurer.class);
+        clusterReplicationPasswordConfigurer = StubHelper.defaultStub(RedisClusterReplicationPasswordConfigurer.class);
+        clusterNoProtectionConfigurer = StubHelper.defaultStub(RedisClusterNoProtectionConfigurer.class);
+        clusterWaitStrategy = StubHelper.defaultStub(RedisClusterWaitStrategy.class);
+        passwordConfigurer = StubHelper.defaultStub(RedisPasswordConfigurer.class);
+        dockerHostResolver = StubHelper.defaultStub(DockerHostResolver.class);
 
         containerAccessibility = GenericContainerAccessibility
                 .builder()
@@ -113,18 +120,19 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var endpoints = getRedisClusterNodes();
+
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, endpoints);
         givenDockerLocalhost(dockerHostResolver);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoints = getRedisClusterNodes();
-
         var envVariables = Map.of(
                 REDIS_CLUSTER_IP_ENV, REDIS_CLUSTER_IP,
                 REDIS_CLUSTER_MASTERS_ENV, REDIS_CLUSTER_MASTERS + "",
@@ -133,17 +141,20 @@ public class RedisClusterDockerServiceTest {
 
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_CLUSTER_LISTENING_PORTS.toArray(new Integer[0]));
-        assertNoContainerExtraHostConfigured(container);
         assertContainerWaitStrategyConfigured(container, clusterWaitStrategy);
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
+        assertNoContainerExtraHostConfigured(container, NON_LOCALHOST, REDIS_CLUSTER_LOOP_BACK_IP);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, REDIS_CLUSTER_SERVICE_NAME);
         assertMultipleEndpoints(service, endpoints);
+        assertNetworkControl(service);
         assertNoEntriesRegistered(service);
         assertNoPasswordConfigured(passwordConfigurer);
         assertNoReplicationPasswordConfigured(clusterReplicationPasswordConfigurer);
         assertNoClusterAnnounceIpConfigured(clusterAnnounceIpConfigurer);
         assertClusterNoProtectionConfigured(clusterNoProtectionConfigurer, container);
+        assertNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, endpoints);
     }
 
     @Test
@@ -172,17 +183,19 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var endpoints = getRedisClusterNodes();
+
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, getRedisClusterNodes());
         givenDockerLocalhost(dockerHostResolver);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoints = getRedisClusterNodes();
         var formattedEndpoints = formatEndpoints(endpoints);
         var endpointsPropertyEntry = ConfigurationEntry.property(endpointsProperty, formattedEndpoints);
         var endpointsEnvVariableEntry = ConfigurationEntry.envVariable(endpointsEnvVariable, formattedEndpoints);
@@ -212,17 +225,20 @@ public class RedisClusterDockerServiceTest {
 
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_CLUSTER_LISTENING_PORTS.toArray(new Integer[0]));
-        assertNoContainerExtraHostConfigured(container);
         assertContainerWaitStrategyConfigured(container, clusterWaitStrategy);
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
+        assertNoContainerExtraHostConfigured(container, NON_LOCALHOST, REDIS_CLUSTER_LOOP_BACK_IP);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, REDIS_CLUSTER_SERVICE_NAME);
         assertMultipleEndpoints(service, endpoints);
+        assertNetworkControl(service);
         assertEntriesRegistered(service, registeredEntries);
         assertPasswordConfigured(passwordConfigurer, credentials, container);
         assertReplicationPasswordConfigured(clusterReplicationPasswordConfigurer, credentials, container);
         assertNoClusterAnnounceIpConfigured(clusterAnnounceIpConfigurer);
         assertClusterNoProtectionConfigured(clusterNoProtectionConfigurer, container);
+        assertNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, endpoints);
     }
 
     @Test
@@ -241,18 +257,19 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var endpoints = getRedisClusterNodes();
+
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, endpoints);
         givenDockerNonLocalhost(dockerHostResolver);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoints = getRedisClusterNodes();
-
         var envVariables = Map.of(
                 REDIS_CLUSTER_IP_ENV, REDIS_CLUSTER_IP,
                 REDIS_CLUSTER_MASTERS_ENV, REDIS_CLUSTER_MASTERS + "",
@@ -262,16 +279,19 @@ public class RedisClusterDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_CLUSTER_LISTENING_PORTS.toArray(new Integer[0]));
         assertContainerExtraHostConfigured(container, NON_LOCALHOST, REDIS_CLUSTER_LOOP_BACK_IP);
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerWaitStrategyConfigured(container, clusterWaitStrategy);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, REDIS_CLUSTER_SERVICE_NAME);
         assertMultipleEndpoints(service, endpoints);
+        assertNetworkControl(service);
         assertNoEntriesRegistered(service);
         assertNoPasswordConfigured(passwordConfigurer);
         assertNoReplicationPasswordConfigured(clusterReplicationPasswordConfigurer);
         assertClusterAnnounceIpConfigured(clusterAnnounceIpConfigurer, NON_LOCALHOST, container);
         assertClusterNoProtectionConfigured(clusterNoProtectionConfigurer, container);
+        assertNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, endpoints);
     }
 
     @Test
@@ -291,7 +311,7 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
@@ -322,7 +342,7 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
@@ -352,7 +372,7 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
@@ -382,7 +402,7 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
@@ -412,14 +432,12 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         givenContainerAccessible(container, containerAccessibility);
-        givenDockerLocalhost(dockerHostResolver);
 
         // when
-        service.start(ServiceStartupContext.defaultContext());
         service.shutdown();
 
         // then
@@ -442,7 +460,7 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         // when
@@ -469,7 +487,7 @@ public class RedisClusterDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
         var service = createRedisClusterService(config, container);
 
         // when
@@ -490,6 +508,7 @@ public class RedisClusterDockerServiceTest {
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                networkConfigurer,
                 credentialsRegisterer,
                 passwordConfigurer,
                 clusterReplicationPasswordConfigurer,

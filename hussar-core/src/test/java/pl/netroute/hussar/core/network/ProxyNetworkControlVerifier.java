@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core.network;
 
 import eu.rekawek.toxiproxy.Proxy;
+import eu.rekawek.toxiproxy.model.Toxic;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -13,7 +14,6 @@ import static org.mockito.Mockito.verify;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ProxyNetworkControlVerifier {
-    private static final String BANDWIDTH_FEATURE_NAME = "bandwidth";
     private static final String LATENCY_FEATURE_NAME = "latency";
 
     private final List<Proxy> proxies;
@@ -26,12 +26,12 @@ class ProxyNetworkControlVerifier {
         proxies.forEach(this::verifyProxyDisabled);
     }
 
-    void verifyNetworkBandwidthSet(long bandwidth) {
-        proxies.forEach(proxy -> verifyProxyBandwidthSet(proxy, bandwidth));
-    }
-
     void verifyNetworkDelaySet(@NonNull Duration latency) {
         proxies.forEach(proxy -> verifyProxyDelaySet(proxy, latency));
+    }
+
+    void verifyNetworkReset() {
+        proxies.forEach(this::verifyProxyReset);
     }
 
     private void verifyProxyEnabled(Proxy proxy) {
@@ -50,21 +50,31 @@ class ProxyNetworkControlVerifier {
         }
     }
 
-    private void verifyProxyBandwidthSet(Proxy proxy, long bandwidth) {
-        try {
-            var toxics = proxy.toxics();
-
-            verify(toxics).bandwidth(BANDWIDTH_FEATURE_NAME, ToxicDirection.DOWNSTREAM, bandwidth);
-        } catch (Exception ex) {
-            throw new AssertionError("Should not happen", ex);
-        }
-    }
-
     private void verifyProxyDelaySet(Proxy proxy, Duration delay) {
         try {
             var toxics = proxy.toxics();
 
             verify(toxics).latency(LATENCY_FEATURE_NAME, ToxicDirection.DOWNSTREAM, delay.toMillis());
+        } catch (Exception ex) {
+            throw new AssertionError("Should not happen", ex);
+        }
+    }
+
+    private void verifyProxyReset(Proxy proxy) {
+        verifyProxyEnabled(proxy);
+
+        try {
+            var toxics = proxy.toxics();
+
+            toxics.getAll().forEach(this::resetToxic);
+        } catch (Exception ex) {
+            throw new AssertionError("Should not happen", ex);
+        }
+    }
+
+    private void resetToxic(Toxic toxic) {
+        try {
+            toxic.remove();
         } catch (Exception ex) {
             throw new AssertionError("Should not happen", ex);
         }

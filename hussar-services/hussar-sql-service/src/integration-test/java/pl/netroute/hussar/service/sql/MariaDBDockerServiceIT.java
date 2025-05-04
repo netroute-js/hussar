@@ -1,56 +1,44 @@
 package pl.netroute.hussar.service.sql;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.sql.api.MariaDBDockerService;
 import pl.netroute.hussar.service.sql.api.MariaDBDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class MariaDBDockerServiceIT {
+class MariaDBDockerServiceIT extends BaseServiceIT<MariaDBDockerService> {
     private static final List<String> TABLES = List.of("table_a", "table_b");
 
-    private MariaDBDockerService databaseService;
-
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(databaseService)
-                .ifPresent(MariaDBDockerService::shutdown);
-    }
-
-    @Test
-    public void shouldStartDatabaseService() {
-        // given
+    @Override
+    protected ServiceTestMetadata<MariaDBDockerService, Consumer<MariaDBDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var schemaName = "hussardb";
         var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
-        databaseService = MariaDBDockerServiceConfigurer
-                .newInstance()
-                .databaseSchema(databaseSchema)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var service = MariaDBDockerServiceTestFactory.createMinimallyConfigured(databaseSchema, context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<MariaDBDockerService>) actualService -> {
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserDatabaseAccessible(schemaName);
+            databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
+            databaseAssertion.assertNoEntriesRegistered();
+        };
 
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
-        databaseAssertion.assertNoEntriesRegistered();
+        return ServiceTestMetadata
+                .<MariaDBDockerService, Consumer<MariaDBDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldStartDatabaseServiceWithFullConfiguration() {
-        // given
+    @Override
+    protected ServiceTestMetadata<MariaDBDockerService, Consumer<MariaDBDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "mariadb-instance";
         var dockerVersion = "10.5.23";
 
@@ -67,7 +55,7 @@ public class MariaDBDockerServiceIT {
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new SQLDatabaseSchema(schemaName, scriptsLocation);
 
-        databaseService = MariaDBDockerServiceConfigurer
+        var service = MariaDBDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -79,49 +67,47 @@ public class MariaDBDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<MariaDBDockerService>) actualService -> {
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserDatabaseAccessible(schemaName);
+            databaseAssertion.assertTablesCreated(schemaName, TABLES);
+            databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+            databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesCreated(schemaName, TABLES);
-        databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<MariaDBDockerService, Consumer<MariaDBDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownDatabaseService() {
-        var name = "mariadb-instance";
-        var dockerVersion = "10.5.12";
-
+    @Override
+    protected ServiceTestMetadata<MariaDBDockerService, BiConsumer<MariaDBDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
         var schemaName = "hussardb";
         var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
-        databaseService = MariaDBDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .databaseSchema(databaseSchema)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var service = MariaDBDockerServiceTestFactory.createMinimallyConfigured(databaseSchema, context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (BiConsumer<MariaDBDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        };
 
-        databaseService.shutdown();
-
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        return ServiceTestMetadata
+                .<MariaDBDockerService, BiConsumer<MariaDBDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
+
 }

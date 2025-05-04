@@ -1,32 +1,40 @@
 package pl.netroute.hussar.service.sql.api;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
+import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_BRIDGE_HOST;
+import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_HOST_GATEWAY;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExtraHostConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
+import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertNoSchemaInitialized;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemasInitialized;
 
@@ -46,6 +54,24 @@ public class MySQLDockerServiceTest {
     private static final String MYSQL_PASSWORD = "test";
     private static final SQLDatabaseCredentials MYSQL_CREDENTIALS = new SQLDatabaseCredentials(MYSQL_USERNAME, MYSQL_PASSWORD);
 
+    private NetworkConfigurer networkConfigurer;
+    private DatabaseSchemaInitializer schemaInitializer;
+
+    private GenericContainerAccessibility containerAccessibility;
+
+    @BeforeEach
+    public void setup() {
+        networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
+        schemaInitializer = StubHelper.defaultStub(DatabaseSchemaInitializer.class);
+
+        containerAccessibility = GenericContainerAccessibility
+                .builder()
+                .host(MYSQL_HOST)
+                .exposedPort(MYSQL_LISTENING_PORT)
+                .mappedPort(MYSQL_LISTENING_PORT, MYSQL_MAPPED_PORT)
+                .build();
+    }
+
     @Test
     public void shouldStartMinimalService() {
         // given
@@ -63,28 +89,32 @@ public class MySQLDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
-        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
-        var service = createDatabaseService(config, container, schemaInitializer);
+        var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
 
-        givenContainerAccessible(container);
+        var container = StubHelper.defaultStub(GenericContainer.class);
+        var service = createDatabaseService(config, container);
+
+        givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, MYSQL_SERVICE_NAME, endpoint);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
         var envVariables = Map.of(MYSQL_PASSWORD_ENV, MYSQL_PASSWORD);
 
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MYSQL_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
+        assertNetworkControl(service);
         assertNoSchemaInitialized(schemaInitializer);
         assertNoEntriesRegistered(service);
+        assertNetworkConfigured(networkConfigurer, MYSQL_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -100,7 +130,7 @@ public class MySQLDockerServiceTest {
         var usernameProperty = "mysql.username";
         var usernameEnvVariable = "MYSQL_USERNAME";
 
-        var passwordProperty = "redis.password";
+        var passwordProperty = "mysql.password";
         var passwordEnvVariable = "MYSQL_PASSWORD";
 
         var config = SQLDatabaseDockerServiceConfig
@@ -117,17 +147,18 @@ public class MySQLDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                 .build();
 
-        var container = createStubContainer();
-        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
-        var service = createDatabaseService(config, container, schemaInitializer);
+        var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
 
-        givenContainerAccessible(container);
+        var container = StubHelper.defaultStub(GenericContainer.class);
+        var service = createDatabaseService(config, container);
+
+        givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, MYSQL_SERVICE_NAME, endpoint);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoint = Endpoint.of(MYSQL_SCHEME, MYSQL_HOST, MYSQL_MAPPED_PORT);
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
 
@@ -153,12 +184,15 @@ public class MySQLDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MYSQL_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
+        assertNetworkControl(service);
         assertSchemasInitialized(schemaInitializer, service, MYSQL_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);
+        assertNetworkConfigured(networkConfigurer, MYSQL_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -178,11 +212,10 @@ public class MySQLDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
-        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
-        var service = createDatabaseService(config, container, schemaInitializer);
+        var container = StubHelper.defaultStub(GenericContainer.class);
+        var service = createDatabaseService(config, container);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.shutdown();
@@ -191,19 +224,8 @@ public class MySQLDockerServiceTest {
         assertContainerStopped(container);
     }
 
-    private GenericContainer<?> createStubContainer() {
-        return mock(GenericContainer.class, RETURNS_DEEP_STUBS);
-    }
-
-    private void givenContainerAccessible(GenericContainer<?> container) {
-        when(container.getHost()).thenReturn(MYSQL_HOST);
-        when(container.getExposedPorts()).thenReturn(List.of(MYSQL_LISTENING_PORT));
-        when(container.getMappedPort(MYSQL_LISTENING_PORT)).thenReturn(MYSQL_MAPPED_PORT);
-    }
-
     private MySQLDockerService createDatabaseService(SQLDatabaseDockerServiceConfig config,
-                                                     GenericContainer<?> container,
-                                                     DatabaseSchemaInitializer schemaInitializer) {
+                                                     GenericContainer<?> container) {
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
@@ -213,9 +235,9 @@ public class MySQLDockerServiceTest {
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                networkConfigurer,
                 credentialsRegisterer,
                 schemaInitializer
         );
     }
-
 }

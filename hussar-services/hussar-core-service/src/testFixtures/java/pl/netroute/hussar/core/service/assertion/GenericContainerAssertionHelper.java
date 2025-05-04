@@ -8,7 +8,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -45,6 +44,12 @@ public class GenericContainerAssertionHelper {
         verify(container).withExtraHost(hostName, ipAddress);
     }
 
+    public static void assertNoContainerExtraHostConfigured(@NonNull GenericContainer<?> container,
+                                                            @NonNull String hostName,
+                                                            @NonNull String ipAddress) {
+        verify(container, never()).withExtraHost(hostName, ipAddress);
+    }
+
     public static void assertNoContainerExtraHostConfigured(@NonNull GenericContainer<?> container) {
         verify(container, never()).withExtraHost(anyString(), anyString());
     }
@@ -65,23 +70,11 @@ public class GenericContainerAssertionHelper {
     public static void assertContainerEnvVariablesConfigured(@NonNull GenericContainer<?> container,
                                                              @NonNull Map<String, String> envVariables) {
         envVariables
-                .entrySet()
-                .forEach(envVariable -> verify(container).withEnv(envVariable.getKey(), envVariable.getValue()));
+                .forEach((envVariableName, envVariableValue) -> verify(container).withEnv(envVariableName, envVariableValue));
     }
 
     public static void assertContainerNoEnvVariablesConfigured(@NonNull GenericContainer<?> container) {
         verify(container, never()).withEnv(anyString(), anyString());
-    }
-
-    public static void assertContainerCommandExecuted(@NonNull GenericContainer<?> container,
-                                                      @NonNull String command) {
-        var subCommands = command.split(COMMAND_SPLITTER);
-
-        try {
-            verify(container).execInContainer(subCommands);
-        } catch (IOException | InterruptedException ex) {
-            throw new AssertionError("Should not happen", ex);
-        }
     }
 
 }

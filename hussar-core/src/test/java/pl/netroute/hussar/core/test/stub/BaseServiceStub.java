@@ -1,9 +1,9 @@
 package pl.netroute.hussar.core.test.stub;
 
-import com.github.javafaker.Faker;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import net.datafaker.Faker;
 import org.mockito.Mockito;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @SuperBuilder(builderMethodName = "newInstance", buildMethodName = "done")
 abstract class BaseServiceStub implements Service {
-    private static final Faker FAKER = Faker.instance();
+    private static final Faker FAKER = new Faker();
 
     @Builder.Default
     private final String name = FAKER.app().name();

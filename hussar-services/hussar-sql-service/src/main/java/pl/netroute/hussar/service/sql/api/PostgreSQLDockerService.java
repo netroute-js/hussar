@@ -3,6 +3,7 @@ package pl.netroute.hussar.service.sql.api;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
@@ -25,6 +26,7 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
      * @param config - the {@link SQLDatabaseDockerServiceConfig} used by this {@link PostgreSQLDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link PostgreSQLDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link PostgreSQLDockerService}.
+     * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link BaseDatabaseDockerService}.
      * @param credentialsRegisterer - the {@link DatabaseCredentialsRegisterer} used by this {@link PostgreSQLDockerService}.
      * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link PostgreSQLDockerService}.
      */
@@ -32,9 +34,19 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
                             @NonNull SQLDatabaseDockerServiceConfig config,
                             @NonNull ConfigurationRegistry configurationRegistry,
                             @NonNull EndpointRegisterer endpointRegisterer,
+                            @NonNull NetworkConfigurer networkConfigurer,
                             @NonNull DatabaseCredentialsRegisterer credentialsRegisterer,
                             @NonNull DatabaseSchemaInitializer schemaInitializer) {
-        super(container, config, configurationRegistry, endpointRegisterer, credentialsRegisterer, defaultCredentials(), schemaInitializer);
+        super(
+                container,
+                config,
+                configurationRegistry,
+                endpointRegisterer,
+                networkConfigurer,
+                credentialsRegisterer,
+                defaultCredentials(),
+                schemaInitializer
+        );
     }
 
     @Override

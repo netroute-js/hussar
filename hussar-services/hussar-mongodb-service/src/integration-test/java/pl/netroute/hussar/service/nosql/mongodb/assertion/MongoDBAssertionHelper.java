@@ -37,7 +37,7 @@ public class MongoDBAssertionHelper {
         assertThat(database.getEndpoints()).hasSize(SINGLE);
     }
 
-    public void asserDatabaseAccessible() {
+    public void asserMongoDBAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
 
         try(var client = createClient(endpoint)) {
@@ -45,7 +45,13 @@ public class MongoDBAssertionHelper {
         }
     }
 
-    public void assertDatabaseNotAccessible(@NonNull Endpoint endpoint) {
+    public void assertMongoDBNotAccessible() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
+
+        assertMongoDBNotAccessible(endpoint);
+    }
+
+    public void assertMongoDBNotAccessible(@NonNull Endpoint endpoint) {
         try(var client = createClient(endpoint)) {
             var states = client
                     .getClusterDescription()

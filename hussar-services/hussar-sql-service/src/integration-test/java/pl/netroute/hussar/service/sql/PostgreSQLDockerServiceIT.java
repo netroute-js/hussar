@@ -1,56 +1,44 @@
 package pl.netroute.hussar.service.sql;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.sql.api.PostgreSQLDockerService;
 import pl.netroute.hussar.service.sql.api.PostgreSQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class PostgreSQLDockerServiceIT {
+class PostgreSQLDockerServiceIT extends BaseServiceIT<PostgreSQLDockerService> {
     private static final List<String> TABLES = List.of("table_a", "table_b");
 
-    private PostgreSQLDockerService databaseService;
-
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(databaseService)
-                .ifPresent(PostgreSQLDockerService::shutdown);
-    }
-
-    @Test
-    public void shouldStartDatabaseService() {
-        // given
+    @Override
+    protected ServiceTestMetadata<PostgreSQLDockerService, Consumer<PostgreSQLDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var schemaName = "hussardb";
         var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
-        databaseService = PostgreSQLDockerServiceConfigurer
-                .newInstance()
-                .databaseSchema(databaseSchema)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var service = PostgreSQLDockerServiceTestFactory.createMinimallyConfigured(databaseSchema, context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<PostgreSQLDockerService>) actualService -> {
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserDatabaseAccessible(schemaName);
+            databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
+            databaseAssertion.assertNoEntriesRegistered();
+        };
 
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
-        databaseAssertion.assertNoEntriesRegistered();
+        return ServiceTestMetadata
+                .<PostgreSQLDockerService, Consumer<PostgreSQLDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldStartDatabaseServiceWithFullConfiguration() {
-        // given
+    @Override
+    protected ServiceTestMetadata<PostgreSQLDockerService, Consumer<PostgreSQLDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "postgres-instance";
         var dockerVersion = "16";
 
@@ -67,7 +55,7 @@ public class PostgreSQLDockerServiceIT {
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new SQLDatabaseSchema(schemaName, scriptsLocation);
 
-        databaseService = PostgreSQLDockerServiceConfigurer
+        var service = PostgreSQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -79,49 +67,47 @@ public class PostgreSQLDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<PostgreSQLDockerService>) actualService -> {
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserDatabaseAccessible(schemaName);
+            databaseAssertion.assertTablesCreated(schemaName, TABLES);
+            databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+            databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesCreated(schemaName, TABLES);
-        databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<PostgreSQLDockerService, Consumer<PostgreSQLDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownDatabaseService() {
-        var name = "postgres-instance";
-        var dockerVersion = "16";
-
+    @Override
+    protected ServiceTestMetadata<PostgreSQLDockerService, BiConsumer<PostgreSQLDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
         var schemaName = "hussardb";
         var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
-        databaseService = PostgreSQLDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .databaseSchema(databaseSchema)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var service = PostgreSQLDockerServiceTestFactory.createMinimallyConfigured(databaseSchema, context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (BiConsumer<PostgreSQLDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        };
 
-        databaseService.shutdown();
-
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        return ServiceTestMetadata
+                .<PostgreSQLDockerService, BiConsumer<PostgreSQLDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
+
 }

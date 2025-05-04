@@ -49,6 +49,7 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
 
     public MongoDBDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerRegistry = context.dockerRegistry();
+        var networkConfigurer = context.networkConfigurer();
         var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);
@@ -61,6 +62,7 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                networkConfigurer,
                 credentialsRegisterer
         );
     }

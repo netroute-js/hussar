@@ -1,32 +1,40 @@
 package pl.netroute.hussar.service.sql.api;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
+import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_BRIDGE_HOST;
+import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_HOST_GATEWAY;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExtraHostConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
+import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
+import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertNoSchemaInitialized;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemasInitialized;
 
@@ -44,7 +52,25 @@ public class PostgreSQLDockerServiceTest {
 
     private static final String POSTGRE_SQL_USERNAME = "postgres";
     private static final String POSTGRE_SQL_PASSWORD = "test";
-    private static final SQLDatabaseCredentials MYSQL_CREDENTIALS = new SQLDatabaseCredentials(POSTGRE_SQL_USERNAME, POSTGRE_SQL_PASSWORD);
+    private static final SQLDatabaseCredentials POSTGRE_SQL_CREDENTIALS = new SQLDatabaseCredentials(POSTGRE_SQL_USERNAME, POSTGRE_SQL_PASSWORD);
+
+    private NetworkConfigurer networkConfigurer;
+    private DatabaseSchemaInitializer schemaInitializer;
+
+    private GenericContainerAccessibility containerAccessibility;
+
+    @BeforeEach
+    public void setup() {
+        networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
+        schemaInitializer = StubHelper.defaultStub(DatabaseSchemaInitializer.class);
+
+        containerAccessibility = GenericContainerAccessibility
+                .builder()
+                .host(POSTGRE_SQL_HOST)
+                .exposedPort(POSTGRE_SQL_LISTENING_PORT)
+                .mappedPort(POSTGRE_SQL_LISTENING_PORT, POSTGRE_SQL_MAPPED_PORT)
+                .build();
+    }
 
     @Test
     public void shouldStartMinimalService() {
@@ -63,28 +89,32 @@ public class PostgreSQLDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
-        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
-        var service = createDatabaseService(config, container, schemaInitializer);
+        var endpoint = Endpoint.of(POSTGRE_SQL_SCHEME, POSTGRE_SQL_HOST, POSTGRE_SQL_MAPPED_PORT);
 
-        givenContainerAccessible(container);
+        var container = StubHelper.defaultStub(GenericContainer.class);
+        var service = createDatabaseService(config, container);
+
+        givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, POSTGRE_SQL_SERVICE_NAME, endpoint);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoint = Endpoint.of(POSTGRE_SQL_SCHEME, POSTGRE_SQL_HOST, POSTGRE_SQL_MAPPED_PORT);
         var envVariables = Map.of(POSTGRE_SQL_PASSWORD_ENV, POSTGRE_SQL_PASSWORD);
 
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, POSTGRE_SQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, POSTGRE_SQL_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
+        assertNetworkControl(service);
         assertNoSchemaInitialized(schemaInitializer);
         assertNoEntriesRegistered(service);
+        assertNetworkConfigured(networkConfigurer, POSTGRE_SQL_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -97,11 +127,11 @@ public class PostgreSQLDockerServiceTest {
         var endpointProperty = "endpoint.url";
         var endpointEnvVariable = "ENDPOINT_URL";
 
-        var usernameProperty = "mysql.username";
-        var usernameEnvVariable = "MYSQL_USERNAME";
+        var usernameProperty = "postgres.username";
+        var usernameEnvVariable = "POSTGRES_USERNAME";
 
-        var passwordProperty = "redis.password";
-        var passwordEnvVariable = "MYSQL_PASSWORD";
+        var passwordProperty = "postgres.password";
+        var passwordEnvVariable = "POSTGRES_PASSWORD";
 
         var config = SQLDatabaseDockerServiceConfig
                 .builder()
@@ -117,17 +147,18 @@ public class PostgreSQLDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                 .build();
 
-        var container = createStubContainer();
-        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
-        var service = createDatabaseService(config, container, schemaInitializer);
+        var endpoint = Endpoint.of(POSTGRE_SQL_SCHEME, POSTGRE_SQL_HOST, POSTGRE_SQL_MAPPED_PORT);
 
-        givenContainerAccessible(container);
+        var container = StubHelper.defaultStub(GenericContainer.class);
+        var service = createDatabaseService(config, container);
+
+        givenContainerAccessible(container, containerAccessibility);
+        givenNetworkConfigured(networkConfigurer, POSTGRE_SQL_SERVICE_NAME, endpoint);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var endpoint = Endpoint.of(POSTGRE_SQL_SCHEME, POSTGRE_SQL_HOST, POSTGRE_SQL_MAPPED_PORT);
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
 
@@ -153,12 +184,15 @@ public class PostgreSQLDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, POSTGRE_SQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, POSTGRE_SQL_SERVICE_NAME);
         assertSingleEndpoint(service, endpoint);
-        assertSchemasInitialized(schemaInitializer, service, MYSQL_CREDENTIALS, schemas);
+        assertNetworkControl(service);
+        assertSchemasInitialized(schemaInitializer, service, POSTGRE_SQL_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);
+        assertNetworkConfigured(networkConfigurer, POSTGRE_SQL_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -178,11 +212,10 @@ public class PostgreSQLDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var container = createStubContainer();
-        var schemaInitializer = mock(DatabaseSchemaInitializer.class);
-        var service = createDatabaseService(config, container, schemaInitializer);
+        var container = StubHelper.defaultStub(GenericContainer.class);
+        var service = createDatabaseService(config, container);
 
-        givenContainerAccessible(container);
+        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.shutdown();
@@ -191,19 +224,8 @@ public class PostgreSQLDockerServiceTest {
         assertContainerStopped(container);
     }
 
-    private GenericContainer<?> createStubContainer() {
-        return mock(GenericContainer.class, RETURNS_DEEP_STUBS);
-    }
-
-    private void givenContainerAccessible(GenericContainer<?> container) {
-        when(container.getHost()).thenReturn(POSTGRE_SQL_HOST);
-        when(container.getExposedPorts()).thenReturn(List.of(POSTGRE_SQL_LISTENING_PORT));
-        when(container.getMappedPort(POSTGRE_SQL_LISTENING_PORT)).thenReturn(POSTGRE_SQL_MAPPED_PORT);
-    }
-
     private PostgreSQLDockerService createDatabaseService(SQLDatabaseDockerServiceConfig config,
-                                                          GenericContainer<?> container,
-                                                          DatabaseSchemaInitializer schemaInitializer) {
+                                                          GenericContainer<?> container) {
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
         var credentialsRegisterer = new DatabaseCredentialsRegisterer(configurationRegistry);
@@ -213,9 +235,9 @@ public class PostgreSQLDockerServiceTest {
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                networkConfigurer,
                 credentialsRegisterer,
                 schemaInitializer
         );
     }
-
 }

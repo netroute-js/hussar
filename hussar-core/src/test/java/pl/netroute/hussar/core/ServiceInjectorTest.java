@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.service.api.HussarService;
 import pl.netroute.hussar.core.service.api.ServiceRegistry;
-import pl.netroute.hussar.core.test.stub.Mock;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.core.test.stub.ServiceStubA;
 import pl.netroute.hussar.core.test.stub.ServiceStubB;
 
@@ -24,7 +24,7 @@ public class ServiceInjectorTest {
 
     @BeforeEach
     public void setup() {
-        serviceRegistry = Mock.defaultMock(ServiceRegistry.class);
+        serviceRegistry = StubHelper.defaultStub(ServiceRegistry.class);
 
         serviceInjector = new ServiceInjector(serviceRegistry);
     }

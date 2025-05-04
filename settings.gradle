@@ -30,12 +30,12 @@ dependencyResolutionManagement {
             def fasterXmlVersion = version("fasterXml", "2.17.1")
             def kafkaClientsVersion = version("kafkaClients", "3.7.0")
             def slf4jVersion = version("slf4j", "1.7.36")
-            def logbackVersion = version("logback", "1.2.11")
+            def logbackVersion = version("logback", "1.5.18")
             def testcontainersVersion = version("testcontainers", "1.19.7")
             def wiremockVersion = version("wiremock", "3.3.1")
             def mockitoVersion = version("mockito", "5.14.2")
             def assertjVersion = version("assertj", "3.22.0")
-            def javaFakerVersion = version("faker", "1.0.2")
+            def javaFakerVersion = version("faker", "2.4.2")
             def junit5Version = version("junit", "5.8.2")
             def junit5PlatformVersion = version("junitPlatform", "1.12.1")
 
@@ -79,7 +79,7 @@ dependencyResolutionManagement {
             library("junit-platform", "org.junit.platform", "junit-platform-launcher").versionRef(junit5PlatformVersion)
             library("assertj-core", "org.assertj", "assertj-core").versionRef(assertjVersion)
             library("mockito-core", "org.mockito", "mockito-core").versionRef(mockitoVersion)
-            library("java-faker", "com.github.javafaker", "javafaker").versionRef(javaFakerVersion)
+            library("java-faker", "net.datafaker", "datafaker").versionRef(javaFakerVersion)
 
             bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core', 'java-faker'])
         }

@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core.network;
 
 import eu.rekawek.toxiproxy.Proxy;
+import eu.rekawek.toxiproxy.model.Toxic;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import java.util.List;
 @InternalUseOnly
 @RequiredArgsConstructor
 public class ProxyNetworkControl implements NetworkControl {
-    private static final String BANDWIDTH_FEATURE_NAME = "bandwidth";
     private static final String LATENCY_FEATURE_NAME = "latency";
 
     @NonNull
@@ -31,13 +31,13 @@ public class ProxyNetworkControl implements NetworkControl {
     }
 
     @Override
-    public void bandwidth(long kilobytesPerSecond) {
-        proxies.forEach(proxy -> setProxyBandwidth(proxy, kilobytesPerSecond));
+    public void delay(@NonNull Duration delay) {
+        proxies.forEach(proxy -> setProxyDelay(proxy, delay));
     }
 
     @Override
-    public void delay(@NonNull Duration delay) {
-        proxies.forEach(proxy -> setProxyDelay(proxy, delay));
+    public void reset() {
+        proxies.forEach(this::resetProxy);
     }
 
     private void enableProxy(Proxy proxy) {
@@ -56,23 +56,32 @@ public class ProxyNetworkControl implements NetworkControl {
         }
     }
 
-    private void setProxyBandwidth(Proxy proxy, long kilobytesPerSecond) {
+    private void setProxyDelay(Proxy proxy, Duration delay) {
         try {
-            proxy
-                    .toxics()
-                    .bandwidth(BANDWIDTH_FEATURE_NAME, ToxicDirection.DOWNSTREAM, kilobytesPerSecond);
+            proxy.toxics()
+                 .latency(LATENCY_FEATURE_NAME, ToxicDirection.DOWNSTREAM, delay.toMillis());
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to set bandwidth", ex);
         }
     }
 
-    private void setProxyDelay(Proxy proxy, Duration delay) {
+    private void resetProxy(Proxy proxy) {
+        enableProxy(proxy);
+
         try {
-            proxy
-                    .toxics()
-                    .latency(LATENCY_FEATURE_NAME, ToxicDirection.DOWNSTREAM, delay.toMillis());
+            proxy.toxics()
+                 .getAll()
+                 .forEach(this::resetToxic);
         } catch (IOException ex) {
-            throw new IllegalStateException("Failed to set bandwidth", ex);
+            throw new IllegalStateException("Failed to reset proxy", ex);
+        }
+    }
+
+    private void resetToxic(Toxic toxic) {
+        try {
+            toxic.remove();
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to reset toxic", ex);
         }
     }
 

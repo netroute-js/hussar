@@ -1,8 +1,8 @@
 package pl.netroute.hussar.service.kafka;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.service.kafka.api.KafkaDockerService;
@@ -12,42 +12,86 @@ import pl.netroute.hussar.service.kafka.assertion.KafkaAssertionHelper;
 import pl.netroute.hussar.service.kafka.helper.KafkaSenderFactory;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class KafkaDockerServiceIT {
-    private KafkaDockerService kafkaService;
-
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(kafkaService)
-                .ifPresent(KafkaDockerService::shutdown);
-    }
+public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
 
     @Test
-    public void shouldStartKafkaService() {
+    public void shouldAutoCreateTopic() {
         // given
-        kafkaService = KafkaDockerServiceConfigurer
+        var partitions = 1;
+        var topic = new KafkaTopic("topic", partitions);
+        var message = "a-message";
+        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+
+        service = KafkaDockerServiceConfigurer
                 .newInstance()
+                .topicAutoCreation(true)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
         // when
-        kafkaService.start(ServiceStartupContext.defaultContext());
+        service.start(ServiceStartupContext.defaultContext());
+
+        KafkaSenderFactory
+                .create(service)
+                .send(topic.name(), message);
 
         // then
-        var kafkaAssertion = new KafkaAssertionHelper(kafkaService);
+        var kafkaAssertion = new KafkaAssertionHelper(service);
         kafkaAssertion.assertSingleEndpoint();
         kafkaAssertion.asserKafkaAccessible();
-        kafkaAssertion.assertNoTopicsCreated();
-        kafkaAssertion.assertNoEntriesRegistered();
+        kafkaAssertion.assertTopicsCreated(List.of(topic));
     }
 
+
     @Test
-    public void shouldStartExtendedKafkaService() {
+    public void shouldFailStartingKafkaServiceWhenKraftModeNotSupported() {
         // given
+        var dockerVersion = "3.0.0";
+        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+
+        service = KafkaDockerServiceConfigurer
+                .newInstance()
+                .dockerImageVersion(dockerVersion)
+                .kraftMode(true)
+                .done()
+                .configure(context);
+
+        // when
+        // then
+        assertThatThrownBy(() -> service.start(ServiceStartupContext.defaultContext()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Provided Confluent Platform's version 3.0.0 is not supported in Kraft mode (must be 7.0.0 or above)");
+    }
+
+    @Override
+    protected ServiceTestMetadata<KafkaDockerService, Consumer<KafkaDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
+        var service = KafkaDockerServiceConfigurer
+                .newInstance()
+                .done()
+                .configure(context);
+
+        var assertion = (Consumer<KafkaDockerService>) actualService -> {
+            var kafkaAssertion = new KafkaAssertionHelper(actualService);
+            kafkaAssertion.assertSingleEndpoint();
+            kafkaAssertion.asserKafkaAccessible();
+            kafkaAssertion.assertNoTopicsCreated();
+            kafkaAssertion.assertNoEntriesRegistered();
+        };
+
+        return ServiceTestMetadata
+                .<KafkaDockerService, Consumer<KafkaDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
+    }
+
+    @Override
+    protected ServiceTestMetadata<KafkaDockerService, Consumer<KafkaDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "kafka-instance";
         var dockerVersion = "7.5.4";
 
@@ -58,7 +102,7 @@ public class KafkaDockerServiceIT {
         var endpointProperty = "kafka.url";
         var endpointEnvVariable = "KAFKA_URL";
 
-        kafkaService = KafkaDockerServiceConfigurer
+        var service = KafkaDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .topic(topicA)
@@ -69,131 +113,43 @@ public class KafkaDockerServiceIT {
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        kafkaService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<KafkaDockerService>) actualService -> {
+            var kafkaAssertion = new KafkaAssertionHelper(actualService);
+            kafkaAssertion.assertSingleEndpoint();
+            kafkaAssertion.asserKafkaAccessible();
+            kafkaAssertion.assertTopicsCreated(List.of(topicA, topicB));
+            kafkaAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            kafkaAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+        };
 
-        // then
-        var kafkaAssertion = new KafkaAssertionHelper(kafkaService);
-        kafkaAssertion.assertSingleEndpoint();
-        kafkaAssertion.asserKafkaAccessible();
-        kafkaAssertion.assertTopicsCreated(List.of(topicA, topicB));
-        kafkaAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        kafkaAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+        return ServiceTestMetadata
+                .<KafkaDockerService, Consumer<KafkaDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldAutoCreateTopic() {
-        // given
-        var name = "kafka-instance";
-        var dockerVersion = "7.5.4";
-
-        var partitions = 1;
-        var topic = new KafkaTopic("topic", partitions);
-
-        var endpointProperty = "kafka.url";
-        var endpointEnvVariable = "KAFKA_URL";
-
-        var message = "a-message";
-
-        kafkaService = KafkaDockerServiceConfigurer
+    @Override
+    protected ServiceTestMetadata<KafkaDockerService, BiConsumer<KafkaDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
+        var service = KafkaDockerServiceConfigurer
                 .newInstance()
-                .name(name)
-                .topicAutoCreation(true)
-                .kraftMode(true)
-                .dockerImageVersion(dockerVersion)
-                .registerEndpointUnderProperty(endpointProperty)
-                .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        kafkaService.start(ServiceStartupContext.defaultContext());
+        var assertion = (BiConsumer<KafkaDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        // when
-        KafkaSenderFactory
-                .create(kafkaService)
-                .send(topic.name(), message);
+            var kafkaAssertion = new KafkaAssertionHelper(actualService);
+            kafkaAssertion.assertKafkaNotAccessible(endpoint);
+        };
 
-        // then
-        var kafkaAssertion = new KafkaAssertionHelper(kafkaService);
-        kafkaAssertion.assertSingleEndpoint();
-        kafkaAssertion.asserKafkaAccessible();
-        kafkaAssertion.assertTopicsCreated(List.of(topic));
-        kafkaAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        kafkaAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+        return ServiceTestMetadata
+                .<KafkaDockerService, BiConsumer<KafkaDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldFailAutoCreatingTopicWhenFeatureDisabled() {
-        // given
-        var topic = "topic";
-        var message = "a-message";
-
-        kafkaService = KafkaDockerServiceConfigurer
-                .newInstance()
-                .topicAutoCreation(false)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
-
-        kafkaService.start(ServiceStartupContext.defaultContext());
-
-        // when
-        // then
-        var sender = KafkaSenderFactory.create(kafkaService);
-
-        assertThatThrownBy(() -> sender.send(topic, message))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Could not send record")
-                .hasRootCauseMessage("Topic topic not present in metadata after 5000 ms.");
-
-        var kafkaAssertion = new KafkaAssertionHelper(kafkaService);
-        kafkaAssertion.assertSingleEndpoint();
-        kafkaAssertion.asserKafkaAccessible();
-        kafkaAssertion.assertNoTopicsCreated();
-        kafkaAssertion.assertNoEntriesRegistered();
-    }
-
-    @Test
-    public void shouldFailStartingKafkaServiceWhenKraftModeNotSupported() {
-        // given
-        var dockerVersion = "3.0.0";
-
-        kafkaService = KafkaDockerServiceConfigurer
-                .newInstance()
-                .dockerImageVersion(dockerVersion)
-                .kraftMode(true)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
-
-        // when
-        // then
-        assertThatThrownBy(() -> kafkaService.start(ServiceStartupContext.defaultContext()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Provided Confluent Platform's version 3.0.0 is not supported in Kraft mode (must be 7.0.0 or above)");
-    }
-
-    @Test
-    public void shouldShutdownKafkaService() {
-        var name = "kafka-instance";
-        var dockerVersion = "7.5.4";
-
-        kafkaService = KafkaDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
-
-        // when
-        kafkaService.start(ServiceStartupContext.defaultContext());
-
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(kafkaService);
-
-        kafkaService.shutdown();
-
-        // then
-        var databaseAssertion = new KafkaAssertionHelper(kafkaService);
-        databaseAssertion.asserKafkaNotAccessible(endpoint);
-    }
 }

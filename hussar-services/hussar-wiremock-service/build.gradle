@@ -18,4 +18,5 @@ dependencies {
 	integrationTestImplementation libs.logback.classic
 	integrationTestImplementation libs.okhttp
 	integrationTestImplementation libs.wiremock
+	integrationTestImplementation libs.toxiproxy.testcontainers
 }

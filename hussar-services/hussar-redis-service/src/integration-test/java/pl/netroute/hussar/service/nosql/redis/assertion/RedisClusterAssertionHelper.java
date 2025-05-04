@@ -37,7 +37,7 @@ public class RedisClusterAssertionHelper {
         assertThat(redisCluster.getEndpoints()).hasSize(ENDPOINTS);
     }
 
-    public void asserRedisClusterAccessible() {
+    public void assertRedisClusterAccessible() {
         var endpoints = redisCluster.getEndpoints();
 
         try(var client = createClient(endpoints)) {
@@ -45,6 +45,12 @@ public class RedisClusterAssertionHelper {
 
             assertThat(result).isEqualTo(PING_RESULT);
         }
+    }
+
+    public void assertRedisClusterNotAccessible() {
+        var endpoints = redisCluster.getEndpoints();
+
+        assertRedisClusterNotAccessible(endpoints);
     }
 
     public void assertRedisClusterNotAccessible(@NonNull List<Endpoint> endpoints) {

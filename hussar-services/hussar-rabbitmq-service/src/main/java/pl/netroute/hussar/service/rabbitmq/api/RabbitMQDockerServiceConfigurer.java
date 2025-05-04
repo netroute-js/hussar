@@ -68,6 +68,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
     @Override
     public RabbitMQDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerRegistry = context.dockerRegistry();
+        var networkConfigurer = context.networkConfigurer();
         var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);
@@ -81,6 +82,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                networkConfigurer,
                 credentialsRegisterer,
                 queueConfigurer
         );

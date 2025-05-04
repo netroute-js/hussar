@@ -44,7 +44,13 @@ public class RedisAssertionHelper {
         }
     }
 
-    public void asserRedisNotAccessible(@NonNull Endpoint endpoint) {
+    public void assertRedisNotAccessible() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(redis);
+
+        assertRedisNotAccessible(endpoint);
+    }
+
+    public void assertRedisNotAccessible(@NonNull Endpoint endpoint) {
         try(var client = createClient(endpoint)) {
             throw new AssertionError("Expected JedisConnectionException");
         } catch (JedisConnectionException ex) {

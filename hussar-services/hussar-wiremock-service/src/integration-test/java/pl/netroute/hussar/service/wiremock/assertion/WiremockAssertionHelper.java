@@ -31,7 +31,13 @@ public class WiremockAssertionHelper {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(wiremock);
         var wiremockClient = new WireMock(endpoint.host(), endpoint.port());
 
-        wiremockClient.resetToDefaultMappings();
+        wiremockClient.allStubMappings().getMappings();
+    }
+
+    public void assertWiremockNotAccessible() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(wiremock);
+
+        assertWiremockNotAccessible(endpoint);
     }
 
     public void assertWiremockNotAccessible(@NonNull Endpoint endpoint) {

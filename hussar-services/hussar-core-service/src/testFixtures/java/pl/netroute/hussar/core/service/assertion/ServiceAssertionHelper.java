@@ -29,6 +29,10 @@ public class ServiceAssertionHelper {
         assertThat(service.getEndpoints()).containsExactlyInAnyOrderElementsOf(expectedEndpoints);
     }
 
+    public static void assertNetworkControl(@NonNull Service service) {
+        assertThat(service.getNetworkControl()).isNotNull();
+    }
+
     public static void assertEntriesRegistered(@NonNull Service service,
                                                @NonNull List<ConfigurationEntry> expectedEntries) {
         var registry = service.getConfigurationRegistry();

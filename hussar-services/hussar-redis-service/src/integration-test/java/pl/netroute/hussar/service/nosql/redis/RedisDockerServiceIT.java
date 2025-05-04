@@ -1,66 +1,61 @@
 package pl.netroute.hussar.service.nosql.redis;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisAssertionHelper;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class RedisDockerServiceIT {
-    private RedisDockerService redisService;
-
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(redisService)
-                .ifPresent(RedisDockerService::shutdown);
-    }
+public class RedisDockerServiceIT extends BaseServiceIT<RedisDockerService> {
 
     @Test
-    public void shouldStartRedisService() {
+    public void shouldStartSecuredService() {
         // given
-        redisService = RedisDockerServiceConfigurer
-                .newInstance()
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
 
-        // when
-        redisService.start(ServiceStartupContext.defaultContext());
-
-        // then
-        var redisAssertion = new RedisAssertionHelper(redisService);
-        redisAssertion.assertSingleEndpoint();
-        redisAssertion.asserRedisAccessible();
-        redisAssertion.assertNoEntriesRegistered();
-    }
-
-    @Test
-    public void shouldStartSecuredRedisService() {
-        // given
-        redisService = RedisDockerServiceConfigurer
+        service = RedisDockerServiceConfigurer
                 .newInstance()
                 .enablePassword(true)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
         // when
-        redisService.start(ServiceStartupContext.defaultContext());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var redisAssertion = new RedisAssertionHelper(redisService);
+        var redisAssertion = new RedisAssertionHelper(service);
         redisAssertion.assertSingleEndpoint();
         redisAssertion.asserRedisAccessible();
         redisAssertion.assertNoEntriesRegistered();
     }
 
-    @Test
-    public void shouldStartRedisServiceWithFullConfiguration() {
-        // given
+    @Override
+    protected ServiceTestMetadata<RedisDockerService, Consumer<RedisDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
+        var service = RedisDockerServiceTestFactory.createMinimallyConfigured(context);
+
+        var assertion = (Consumer<RedisDockerService>) actualService -> {
+            var redisAssertion = new RedisAssertionHelper(actualService);
+            redisAssertion.assertSingleEndpoint();
+            redisAssertion.asserRedisAccessible();
+            redisAssertion.assertNoEntriesRegistered();
+        };
+
+        return ServiceTestMetadata
+                .<RedisDockerService, Consumer<RedisDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
+    }
+
+    @Override
+    protected ServiceTestMetadata<RedisDockerService, Consumer<RedisDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "redis-instance";
         var dockerVersion = "6.2";
 
@@ -73,7 +68,7 @@ public class RedisDockerServiceIT {
         var passwordProperty = "redis.password";
         var passwordEnvVariable = "REDIS_PASSWORD";
 
-        redisService = RedisDockerServiceConfigurer
+        var service = RedisDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -85,45 +80,43 @@ public class RedisDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        redisService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<RedisDockerService>) actualService -> {
+            var redisAssertion = new RedisAssertionHelper(actualService);
+            redisAssertion.assertSingleEndpoint();
+            redisAssertion.asserRedisAccessible();
+            redisAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            redisAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+            redisAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            redisAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            redisAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            redisAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var redisAssertion = new RedisAssertionHelper(redisService);
-        redisAssertion.assertSingleEndpoint();
-        redisAssertion.asserRedisAccessible();
-        redisAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        redisAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        redisAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        redisAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        redisAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        redisAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<RedisDockerService, Consumer<RedisDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownRedisService() {
-        var name = "redis-instance";
-        var dockerVersion = "6.2";
+    @Override
+    protected ServiceTestMetadata<RedisDockerService, BiConsumer<RedisDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
+        var service = RedisDockerServiceTestFactory.createMinimallyConfigured(context);
 
-        redisService = RedisDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var assertion = (BiConsumer<RedisDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        // when
-        redisService.start(ServiceStartupContext.defaultContext());
+            var redisAssertion = new RedisAssertionHelper(actualService);
+            redisAssertion.assertRedisNotAccessible(endpoint);
+        };
 
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(redisService);
-
-        redisService.shutdown();
-
-        // then
-        var redisAssertion = new RedisAssertionHelper(redisService);
-        redisAssertion.asserRedisNotAccessible(endpoint);
+        return ServiceTestMetadata
+                .<RedisDockerService, BiConsumer<RedisDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
 }

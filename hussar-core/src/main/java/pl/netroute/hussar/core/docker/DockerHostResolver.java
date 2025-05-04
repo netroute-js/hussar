@@ -9,6 +9,9 @@ import java.util.List;
 @InternalUseOnly
 @NoArgsConstructor
 public class DockerHostResolver {
+    public static final String DOCKER_BRIDGE_HOST = "host.docker.internal";
+    public static final String DOCKER_HOST_GATEWAY = "host-gateway";
+
     private static final List<String> LOCALHOST_ADDRESSES = List.of("localhost", "127.0.0.1");
 
     public boolean isLocalHost() {

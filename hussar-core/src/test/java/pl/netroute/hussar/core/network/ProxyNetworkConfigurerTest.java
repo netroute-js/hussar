@@ -5,29 +5,44 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.testcontainers.containers.ToxiproxyContainer;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.helper.SchemesHelper;
-import pl.netroute.hussar.core.test.stub.Mock;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.mockito.Mockito.when;
 
 public class ProxyNetworkConfigurerTest {
+    private static final int PROXY_INITIAL_PORT = 8666;
+    private static final int PROXY_MAPPED_INITIAL_PORT = 18666;
+
+    private ToxiproxyContainer proxyContainer;
+
     private ProxyNetworkConfigurer configurer;
     private ProxyNetworkConfigurerVerifier verifier;
     
     @BeforeEach
     public void setup() {
-        var proxyClient = Mock.defaultMock(ToxiproxyClient.class);
+        var proxyClient = StubHelper.defaultStub(ToxiproxyClient.class);
 
-        configurer = new ProxyNetworkConfigurer(proxyClient);
+        proxyContainer = StubHelper.defaultStub(ToxiproxyContainer.class);
+
+        configurer = new ProxyNetworkConfigurer(proxyContainer, proxyClient);
         verifier = new ProxyNetworkConfigurerVerifier(proxyClient);
     }
 
     @ParameterizedTest
     @MethodSource("endpointVariants")
-    public void shouldConfigureNetworkForSingleEndpoint(List<Endpoint> endpoints) {
+    public void shouldConfigureNetwork(List<Endpoint> endpoints) {
         // given
         var networkPrefix = "net";
+
+        IntStream
+                .range(0, endpoints.size())
+                .forEach(index -> when(proxyContainer.getMappedPort(PROXY_INITIAL_PORT + index)).thenReturn(PROXY_MAPPED_INITIAL_PORT + index));
 
         // when
         var network = configurer.configure(networkPrefix, endpoints);
@@ -45,7 +60,7 @@ public class ProxyNetworkConfigurerTest {
                 Arguments.of(List.of(localhostEndpoint)),
                 Arguments.of(List.of(devEndpoint)),
                 Arguments.of(List.of(schemeLessEndpoint)),
-                Arguments.of(List.of(localhostEndpoint, devEndpoint, schemeLessEndpoint))
+                Arguments.of(List.of(localhostEndpoint, devEndpoint))
         );
     }
 

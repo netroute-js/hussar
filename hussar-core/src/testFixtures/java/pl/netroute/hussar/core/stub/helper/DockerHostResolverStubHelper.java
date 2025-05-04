@@ -1,4 +1,4 @@
-package pl.netroute.hussar.core.stub;
+package pl.netroute.hussar.core.stub.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

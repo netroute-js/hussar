@@ -12,6 +12,9 @@ public record Endpoint(@NonNull String scheme,
     private static final String ADDRESS_FORMAT = "%s%s:%d";
     private static final String HOST_PORT_FORMAT = "%s:%d";
 
+    private static final String LOCALHOST = "localhost";
+    private static final String LOOP_BACK_IP_ADDRESS = "127.0.0.1";
+
     /**
      * Creates new instance of {@link Endpoint}.
      *
@@ -41,6 +44,10 @@ public record Endpoint(@NonNull String scheme,
      */
     public String hostPort() {
         return String.format(HOST_PORT_FORMAT, host, port);
+    }
+
+    public boolean isLocalhost() {
+        return host.equals(LOCALHOST) || host.equals(LOOP_BACK_IP_ADDRESS);
     }
 
     /**

@@ -47,7 +47,13 @@ public class KafkaAssertionHelper {
         }
     }
 
-    public void asserKafkaNotAccessible(@NonNull Endpoint endpoint) {
+    public void assertKafkaNotAccessible() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(kafka);
+
+        assertKafkaNotAccessible(endpoint);
+    }
+
+    public void assertKafkaNotAccessible(@NonNull Endpoint endpoint) {
         try(var client = createClient(endpoint)) {
             client
                     .describeCluster()

@@ -44,6 +44,12 @@ public class SQLDBAssertionHelper {
         assertThat(executeCommand(command, template)).isEmpty();
     }
 
+    public void assertDatabaseNotAccessible(@NonNull String schema) {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
+
+        assertDatabaseNotAccessible(schema, endpoint);
+    }
+
     public void assertDatabaseNotAccessible(@NonNull String schema, @NonNull Endpoint endpoint) {
         var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
         var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);

@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.test.factory.EndpointTestFactory;
-import pl.netroute.hussar.core.test.stub.Mock;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class LazyNetworkConfigurerTest {
     public void shouldConfigureNetwork(List<Endpoint> endpoints) {
         // given
         var networkPrefix = "net";
-        var delegateConfigurer = Mock.defaultMock(NetworkConfigurer.class);
+        var delegateConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
 
         configurer.setNetworkConfigurer(delegateConfigurer);
 

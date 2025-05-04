@@ -7,6 +7,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.ApplicationStartupContext;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.dependency.api.DependencyInjector;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.core.test.factory.EndpointTestFactory;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class ApplicationStub implements Application {
     private final List<Endpoint> endpoints = List.of(EndpointTestFactory.createHttp());
 
     @Builder.Default
-    private final DependencyInjector dependencyInjector = DependencyInjectorStub.defaultStub();
+    private final DependencyInjector dependencyInjector = StubHelper.defaultStub(DependencyInjector.class);
 
     @Override
     public List<Endpoint> getEndpoints() {

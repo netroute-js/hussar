@@ -3,7 +3,7 @@ package pl.netroute.hussar.core.network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.ToxiproxyContainer;
-import pl.netroute.hussar.core.test.stub.Mock;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 public class ProxyNetworkOperatorTest {
     private ProxyNetworkOperator networkOperator;
@@ -11,7 +11,7 @@ public class ProxyNetworkOperatorTest {
 
     @BeforeEach
     public void setup() {
-        var proxyContainer = Mock.defaultMock(ToxiproxyContainer.class);
+        var proxyContainer = StubHelper.defaultStub(ToxiproxyContainer.class);
 
         networkOperator = new ProxyNetworkOperator(proxyContainer);
         verifier = new ProxyNetworkOperatorVerifier(proxyContainer);

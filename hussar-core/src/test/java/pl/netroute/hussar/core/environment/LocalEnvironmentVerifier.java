@@ -36,7 +36,7 @@ class LocalEnvironmentVerifier {
         verify(networkOperator).start(any());
     }
 
-    void verifyEnvironmentShutdown(Environment environment) {
+    void verifyEnvironmentShutdown(@NonNull Environment environment) {
         var application = environment.getApplication();
         verify(application).shutdown();
 

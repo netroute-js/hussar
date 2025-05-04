@@ -2,16 +2,17 @@ package pl.netroute.hussar.service.nosql.redis.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
-import pl.netroute.hussar.core.stub.GenericContainerStubHelper.GenericContainerAccessibility;
+import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
+import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.createStubFixedHostPortGenericContainer;
-import static pl.netroute.hussar.core.stub.GenericContainerStubHelper.givenContainerAccessible;
+import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
 
 public class RedisClusterNoProtectionConfigurerTest {
     private static final String REDIS_HOST = "localhost";
@@ -40,7 +41,7 @@ public class RedisClusterNoProtectionConfigurerTest {
     @Test
     public void shouldConfigureNoProtectionMode() {
         // given
-        var container = createStubFixedHostPortGenericContainer();
+        var container = StubHelper.defaultStub(FixedHostPortGenericContainer.class);
 
         givenContainerAccessible(container, containerAccessibility);
 
