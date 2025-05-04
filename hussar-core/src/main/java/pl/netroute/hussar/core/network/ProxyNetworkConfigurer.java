@@ -48,6 +48,7 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
                 .stream()
                 .map(this::rewriteUpstreamEndpoint)
                 .map(endpoint -> configureProxy(networkPrefix, endpoint))
+                .peek(this::logConfiguredProxy)
                 .toList();
     }
 
@@ -79,7 +80,7 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
             var proxyEndpoint = Endpoint.of(proxyScheme, PROXY_BIND_IP, proxyPort);
             var proxy = toxiproxyClient.createProxy(proxyName, internalProxyEndpoint.hostPort(), upstreamEndpoint.hostPort());
 
-            return new ProxyMetadata(proxy, proxyEndpoint, upstreamEndpoint);
+            return new ProxyMetadata(proxyPrefix, proxy, proxyEndpoint, upstreamEndpoint);
         } catch (IOException ex) {
             throw new IllegalStateException("Could not create Proxy", ex);
         }
@@ -93,7 +94,12 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
                 .orElse(upstreamEndpoint);
     }
 
-    private record ProxyMetadata(@NonNull Proxy proxy,
+    private void logConfiguredProxy(ProxyMetadata proxy) {
+        log.info("Configuring Network[{} -> {}] for {}", proxy.proxyEndpoint().address(), proxy.upstreamEndpoint().address(), proxy.networkPrefix());
+    }
+
+    private record ProxyMetadata(@NonNull String networkPrefix,
+                                 @NonNull Proxy proxy,
                                  @NonNull Endpoint proxyEndpoint,
                                  @NonNull Endpoint upstreamEndpoint) {
     }

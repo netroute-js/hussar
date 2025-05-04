@@ -26,4 +26,8 @@ jobs:
         if: always()
         with:
           name: build-reports
-          path: build/reports/
+          path: |
+            hussar-core/build/reports/tests/test
+            hussar-applications/**/build/reports/tests/test
+            hussar-extensions/**/build/reports/test
+            hussar-services/**/build/reports/test
