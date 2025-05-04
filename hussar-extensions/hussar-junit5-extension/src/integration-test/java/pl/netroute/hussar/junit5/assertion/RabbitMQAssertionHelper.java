@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.RABBITMQ_ALTERNATIVE_PASSWORD_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.RABBITMQ_ALTERNATIVE_URL_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.RABBITMQ_ALTERNATIVE_USERNAME_PROPERTY;
@@ -40,7 +41,9 @@ public class RabbitMQAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertRabbitMQReachable(managementEndpoint, credentials);
+        assertNetworkControlConfigured(rabbitMQService);
         assertQueuesCreated(managementEndpoint, credentials, List.of(RABBITMQ_EVENTS_QUEUE));
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(RABBITMQ_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(RABBITMQ_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(RABBITMQ_USERNAME_PROPERTY, credentials.username(), applicationClient));

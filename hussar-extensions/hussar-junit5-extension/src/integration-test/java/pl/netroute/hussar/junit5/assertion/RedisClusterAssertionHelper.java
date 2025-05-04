@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_CLUSTER_ALTERNATIVE_PASSWORD_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_CLUSTER_ALTERNATIVE_URL_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_CLUSTER_ALTERNATIVE_USERNAME_PROPERTY;
@@ -42,6 +43,8 @@ public class RedisClusterAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertRedisReachable(endpoints, credentials);
+        assertNetworkControlConfigured(redisClusterService);
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(REDIS_CLUSTER_URL_PROPERTY, squashedEndpoints, applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(REDIS_CLUSTER_ALTERNATIVE_URL_PROPERTY, squashedEndpoints, applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(REDIS_CLUSTER_USERNAME_PROPERTY, credentials.username(), applicationClient));

@@ -9,6 +9,7 @@ import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
 import pl.netroute.hussar.service.sql.api.MariaDBDockerService;
 
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.assertion.SQLDatabaseAssertionHelper.assertDatabaseReachable;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MARIADB_ALTERNATIVE_PASSWORD_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MARIADB_ALTERNATIVE_URL_PROPERTY;
@@ -28,6 +29,8 @@ public class MariaDBAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertDatabaseReachable(endpoint, SCHEMA, credentials);
+        assertNetworkControlConfigured(mariaDBService);
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MARIADB_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MARIADB_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MARIADB_USERNAME_PROPERTY, credentials.username(), applicationClient));

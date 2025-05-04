@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.KAFKA_ALTERNATIVE_URL_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.KAFKA_URL_PROPERTY;
 import static pl.netroute.hussar.junit5.factory.KafkaServiceFactory.KAFKA_EVENTS_TOPIC;
@@ -34,7 +35,9 @@ public class KafkaAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertKafkaReachable(endpoint);
+        assertNetworkControlConfigured(kafkaService);
         assertTopicsCreated(endpoint, List.of(KAFKA_EVENTS_TOPIC));
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(KAFKA_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(KAFKA_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
     }

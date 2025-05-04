@@ -9,6 +9,7 @@ import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
 import pl.netroute.hussar.service.sql.api.MySQLDockerService;
 
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.assertion.SQLDatabaseAssertionHelper.assertDatabaseReachable;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MYSQL_ALTERNATIVE_PASSWORD_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MYSQL_ALTERNATIVE_URL_PROPERTY;
@@ -28,6 +29,8 @@ public class MySQLAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertDatabaseReachable(endpoint, SCHEMA, credentials);
+        assertNetworkControlConfigured(mysqlService);
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MYSQL_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MYSQL_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MYSQL_USERNAME_PROPERTY, credentials.username(), applicationClient));
