@@ -11,6 +11,8 @@ import java.util.List;
 public class DockerHostResolver {
     private static final String NON_LINUX_DOCKER_GATEWAY_HOST = "host.docker.internal";
 
+    private static final String DOCKER_BRIDGE_NETWORK = "bridge";
+
     private static final String OPERATION_SYSTEM_PROPERTY = "os.name";
     private static final String LINUX_OPERATION_SYSTEM = "linux";
 
@@ -34,6 +36,7 @@ public class DockerHostResolver {
                     .instance()
                     .client()
                     .inspectNetworkCmd()
+                    .withNetworkId(DOCKER_BRIDGE_NETWORK)
                     .exec()
                     .getIpam()
                     .getConfig()
