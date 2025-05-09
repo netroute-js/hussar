@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.testcontainers.containers.ToxiproxyContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.docker.DockerHostResolver;
 import pl.netroute.hussar.core.network.api.NetworkOperator;
 
 @Slf4j
@@ -44,8 +45,9 @@ public class ProxyNetworkOperator implements NetworkOperator {
     private void initializeNetworkConfigurer(ToxiproxyContainer toxiproxyContainer) {
         var host = toxiproxyContainer.getHost();
         var port = toxiproxyContainer.getControlPort();
+        var dockerHostResolver = new DockerHostResolver();
         var proxyClient = new ToxiproxyClient(host, port);
-        var proxyNetworkConfigurer = new ProxyNetworkConfigurer(toxiproxyContainer, proxyClient);
+        var proxyNetworkConfigurer = new ProxyNetworkConfigurer(toxiproxyContainer, proxyClient, dockerHostResolver);
 
         networkConfigurer.setNetworkConfigurer(proxyNetworkConfigurer);
     }

@@ -20,18 +20,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 @InternalUseOnly
 public class ProxyNetworkConfigurer implements NetworkConfigurer {
     private static final String PROXY_BIND_IP = "0.0.0.0";
-
     private static final int PROXY_INITIAL_PORT = 8666;
 
     private final ToxiproxyContainer toxiproxyContainer;
     private final ToxiproxyClient toxiproxyClient;
     private final AtomicInteger toxiproxyPortCounter;
+    private final DockerHostResolver dockerHostResolver;
 
     public ProxyNetworkConfigurer(@NonNull ToxiproxyContainer toxiproxyContainer,
-                                  @NonNull ToxiproxyClient toxiproxyClient) {
+                                  @NonNull ToxiproxyClient toxiproxyClient,
+                                  @NonNull DockerHostResolver dockerHostResolver) {
         this.toxiproxyContainer = toxiproxyContainer;
         this.toxiproxyClient = toxiproxyClient;
         this.toxiproxyPortCounter = new AtomicInteger(PROXY_INITIAL_PORT);
+        this.dockerHostResolver = dockerHostResolver;
     }
 
     @Override
@@ -44,9 +46,11 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
     }
 
     private List<ProxyMetadata> configureProxies(String networkPrefix, List<Endpoint> endpoints) {
+        var gatewayAddress = dockerHostResolver.getGatewayHost();
+
         return endpoints
                 .stream()
-                .map(this::rewriteUpstreamEndpoint)
+                .map(endpoint -> rewriteUpstreamEndpoint(gatewayAddress, endpoint))
                 .map(endpoint -> configureProxy(networkPrefix, endpoint))
                 .peek(this::logConfiguredProxy)
                 .toList();
@@ -86,11 +90,11 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
         }
     }
 
-    private Endpoint rewriteUpstreamEndpoint(Endpoint upstreamEndpoint) {
+    private Endpoint rewriteUpstreamEndpoint(String gatewayHost, Endpoint upstreamEndpoint) {
         return Optional
                 .of(upstreamEndpoint)
                 .filter(Endpoint::isLocalhost)
-                .map(endpoint -> Endpoint.of(endpoint.scheme(), DockerHostResolver.DOCKER_BRIDGE_HOST, endpoint.port()))
+                .map(endpoint -> Endpoint.of(endpoint.scheme(), gatewayHost, endpoint.port()))
                 .orElse(upstreamEndpoint);
     }
 

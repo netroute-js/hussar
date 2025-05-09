@@ -19,10 +19,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
-import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_BRIDGE_HOST;
-import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_HOST_GATEWAY;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExtraHostConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNoEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
@@ -100,7 +97,6 @@ public class RedisDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
@@ -172,7 +168,6 @@ public class RedisDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);

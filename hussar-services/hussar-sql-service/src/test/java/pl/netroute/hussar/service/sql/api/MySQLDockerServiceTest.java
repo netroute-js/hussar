@@ -19,11 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
-import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_BRIDGE_HOST;
-import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_HOST_GATEWAY;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
-import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExtraHostConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
@@ -106,7 +103,6 @@ public class MySQLDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MYSQL_SERVICE_NAME);
@@ -184,7 +180,6 @@ public class MySQLDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MYSQL_SERVICE_NAME);

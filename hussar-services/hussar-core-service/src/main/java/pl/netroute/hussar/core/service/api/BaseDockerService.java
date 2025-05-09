@@ -4,12 +4,11 @@ import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.docker.DockerHostResolver;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
@@ -83,7 +82,6 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
     protected void configureContainer(GenericContainer<?> container) {
         configureLogging(container);
         configureWaitStrategy(container);
-        configureExtraHosts(container);
     }
 
     /**
@@ -102,15 +100,6 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
      */
     protected void configureWaitStrategy(GenericContainer<?> container) {
         container.waitingFor(Wait.forListeningPort());
-    }
-
-    /**
-     * Configure extra hosts of {@link GenericContainer}.
-     *
-     * @param container - the {@link GenericContainer} to configure.
-     */
-    protected void configureExtraHosts(GenericContainer<?> container) {
-        container.withExtraHost(DockerHostResolver.DOCKER_BRIDGE_HOST, DockerHostResolver.DOCKER_HOST_GATEWAY);
     }
 
 }

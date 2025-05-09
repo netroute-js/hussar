@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.docker.DockerHostResolver;
 import pl.netroute.hussar.core.network.api.Network;
 
 import java.util.List;
@@ -29,11 +28,12 @@ class ProxyNetworkConfigurerVerifier {
 
     void verifyNetworkConfigured(@NonNull Network network,
                                  @NonNull String networkPrefix,
+                                 @NonNull String gatewayAddress,
                                  @NonNull List<Endpoint> internalEndpoints) {
         verifyNetworkPresent(network);
         verifyNetworkControlPresent(network);
         verifyEndpoints(network, internalEndpoints);
-        verifyProxiesCreated(networkPrefix, internalEndpoints);
+        verifyProxiesCreated(networkPrefix, gatewayAddress, internalEndpoints);
     }
 
     private void verifyNetworkPresent(Network network) {
@@ -58,15 +58,15 @@ class ProxyNetworkConfigurerVerifier {
         assertThat(actualEndpoints).containsExactlyElementsOf(expectedEndpoints);
     }
 
-    private void verifyProxiesCreated(String networkPrefix, List<Endpoint> internalEndpoints) {
+    private void verifyProxiesCreated(String networkPrefix, String gatewayHost, List<Endpoint> internalEndpoints) {
         var portCounter = new AtomicInteger(PROXY_INITIAL_PORT);
 
-        internalEndpoints.forEach(internalEndpoint -> verifyProxyCreated(networkPrefix, portCounter.getAndIncrement(), internalEndpoint));
+        internalEndpoints.forEach(internalEndpoint -> verifyProxyCreated(networkPrefix, gatewayHost, portCounter.getAndIncrement(), internalEndpoint));
     }
 
-    private void verifyProxyCreated(String networkPrefix, int proxyPort, Endpoint internalEndpoint) {
+    private void verifyProxyCreated(String networkPrefix, String gatewayHost, int proxyPort, Endpoint internalEndpoint) {
         try {
-            var rewritedInternalEndpoint = rewriteInternalEndpoint(internalEndpoint);
+            var rewritedInternalEndpoint = rewriteInternalEndpoint(gatewayHost, internalEndpoint);
             var proxyEndpoint = Endpoint.of(rewritedInternalEndpoint.scheme(), PROXY_BIND_IP, proxyPort);
 
             verify(proxyClient).createProxy(startsWith(networkPrefix), eq(proxyEndpoint.hostPort()), eq(rewritedInternalEndpoint.hostPort()));
@@ -75,11 +75,11 @@ class ProxyNetworkConfigurerVerifier {
         }
     }
 
-    private Endpoint rewriteInternalEndpoint(Endpoint endpoint) {
+    private Endpoint rewriteInternalEndpoint(String gatewayHost, Endpoint endpoint) {
         return Optional
                 .of(endpoint)
                 .filter(Endpoint::isLocalhost)
-                .map(actualEndpoint -> Endpoint.of(endpoint.scheme(), DockerHostResolver.DOCKER_BRIDGE_HOST, endpoint.port()))
+                .map(actualEndpoint -> Endpoint.of(endpoint.scheme(), gatewayHost, endpoint.port()))
                 .orElse(endpoint);
     }
 

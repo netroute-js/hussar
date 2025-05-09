@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
-import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_BRIDGE_HOST;
-import static pl.netroute.hussar.core.docker.DockerHostResolver.DOCKER_HOST_GATEWAY;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExtraHostConfigured;
@@ -142,7 +140,6 @@ public class RedisClusterDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_CLUSTER_LISTENING_PORTS.toArray(new Integer[0]));
         assertContainerWaitStrategyConfigured(container, clusterWaitStrategy);
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertNoContainerExtraHostConfigured(container, NON_LOCALHOST, REDIS_CLUSTER_LOOP_BACK_IP);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -226,7 +223,6 @@ public class RedisClusterDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_CLUSTER_LISTENING_PORTS.toArray(new Integer[0]));
         assertContainerWaitStrategyConfigured(container, clusterWaitStrategy);
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertNoContainerExtraHostConfigured(container, NON_LOCALHOST, REDIS_CLUSTER_LOOP_BACK_IP);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -279,7 +275,6 @@ public class RedisClusterDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_CLUSTER_LISTENING_PORTS.toArray(new Integer[0]));
         assertContainerExtraHostConfigured(container, NON_LOCALHOST, REDIS_CLUSTER_LOOP_BACK_IP);
-        assertContainerExtraHostConfigured(container, DOCKER_BRIDGE_HOST, DOCKER_HOST_GATEWAY);
         assertContainerWaitStrategyConfigured(container, clusterWaitStrategy);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
