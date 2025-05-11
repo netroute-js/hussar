@@ -24,6 +24,18 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
     private static final String MONGODB_SCHEME = "mongodb://";
 
     /**
+     * Set of properties to be used to register {@link pl.netroute.hussar.core.api.Endpoint} with {@link MongoDBCredentials} under.
+     */
+    @Singular
+    protected final Set<String> registerEndpointWithCredentialsUnderProperties;
+
+    /**
+     * Set of environment variables to be used to register {@link pl.netroute.hussar.core.api.Endpoint} with {@link MongoDBCredentials} under.
+     */
+    @Singular
+    protected final Set<String> registerEndpointWithCredentialsUnderEnvironmentVariables;
+
+    /**
      * Set of properties to be used to register MongoDB username under.
      */
     @Singular
@@ -54,6 +66,7 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
         var container = GenericContainerFactory.create(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
+        var endpointWithCredentialsRegisterer = new MongoDBEndpointWithCredentialsRegisterer(configurationRegistry);
         var credentialsRegisterer = new MongoDBCredentialsRegisterer(configurationRegistry);
 
         return new MongoDBDockerService(
@@ -61,6 +74,7 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                endpointWithCredentialsRegisterer,
                 credentialsRegisterer
         );
     }
@@ -79,6 +93,8 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
                 .registerPasswordUnderEnvironmentVariables(registerPasswordUnderEnvironmentVariables)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
                 .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)
+                .registerEndpointWithCredentialsUnderProperties(registerEndpointWithCredentialsUnderProperties)
+                .registerEndpointWithCredentialsUnderEnvironmentVariables(registerEndpointWithCredentialsUnderEnvironmentVariables)
                 .build();
     }
 }

@@ -7,9 +7,9 @@ import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
+import pl.netroute.hussar.core.helper.StringHelper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A custom {@link Endpoint} registerer in {@link ConfigurationRegistry}.
@@ -30,7 +30,7 @@ public class EndpointRegisterer {
      */
     public void registerUnderProperty(@NonNull List<Endpoint> endpoints,
                                       @NonNull String endpointProperty) {
-        var formattedEndpoints = formatEndpoints(endpoints);
+        var formattedEndpoints = StringHelper.join(Endpoint::address, JOIN_DELIMITER, endpoints);
         var property = new PropertyConfigurationEntry(endpointProperty, formattedEndpoints);
 
         configurationRegistry.register(property);
@@ -44,17 +44,10 @@ public class EndpointRegisterer {
      */
     public void registerUnderEnvironmentVariable(@NonNull List<Endpoint> endpoints,
                                                  @NonNull String endpointEnvVariable) {
-        var formattedEndpoints = formatEndpoints(endpoints);
+        var formattedEndpoints = StringHelper.join(Endpoint::address, JOIN_DELIMITER, endpoints);
         var envVariable = new EnvVariableConfigurationEntry(endpointEnvVariable, formattedEndpoints);
 
         configurationRegistry.register(envVariable);
-    }
-
-    private String formatEndpoints(List<Endpoint> endpoints) {
-        return endpoints
-                .stream()
-                .map(Endpoint::address)
-                .collect(Collectors.joining(JOIN_DELIMITER));
     }
 
 }

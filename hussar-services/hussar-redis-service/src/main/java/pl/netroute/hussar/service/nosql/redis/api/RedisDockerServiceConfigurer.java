@@ -28,7 +28,8 @@ public class RedisDockerServiceConfigurer extends BaseDockerServiceConfigurer<Re
     /**
      * Shall run Redis in password less mode.
      */
-    @Builder.Default boolean enablePassword = false;
+    @Builder.Default
+    protected boolean enablePassword = false;
 
     /**
      * Set of properties to be used to register Redis username under.

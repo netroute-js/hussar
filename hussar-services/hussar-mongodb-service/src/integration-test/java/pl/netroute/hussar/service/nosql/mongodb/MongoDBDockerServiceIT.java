@@ -48,6 +48,9 @@ public class MongoDBDockerServiceIT {
         var endpointProperty = "mongodb.url";
         var endpointEnvVariable = "MONGODB_URL";
 
+        var endpointWithCredentialsProperty = "mongodb.alternative.url";
+        var endpointWithCredentialsEnvVariable = "MONGODB_ALTERNATIVE_URL";
+
         var usernameProperty = "mongodb.username";
         var usernameEnvVariable = "MONGODB_USERNAME";
 
@@ -60,6 +63,8 @@ public class MongoDBDockerServiceIT {
                 .dockerImageVersion(dockerVersion)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
+                .registerEndpointWithCredentialsUnderProperty(endpointWithCredentialsProperty)
+                .registerEndpointWithCredentialsUnderEnvironmentVariable(endpointWithCredentialsEnvVariable)
                 .registerUsernameUnderProperty(usernameProperty)
                 .registerUsernameUnderEnvironmentVariable(usernameEnvVariable)
                 .registerPasswordUnderProperty(passwordProperty)
@@ -76,6 +81,8 @@ public class MongoDBDockerServiceIT {
         databaseAssertion.asserDatabaseAccessible();
         databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
         databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+        databaseAssertion.assertRegisteredEndpointWithCredentialsUnderProperty(endpointWithCredentialsProperty);
+        databaseAssertion.assertRegisteredEndpointWithCredentialsUnderEnvironmentVariable(endpointWithCredentialsEnvVariable);
         databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
         databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
         databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);

@@ -29,7 +29,8 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
     /**
      * Shall run RedisCluster in password less mode.
      */
-    @Builder.Default boolean enablePassword = false;
+    @Builder.Default
+    protected boolean enablePassword = false;
 
     /**
      * Set of properties to be used to register RedisCluster username under.
