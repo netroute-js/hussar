@@ -339,17 +339,19 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > The table below shows the most important methods that you can use to configure **MongoDB**:
 >
->| Method                                   	   | Description                                                                    	            | Default                 	 |
->|----------------------------------------------|---------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar MongoDB service.                                      	             | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	 | Sets the docker image version of MongoDB.                                     	             | Latest.                 	 |
->| `registerEndpointUnderProperty`            	 | Dynamically registers MongoDB's endpoint under given property(ies).           	             | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers MongoDB's endpoint under given environment variable(s). 	             | Empty Set.              	 |
->| `registerUsernameUnderProperty`              | Dynamically registers MongoDB's username under given property(ies).                         | Empty Set.                |
->| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers MongoDB's username under given environment variable(s).               | Empty Set.                |
->| `registerPasswordUnderProperties`            | Dynamically registers MongoDB's password under given property(ies).                         | Empty Set.                |
->| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers MongoDB's password under given environment variable(s).               | Empty Set.                |
->| `done`                                     	 | Finishes configuring MongoDB's configurer.                                                 	 | N/A                     	 |
+>| Method                                   	                  | Description                                                                    	                 | Default                 	 |
+>|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	                | Sets the name of Hussar MongoDB service.                                      	                  | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	                | Sets the docker image version of MongoDB.                                     	                  | Latest.                 	 |
+>| `registerEndpointUnderProperty`            	                | Dynamically registers MongoDB's endpoint under given property(ies).           	                  | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	                | Dynamically registers MongoDB's endpoint under given environment variable(s). 	                  | Empty Set.              	 |
+>| `registerEndpointWithCredentialsUnderProperty`            	 | Dynamically registers MongoDB's endpoint with credentials under given property(ies).           	 | Empty Set.              	 |
+>| `registerEndpointWithCredentialsUnderEnvironmentVariable` 	 | Dynamically registers MongoDB's endpoint with credentials under given environment variable(s). 	 | Empty Set.              	 |
+>| `registerUsernameUnderProperty`                             | Dynamically registers MongoDB's username under given property(ies).                              | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`                 | Dynamically registers MongoDB's username under given environment variable(s).                    | Empty Set.                |
+>| `registerPasswordUnderProperties`                           | Dynamically registers MongoDB's password under given property(ies).                              | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`                 | Dynamically registers MongoDB's password under given environment variable(s).                    | Empty Set.                |
+>| `done`                                     	                | Finishes configuring MongoDB's configurer.                                                 	     | N/A                     	 |
 >
 > If you want to see a proper example, you can find it under [MongoDB configuration](#mongodb-configuration-example) section.
 ---
@@ -1247,6 +1249,8 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .dockerImageVersion("6.0.13") // it sets the docker image version. It's optional parameter.
 >            .registerEndpointUnderProperty("application.mongodb.url") // it registers service's URL under following property. It's optional parameter.
 >            .registerEndpointUnderEnvironmentVariable("MONGODB_URL") // it registers service's URL under following environment variable. It's optional parameter.
+>            .registerEndpointWithCredentialsUnderProperty("application.mongodb.alternative.url") // it registers service's URL with credentials under following property. It's optional parameter.
+>            .registerEndpointWithCredentialsUnderEnvironmentVariable("MONGODB_ALTERNATIVE_URL") // it registers service's URL with credentials under following environment variable. It's optional parameter.
 >            .registerUsernameUnderProperty("application.mongodb.username") // it registers service's username under following property. It's optional parameter.
 >            .registerUsernameUnderEnvironmentVariable("MONGODB_USERNAME") // it registers service's username under following environment variable. It's optional parameter.
 >            .registerPasswordUnderProperty("application.mongodb.password") // it registers service's password under following property. It's optional parameter.
