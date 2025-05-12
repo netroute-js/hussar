@@ -39,6 +39,8 @@ public class MongoDBDockerServiceTest {
     private static final int MONGO_DB_LISTENING_PORT = 27017;
     private static final int MONGO_DB_MAPPED_PORT = 27000;
 
+    private static final String MONGO_DB_ENDPOINT_WITH_CREDENTIALS_TEMPLATE = "%s%s:%s@%s:%d";
+
     private static final String MONGO_DB_SERVICE_NAME = "mongodb-service";
     private static final String MONGO_DB_SERVICE_IMAGE = "mongo";
 
@@ -76,6 +78,8 @@ public class MongoDBDockerServiceTest {
                 .scheme(MONGO_DB_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerEndpointWithCredentialsUnderProperties(Set.of())
+                .registerEndpointWithCredentialsUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
@@ -117,6 +121,9 @@ public class MongoDBDockerServiceTest {
         var endpointProperty = "endpoint.url";
         var endpointEnvVariable = "ENDPOINT_URL";
 
+        var endpointWithCredentialsProperty = "endpoint.credentials.url";
+        var endpointWithCredentialsEnvVariable = "ENDPOINT_CREDENTIALS_URL";
+
         var usernameProperty = "mongo.username";
         var usernameEnvVariable = "MONGO_USERNAME";
 
@@ -130,6 +137,8 @@ public class MongoDBDockerServiceTest {
                 .scheme(MONGO_DB_SCHEME)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
                 .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
+                .registerEndpointWithCredentialsUnderProperties(Set.of(endpointWithCredentialsProperty))
+                .registerEndpointWithCredentialsUnderEnvironmentVariables(Set.of(endpointWithCredentialsEnvVariable))
                 .registerUsernameUnderProperties(Set.of(usernameProperty))
                 .registerUsernameUnderEnvironmentVariables(Set.of(usernameEnvVariable))
                 .registerPasswordUnderProperties(Set.of(passwordProperty))
@@ -151,6 +160,10 @@ public class MongoDBDockerServiceTest {
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
 
+        var endpointWithCredentials = MONGO_DB_ENDPOINT_WITH_CREDENTIALS_TEMPLATE.formatted(MONGO_DB_SCHEME, MONGO_DB_USERNAME, MONGO_DB_PASSWORD, MONGO_DB_HOST, MONGO_DB_MAPPED_PORT);
+        var endpointWithCredentialsPropertyEntry = ConfigurationEntry.property(endpointWithCredentialsProperty, endpointWithCredentials);
+        var endpointWithCredentialsEnvVariableEntry = ConfigurationEntry.envVariable(endpointWithCredentialsEnvVariable, endpointWithCredentials);
+
         var usernamePropertyEntry = ConfigurationEntry.property(usernameProperty, MONGO_DB_USERNAME);
         var usernameEnvVariableEntry = ConfigurationEntry.envVariable(usernameEnvVariable, MONGO_DB_USERNAME);
 
@@ -160,6 +173,8 @@ public class MongoDBDockerServiceTest {
         var registeredEntries = List.<ConfigurationEntry>of(
                 endpointPropertyEntry,
                 endpointEnvVariableEntry,
+                endpointWithCredentialsPropertyEntry,
+                endpointWithCredentialsEnvVariableEntry,
                 usernamePropertyEntry,
                 usernameEnvVariableEntry,
                 passwordPropertyEntry,
@@ -193,6 +208,8 @@ public class MongoDBDockerServiceTest {
                 .scheme(SchemesHelper.HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerEndpointWithCredentialsUnderProperties(Set.of())
+                .registerEndpointWithCredentialsUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
@@ -221,6 +238,8 @@ public class MongoDBDockerServiceTest {
                 .scheme(SchemesHelper.HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
+                .registerEndpointWithCredentialsUnderProperties(Set.of())
+                .registerEndpointWithCredentialsUnderEnvironmentVariables(Set.of())
                 .registerUsernameUnderProperties(Set.of())
                 .registerUsernameUnderEnvironmentVariables(Set.of())
                 .registerPasswordUnderProperties(Set.of())
@@ -241,9 +260,10 @@ public class MongoDBDockerServiceTest {
                                                       GenericContainer<?> container) {
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
+        var endpointWithCredentialsRegisterer = new MongoDBEndpointWithCredentialsRegisterer(configurationRegistry);
         var credentialsRegisterer = new MongoDBCredentialsRegisterer(configurationRegistry);
 
-        return new MongoDBDockerService(container, config, configurationRegistry, endpointRegisterer, networkConfigurer, credentialsRegisterer);
+        return new MongoDBDockerService(container, config, configurationRegistry, endpointRegisterer, networkConfigurer, endpointWithCredentialsRegisterer, credentialsRegisterer);
     }
 
     private void assertCredentials(MongoDBCredentials credentials) {

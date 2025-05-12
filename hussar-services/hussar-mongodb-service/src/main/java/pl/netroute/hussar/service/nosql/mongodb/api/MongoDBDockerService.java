@@ -22,6 +22,7 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
     private static final String MONGO_DB_PASSWORD = "test";
 
     private final MongoDBCredentials credentials;
+    private final MongoDBEndpointWithCredentialsRegisterer endpointWithCredentialsRegisterer;
     private final MongoDBCredentialsRegisterer credentialsRegisterer;
 
     /**
@@ -32,6 +33,7 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link MongoDBDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link MongoDBDockerService}.
      * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link MongoDBDockerService}.
+     * @param endpointWithCredentialsRegisterer - the  {@link MongoDBEndpointWithCredentialsRegisterer} used by this {@link MongoDBDockerService}.
      * @param credentialsRegisterer - the {@link MongoDBCredentialsRegisterer} used by this {@link MongoDBDockerService}.
      */
     MongoDBDockerService(@NonNull GenericContainer<?> container,
@@ -39,9 +41,11 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
                          @NonNull ConfigurationRegistry configurationRegistry,
                          @NonNull EndpointRegisterer endpointRegisterer,
                          @NonNull NetworkConfigurer networkConfigurer,
+                         @NonNull MongoDBEndpointWithCredentialsRegisterer endpointWithCredentialsRegisterer,
                          @NonNull MongoDBCredentialsRegisterer credentialsRegisterer) {
         super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
+        this.endpointWithCredentialsRegisterer = endpointWithCredentialsRegisterer;
         this.credentials = defaultCredentials();
         this.credentialsRegisterer = credentialsRegisterer;
     }
@@ -59,6 +63,9 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
     protected void doAfterServiceStartup(ServiceStartupContext context) {
         super.doAfterServiceStartup(context);
 
+        registerEndpointWithCredentialsUnderProperties();
+        registerEndpointWithCredentialsUnderEnvironmentVariables();
+
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
     }
@@ -70,6 +77,20 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
      */
     public MongoDBCredentials getCredentials() {
         return credentials;
+    }
+
+    private void registerEndpointWithCredentialsUnderProperties() {
+        var endpoints = getEndpoints();
+
+        config.getRegisterEndpointWithCredentialsUnderProperties()
+              .forEach(endpointProperty -> endpointWithCredentialsRegisterer.registerUnderProperty(endpoints, credentials, endpointProperty));
+    }
+
+    private void registerEndpointWithCredentialsUnderEnvironmentVariables() {
+        var endpoints = getEndpoints();
+
+        config.getRegisterEndpointWithCredentialsUnderEnvironmentVariables()
+              .forEach(endpointEnvVariable -> endpointWithCredentialsRegisterer.registerUnderEnvironmentVariable(endpoints, credentials, endpointEnvVariable));
     }
 
     private void registerCredentialsUnderProperties() {

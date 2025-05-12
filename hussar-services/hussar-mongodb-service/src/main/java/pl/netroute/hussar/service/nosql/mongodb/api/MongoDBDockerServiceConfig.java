@@ -16,6 +16,12 @@ import java.util.Set;
 class MongoDBDockerServiceConfig extends BaseDockerServiceConfig {
 
     @NonNull
+    Set<String> registerEndpointWithCredentialsUnderProperties;
+
+    @NonNull
+    Set<String> registerEndpointWithCredentialsUnderEnvironmentVariables;
+
+    @NonNull
     Set<String> registerUsernameUnderProperties;
 
     @NonNull

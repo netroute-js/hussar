@@ -26,7 +26,14 @@ public class DefaultConfigurationRegistry implements ConfigurationRegistry {
 
     @Override
     public void register(@NonNull ConfigurationEntry configuration) {
-        registeredConfigurations.add(configuration);
+        registeredConfigurations
+                .stream()
+                .filter(actualConfiguration -> actualConfiguration.name().equals(configuration.name()))
+                .findFirst()
+                .ifPresentOrElse(
+                        actualConfiguration -> {},
+                        () -> registeredConfigurations.add(configuration)
+                );
     }
 
     @Override

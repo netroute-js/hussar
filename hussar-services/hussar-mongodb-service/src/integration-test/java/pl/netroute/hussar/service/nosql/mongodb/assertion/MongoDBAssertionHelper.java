@@ -16,6 +16,7 @@ import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBCredentials;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerService;
 
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,8 @@ public class MongoDBAssertionHelper {
     private static final int SINGLE = 1;
 
     private static final int TIMEOUT_MILLIS = 5000;
+
+    private static final String ENDPOINT_WITH_CREDENTIALS_TEMPLATE = "%s%s:%s@%s:%d";
 
     private static final String DEFAULT_AUTH_DB = "admin";
 
@@ -70,10 +73,26 @@ public class MongoDBAssertionHelper {
         assertRegisteredEntryInConfigRegistry(registeredProperty, endpoint.address(), PropertyConfigurationEntry.class);
     }
 
+    public void assertRegisteredEndpointWithCredentialsUnderProperty(@NonNull String registeredProperty) {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
+        var credentials = database.getCredentials();
+        var formattedEndpoint = formatEndpointWithCredentials(endpoint, credentials);
+
+        assertRegisteredEntryInConfigRegistry(registeredProperty, formattedEndpoint, PropertyConfigurationEntry.class);
+    }
+
     public void assertRegisteredEndpointUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
 
         assertRegisteredEntryInConfigRegistry(registeredEnvVariable, endpoint.address(), EnvVariableConfigurationEntry.class);
+    }
+
+    public void assertRegisteredEndpointWithCredentialsUnderEnvironmentVariable(@NonNull String registeredEnvVariable) {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
+        var credentials = database.getCredentials();
+        var formattedEndpoint = formatEndpointWithCredentials(endpoint, credentials);
+
+        assertRegisteredEntryInConfigRegistry(registeredEnvVariable, formattedEndpoint, EnvVariableConfigurationEntry.class);
     }
 
     public void assertRegisteredUsernameUnderProperty(@NonNull String registeredProperty) {
@@ -154,4 +173,16 @@ public class MongoDBAssertionHelper {
     private void configureClusterSettings(ClusterSettings.Builder builder) {
         builder.serverSelectionTimeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
+
+    private String formatEndpointWithCredentials(Endpoint endpoint, MongoDBCredentials credentials) {
+        var username = credentials.username();
+        var password = credentials.password();
+
+        var scheme = endpoint.scheme();
+        var host = endpoint.host();
+        var port = endpoint.port();
+
+        return ENDPOINT_WITH_CREDENTIALS_TEMPLATE.formatted(scheme, username, password, host, port);
+    }
+
 }
