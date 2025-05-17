@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
 import pl.netroute.hussar.core.environment.api.HussarEnvironment;
+import pl.netroute.hussar.core.network.api.HussarNetworkRestore;
+import pl.netroute.hussar.core.network.api.NetworkRestore;
 import pl.netroute.hussar.core.service.api.HussarService;
 import pl.netroute.hussar.core.test.stub.ApplicationStub;
 import pl.netroute.hussar.core.test.stub.ServiceStubA;
@@ -22,6 +24,9 @@ public class HussarAwareTest {
 
     @HussarService
     public ServiceStubB serviceB;
+
+    @HussarNetworkRestore
+    public NetworkRestore networkRestore;
 
     @Test
     public void test() {

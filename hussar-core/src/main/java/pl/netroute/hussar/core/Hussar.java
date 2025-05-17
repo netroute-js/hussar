@@ -74,6 +74,7 @@ public class Hussar {
         cacheEnvironment(testObject, environment);
         injectServices(testObject, environment);
         injectApplication(testObject, environment);
+        injectGlobalNetworkRestore(testObject, environment);
         injectDependencies(testObject, environment);
     }
 
@@ -93,6 +94,11 @@ public class Hussar {
     private void injectApplication(Object testObject, Environment environment) {
         var applicationInjector = ApplicationInjector.newInstance(environment);
         applicationInjector.inject(testObject);
+    }
+
+    private void injectGlobalNetworkRestore(Object testObject, Environment environment) {
+        var networkRestoreInjector = NetworkRestoreInjector.newInstance(environment);
+        networkRestoreInjector.inject(testObject);
     }
 
     private void injectDependencies(Object testObject, Environment environment) {

@@ -7,6 +7,7 @@ import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.test.HussarAwareTest;
 import pl.netroute.hussar.core.test.TestEnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.test.factory.NetworkRestoreTestFactory;
 import pl.netroute.hussar.core.test.stub.ServiceStubA;
 import pl.netroute.hussar.core.test.stub.ServiceStubB;
 
@@ -27,6 +28,7 @@ class HussarVerifier {
         var application = environment.getApplication();
         var serviceA = findService(ServiceStubA.class, environment);
         var serviceB = findService(ServiceStubB.class, environment);
+        var networkRestore = NetworkRestoreTestFactory.create(environment.getServiceRegistry());
 
         verify(environmentOrchestrator).initialize(isA(TestEnvironmentConfigurerProvider.class));
         verify(environmentRegistry).register(testInstance, environment);
@@ -34,6 +36,8 @@ class HussarVerifier {
         assertThat(testInstance.application).isEqualTo(application);
         assertThat(testInstance.serviceA).isEqualTo(serviceA);
         assertThat(testInstance.serviceB).isEqualTo(serviceB);
+
+        assertThat(testInstance.networkRestore).isEqualTo(networkRestore);
     }
 
     void verifyEnvironmentInitializationSkipped() {
