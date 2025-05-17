@@ -3,6 +3,7 @@ package pl.netroute.hussar.service.wiremock.api;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
@@ -20,12 +21,14 @@ public class WiremockDockerService extends BaseDockerService<WiremockDockerServi
      * @param config - the {@link WiremockDockerServiceConfig} used by this {@link WiremockDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link WiremockDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link WiremockDockerService}.
+     * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link WiremockDockerService}.
      */
     WiremockDockerService(@NonNull GenericContainer<?> container,
                           @NonNull WiremockDockerServiceConfig config,
                           @NonNull ConfigurationRegistry configurationRegistry,
-                          @NonNull EndpointRegisterer endpointRegisterer) {
-        super(container, config, configurationRegistry, endpointRegisterer);
+                          @NonNull EndpointRegisterer endpointRegisterer,
+                          @NonNull NetworkConfigurer networkConfigurer) {
+        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
     }
 
     @Override

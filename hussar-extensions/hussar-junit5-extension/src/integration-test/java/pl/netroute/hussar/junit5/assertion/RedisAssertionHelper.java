@@ -3,13 +3,12 @@ package pl.netroute.hussar.junit5.assertion;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.assertj.core.api.Assertions;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.junit5.helper.ApplicationClientRunner;
-import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisCredentials;
+import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.DefaultRedisCredentials;
 import redis.clients.jedis.Jedis;
@@ -17,7 +16,9 @@ import redis.clients.jedis.Jedis;
 import java.time.Duration;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_ALTERNATIVE_PASSWORD_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_ALTERNATIVE_URL_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.REDIS_ALTERNATIVE_USERNAME_PROPERTY;
@@ -38,6 +39,8 @@ public class RedisAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertRedisReachable(endpoint, credentials);
+        assertNetworkControlConfigured(redisService);
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(REDIS_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(REDIS_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(REDIS_USERNAME_PROPERTY, credentials.username(), applicationClient));
@@ -48,7 +51,7 @@ public class RedisAssertionHelper {
 
     private static void assertRedisReachable(Endpoint endpoint, RedisCredentials credentials) {
         try(var client = createClient(endpoint, credentials)) {
-            Assertions.assertThat(client.ping()).isEqualTo(PING_RESULT);
+            assertThat(client.ping()).isEqualTo(PING_RESULT);
         }
     }
 

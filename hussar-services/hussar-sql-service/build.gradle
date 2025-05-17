@@ -20,5 +20,6 @@ dependencies {
 	testImplementation libs.logback.classic
 	testImplementation libs.spring.jdbc
 	testImplementation libs.bundles.testing
+	testImplementation testFixtures(project(":hussar-core"))
 	testImplementation testFixtures(project(":hussar-services:hussar-core-service"))
 }

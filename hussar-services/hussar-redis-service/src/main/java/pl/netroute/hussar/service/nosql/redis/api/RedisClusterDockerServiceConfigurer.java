@@ -59,6 +59,7 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
     @Override
     public RedisClusterDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerRegistry = context.dockerRegistry();
+        var networkConfigurer = context.networkConfigurer();
         var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var dockerCommandLineRunner = new DockerCommandLineRunner();
         var config = createConfig(dockerImage);
@@ -78,6 +79,7 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
                 config,
                 configurationRegistry,
                 endpointRegisterer,
+                networkConfigurer,
                 credentialsRegisterer,
                 passwordConfigurer,
                 clusterReplicationPasswordConfigurer,

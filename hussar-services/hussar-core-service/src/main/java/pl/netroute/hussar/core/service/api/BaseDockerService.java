@@ -4,10 +4,11 @@ import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
@@ -32,19 +33,22 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
      * @param config - the {@link BaseDockerServiceConfig} used by this {@link BaseDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link BaseDockerService}.
      * @param endpointRegisterer - the {@link EndpointRegisterer} used by this {@link BaseDockerService}.
+     * @param networkConfigurer - the {@link NetworkConfigurer} used by this {@link BaseDockerService}.
      */
     protected BaseDockerService(@NonNull GenericContainer<?> container,
                                 @NonNull C config,
                                 @NonNull ConfigurationRegistry configurationRegistry,
-                                @NonNull EndpointRegisterer endpointRegisterer) {
-        super(config, configurationRegistry, endpointRegisterer);
+                                @NonNull EndpointRegisterer endpointRegisterer,
+                                @NonNull NetworkConfigurer networkConfigurer) {
+        super(config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.container = container;
     }
 
     @Override
-    public List<Endpoint> getEndpoints() {
+    protected List<Endpoint> getInternalEndpoints() {
         var host = container.getHost();
+
         var scheme = Optional
                 .ofNullable(config.getScheme())
                 .orElse(SchemesHelper.EMPTY_SCHEME);

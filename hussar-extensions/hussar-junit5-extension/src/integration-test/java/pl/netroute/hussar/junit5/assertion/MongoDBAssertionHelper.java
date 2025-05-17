@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.netroute.hussar.junit5.assertion.ApplicationPropertiesAssertionHelper.assertPropertyConfigured;
+import static pl.netroute.hussar.junit5.assertion.NetworkControlAssertionHelper.assertNetworkControlConfigured;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MONGODB_ALTERNATIVE_PASSWORD_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MONGODB_ALTERNATIVE_URL_PROPERTY;
 import static pl.netroute.hussar.junit5.config.ApplicationProperties.MONGODB_ALTERNATIVE_USERNAME_PROPERTY;
@@ -41,6 +42,8 @@ public class MongoDBAssertionHelper {
         var applicationClientRunner = new ApplicationClientRunner(application);
 
         assertMongoDBReachable(endpoint, credentials);
+        assertNetworkControlConfigured(mongoDBService);
+
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MONGODB_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MONGODB_ALTERNATIVE_URL_PROPERTY, endpoint.address(), applicationClient));
         applicationClientRunner.run(applicationClient -> assertPropertyConfigured(MONGODB_USERNAME_PROPERTY, credentials.username(), applicationClient));

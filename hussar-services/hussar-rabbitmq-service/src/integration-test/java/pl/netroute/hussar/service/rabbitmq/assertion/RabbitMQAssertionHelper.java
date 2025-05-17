@@ -1,18 +1,20 @@
 package pl.netroute.hussar.service.rabbitmq.assertion;
 
+import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.http.client.Client;
 import com.rabbitmq.http.client.ClientParameters;
 import com.rabbitmq.http.client.domain.QueueInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerService;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor
 public class RabbitMQAssertionHelper {
     private static final int SINGLE = 1;
+
+    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(4L);
 
     private static final String MANAGEMENT_API_PREFIX_PATH = "/api";
 
@@ -30,26 +34,40 @@ public class RabbitMQAssertionHelper {
     }
 
     public void asserRabbitMQAccessible() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(rabbitMQ);
+        var connectionFactory = createConnectionFactory(endpoint);
+
+        try(var connection = connectionFactory.newConnection()) {
+            assertThat(connection.isOpen()).isTrue();
+        } catch (Exception ex) {
+            throw new AssertionError("Expected RabbitMQ to be accessible", ex);
+        }
+    }
+
+    public void asserRabbitMQNotAccessible() {
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(rabbitMQ);
+
+        asserRabbitMQNotAccessible(endpoint);
+    }
+
+    public void asserRabbitMQNotAccessible(@NonNull Endpoint endpoint) {
+        var connectionFactory = createConnectionFactory(endpoint);
+
+        try(var connection = connectionFactory.newConnection()) {
+        } catch (Exception ex) {
+        }
+    }
+
+    public void assertRabbitMQManagementApiAccessible() {
         var endpoint = rabbitMQ
                 .getManagementEndpoint()
                 .orElseThrow(() -> new IllegalStateException("Expected RabbitMQ ManagementAPI"));
 
-        var client = createClient(endpoint);
+        var client = createManagementClient(endpoint);
         var credentials = rabbitMQ.getCredentials();
 
         var currentUser = client.whoAmI();
         assertThat(currentUser.getName()).isEqualTo(credentials.username());
-    }
-
-    public void asserRabbitMQNotAccessible(@NonNull Endpoint endpoint) {
-        var client = createClient(endpoint);
-
-        try {
-            client.whoAmI();
-
-            throw new AssertionError("Expected RabbitMQ to not be accessible");
-        } catch(Exception ex) {
-        }
     }
 
     public void assertQueuesCreated(@NonNull List<RabbitMQQueue> queues) {
@@ -57,7 +75,7 @@ public class RabbitMQAssertionHelper {
                 .getManagementEndpoint()
                 .orElseThrow(() -> new IllegalStateException("Expected RabbitMQ ManagementAPI"));
 
-        var client = createClient(endpoint);
+        var client = createManagementClient(endpoint);
 
         var actualQueueNames = client
                 .getQueues()
@@ -78,7 +96,7 @@ public class RabbitMQAssertionHelper {
                 .getManagementEndpoint()
                 .orElseThrow(() -> new IllegalStateException("Expected RabbitMQ ManagementAPI"));
 
-        var client = createClient(endpoint);
+        var client = createManagementClient(endpoint);
 
         var queues = client.getQueues();
         assertThat(queues).isEmpty();
@@ -160,7 +178,7 @@ public class RabbitMQAssertionHelper {
                 );
     }
 
-    private Client createClient(Endpoint endpoint) {
+    private Client createManagementClient(Endpoint endpoint) {
         var credentials = rabbitMQ.getCredentials();
 
         try {
@@ -175,4 +193,20 @@ public class RabbitMQAssertionHelper {
         }
     }
 
+    private ConnectionFactory createConnectionFactory(Endpoint endpoint) {
+        var credentials = rabbitMQ.getCredentials();
+
+        try {
+            var connectionFactory = new ConnectionFactory();
+            connectionFactory.setUri(endpoint.address());
+            connectionFactory.setUsername(credentials.username());
+            connectionFactory.setPassword(credentials.password());
+            connectionFactory.setConnectionTimeout((int) CONNECTION_TIMEOUT.toMillis());
+
+            return connectionFactory;
+        } catch (Exception ex) {
+            throw new IllegalStateException("Could not create RabbitMQ connection factory", ex);
+        }
+
+    }
 }

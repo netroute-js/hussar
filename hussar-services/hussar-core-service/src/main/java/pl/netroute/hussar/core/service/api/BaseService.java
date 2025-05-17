@@ -8,10 +8,14 @@ import org.slf4j.LoggerFactory;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.Network;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
+import pl.netroute.hussar.core.network.api.NetworkControl;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A base class with default implementation/template for all Hussar {@link Service}.
@@ -46,6 +50,11 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
     @NonNull
     protected final EndpointRegisterer endpointRegisterer;
 
+    @NonNull
+    protected final NetworkConfigurer networkConfigurer;
+
+    protected Network network;
+
     @Override
     public final void start(@NonNull ServiceStartupContext context) {
         var serviceName = getName();
@@ -54,6 +63,7 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
 
         doBeforeServiceStartup(context);
         bootstrapService(context);
+        configureNetwork();
         doAfterServiceStartup(context);
 
         log.info("Started {} Service", serviceName);
@@ -73,8 +83,24 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
     }
 
     @Override
+    public final List<Endpoint> getEndpoints() {
+        return Optional
+                .ofNullable(network)
+                .map(Network::getEndpoints)
+                .orElse(List.of());
+    }
+
+    @Override
     public final ConfigurationRegistry getConfigurationRegistry() {
         return configurationRegistry;
+    }
+
+    @Override
+    public NetworkControl getNetworkControl() {
+        return Optional
+                .ofNullable(network)
+                .map(Network::getNetworkControl)
+                .orElseThrow(() -> new IllegalStateException("NetworkControl could not be resolved. The Service has to be started first."));
     }
 
     @Override
@@ -114,6 +140,13 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
     protected void doAfterServiceShutdown() {
     }
 
+    private void configureNetwork() {
+        var networkPrefix = config.getName();
+        var endpoints = getInternalEndpoints();
+
+        this.network = networkConfigurer.configure(networkPrefix, endpoints);
+    }
+
     private void registerEndpointUnderProperties(List<Endpoint> endpoints) {
         config
                 .getRegisterEndpointUnderProperties()
@@ -137,4 +170,6 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
      * Shutdowns {@link Service}.
      */
     protected abstract void shutdownService();
+
+    protected abstract List<Endpoint> getInternalEndpoints();
 }

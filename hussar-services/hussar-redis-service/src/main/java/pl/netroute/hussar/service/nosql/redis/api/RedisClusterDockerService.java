@@ -8,6 +8,7 @@ import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
 import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
 import pl.netroute.hussar.core.service.api.Service;
@@ -63,6 +64,7 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
                               @NonNull RedisClusterDockerServiceConfig config,
                               @NonNull ConfigurationRegistry configurationRegistry,
                               @NonNull EndpointRegisterer endpointRegisterer,
+                              @NonNull NetworkConfigurer networkConfigurer,
                               @NonNull RedisCredentialsRegisterer credentialsRegisterer,
                               @NonNull RedisPasswordConfigurer passwordConfigurer,
                               @NonNull RedisClusterReplicationPasswordConfigurer clusterReplicationPasswordConfigurer,
@@ -70,7 +72,7 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
                               @NonNull RedisClusterNoProtectionConfigurer redisClusterNoProtectionConfigurer,
                               @NonNull RedisClusterWaitStrategy clusterWaitStrategy,
                               @NonNull DockerHostResolver dockerHostResolver) {
-        super(container, config, configurationRegistry, endpointRegisterer);
+        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         if(isClusterPasswordEnabled()) {
             this.credentials = new RedisCredentials(REDIS_CLUSTER_USERNAME, REDIS_CLUSTER_PASSWORD);
@@ -88,7 +90,7 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
     }
 
     @Override
-    public List<Endpoint> getEndpoints() {
+    public List<Endpoint> getInternalEndpoints() {
         var host = container.getHost();
 
         var scheme = Optional

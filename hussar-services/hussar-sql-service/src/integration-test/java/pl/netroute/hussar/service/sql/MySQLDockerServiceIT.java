@@ -1,56 +1,44 @@
 package pl.netroute.hussar.service.sql;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
-import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.service.sql.api.MySQLDockerService;
 import pl.netroute.hussar.service.sql.api.MySQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class MySQLDockerServiceIT {
+class MySQLDockerServiceIT extends BaseServiceIT<MySQLDockerService> {
     private static final List<String> TABLES = List.of("table_a", "table_b");
 
-    private MySQLDockerService databaseService;
-
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(databaseService)
-                .ifPresent(MySQLDockerService::shutdown);
-    }
-
-    @Test
-    public void shouldStartDatabaseService() {
-        // given
+    @Override
+    protected ServiceTestMetadata<MySQLDockerService, Consumer<MySQLDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var schemaName = "hussardb";
         var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
-        databaseService = MySQLDockerServiceConfigurer
-                .newInstance()
-                .databaseSchema(databaseSchema)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var service = MySQLDockerServiceTestFactory.createMinimallyConfigured(databaseSchema, context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<MySQLDockerService>) actualService -> {
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserDatabaseAccessible(schemaName);
+            databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
+            databaseAssertion.assertNoEntriesRegistered();
+        };
 
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesNotCreated(schemaName, TABLES);
-        databaseAssertion.assertNoEntriesRegistered();
+        return ServiceTestMetadata
+                .<MySQLDockerService, Consumer<MySQLDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldStartDatabaseServiceWithFullConfiguration() {
-        // given
+    @Override
+    protected ServiceTestMetadata<MySQLDockerService, Consumer<MySQLDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "mysql-instance";
         var dockerVersion = "8.2.0";
 
@@ -67,7 +55,7 @@ public class MySQLDockerServiceIT {
         var scriptsLocation = "/flyway/scripts";
         var databaseSchema = new SQLDatabaseSchema(schemaName, scriptsLocation);
 
-        databaseService = MySQLDockerServiceConfigurer
+        var service = MySQLDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -79,49 +67,47 @@ public class MySQLDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<MySQLDockerService>) actualService -> {
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserDatabaseAccessible(schemaName);
+            databaseAssertion.assertTablesCreated(schemaName, TABLES);
+            databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+            databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible(schemaName);
-        databaseAssertion.assertTablesCreated(schemaName, TABLES);
-        databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<MySQLDockerService, Consumer<MySQLDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownDatabaseService() {
-        var name = "mysql-instance";
-        var dockerVersion = "8.2.0";
-
+    @Override
+    protected ServiceTestMetadata<MySQLDockerService, BiConsumer<MySQLDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
         var schemaName = "hussardb";
         var databaseSchema = SQLDatabaseSchema.scriptLess(schemaName);
 
-        databaseService = MySQLDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .databaseSchema(databaseSchema)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var service = MySQLDockerServiceTestFactory.createMinimallyConfigured(databaseSchema, context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (BiConsumer<MySQLDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
+            var databaseAssertion = new SQLDBAssertionHelper(service);
+            databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        };
 
-        databaseService.shutdown();
-
-        // then
-        var databaseAssertion = new SQLDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(schemaName, endpoint);
+        return ServiceTestMetadata
+                .<MySQLDockerService, BiConsumer<MySQLDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
+
 }

@@ -1,47 +1,38 @@
 package pl.netroute.hussar.service.nosql.mongodb;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.mongodb.assertion.MongoDBAssertionHelper;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class MongoDBDockerServiceIT {
-    private MongoDBDockerService databaseService;
+public class MongoDBDockerServiceIT extends BaseServiceIT<MongoDBDockerService> {
 
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(databaseService)
-                .ifPresent(MongoDBDockerService::shutdown);
+    @Override
+    protected ServiceTestMetadata<MongoDBDockerService, Consumer<MongoDBDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
+        var service = MongoDBDockerServiceTestFactory.createMinimallyConfigured(context);
+
+        var assertion = (Consumer<MongoDBDockerService>) actualService -> {
+            var databaseAssertion = new MongoDBAssertionHelper(actualService);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserMongoDBAccessible();
+            databaseAssertion.assertNoEntriesRegistered();
+        };
+
+        return ServiceTestMetadata
+                .<MongoDBDockerService, Consumer<MongoDBDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldStartDatabaseService() {
-        // given
-        databaseService = MongoDBDockerServiceConfigurer
-                .newInstance()
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
-
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
-
-        // then
-        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible();
-        databaseAssertion.assertNoEntriesRegistered();
-    }
-
-    @Test
-    public void shouldStartDatabaseServiceWithFullConfiguration() {
-        // given
+    @Override
+    protected ServiceTestMetadata<MongoDBDockerService, Consumer<MongoDBDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "mongodb-instance";
         var dockerVersion = "6.0.13";
 
@@ -57,7 +48,7 @@ public class MongoDBDockerServiceIT {
         var passwordProperty = "mongodb.password";
         var passwordEnvVariable = "MONGODB_PASSWORD";
 
-        databaseService = MongoDBDockerServiceConfigurer
+        var service = MongoDBDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -70,46 +61,45 @@ public class MongoDBDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<MongoDBDockerService>) actualService -> {
+            var databaseAssertion = new MongoDBAssertionHelper(actualService);
+            databaseAssertion.assertSingleEndpoint();
+            databaseAssertion.asserMongoDBAccessible();
+            databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+            databaseAssertion.assertRegisteredEndpointWithCredentialsUnderProperty(endpointWithCredentialsProperty);
+            databaseAssertion.assertRegisteredEndpointWithCredentialsUnderEnvironmentVariable(endpointWithCredentialsEnvVariable);
+            databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
-        databaseAssertion.assertSingleEndpoint();
-        databaseAssertion.asserDatabaseAccessible();
-        databaseAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        databaseAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        databaseAssertion.assertRegisteredEndpointWithCredentialsUnderProperty(endpointWithCredentialsProperty);
-        databaseAssertion.assertRegisteredEndpointWithCredentialsUnderEnvironmentVariable(endpointWithCredentialsEnvVariable);
-        databaseAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        databaseAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        databaseAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        databaseAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<MongoDBDockerService, Consumer<MongoDBDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownDatabaseService() {
-        var name = "mongodb-instance";
-        var dockerVersion = "6.0.13";
+    @Override
+    protected ServiceTestMetadata<MongoDBDockerService, BiConsumer<MongoDBDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
+        var service = MongoDBDockerServiceTestFactory.createMinimallyConfigured(context);
 
-        databaseService = MongoDBDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var assertion = (BiConsumer<MongoDBDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        // when
-        databaseService.start(ServiceStartupContext.defaultContext());
+            var databaseAssertion = new MongoDBAssertionHelper(actualService);
+            databaseAssertion.assertMongoDBNotAccessible(endpoint);
+        };
 
-        var endpoint = EndpointHelper.getAnyEndpointOrFail(databaseService);
-
-        databaseService.shutdown();
-
-        // then
-        var databaseAssertion = new MongoDBAssertionHelper(databaseService);
-        databaseAssertion.assertDatabaseNotAccessible(endpoint);
+        return ServiceTestMetadata
+                .<MongoDBDockerService, BiConsumer<MongoDBDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
+
 }

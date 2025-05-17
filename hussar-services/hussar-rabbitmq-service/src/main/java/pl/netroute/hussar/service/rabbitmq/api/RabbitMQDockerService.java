@@ -11,6 +11,7 @@ import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
      * @param config - the {@link RabbitMQDockerServiceConfig} used by this {@link RabbitMQDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link RabbitMQDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link RabbitMQDockerService}.
+     * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link RabbitMQDockerService}.
      * @param credentialsRegisterer - the {@link RabbitMQCredentialsRegisterer} used by this {@link RabbitMQDockerService}.
      * @param queueConfigurer - the {@link RabbitMQQueueConfigurer} used by this {@link RabbitMQDockerService}.
      */
@@ -47,9 +49,10 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
                           @NonNull RabbitMQDockerServiceConfig config,
                           @NonNull ConfigurationRegistry configurationRegistry,
                           @NonNull EndpointRegisterer endpointRegisterer,
+                          @NonNull NetworkConfigurer networkConfigurer,
                           @NonNull RabbitMQCredentialsRegisterer credentialsRegisterer,
                           @NonNull RabbitMQQueueConfigurer queueConfigurer) {
-        super(container, config, configurationRegistry, endpointRegisterer);
+        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.credentialsRegisterer = credentialsRegisterer;
         this.queueConfigurer = queueConfigurer;
@@ -58,8 +61,8 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
     }
 
     @Override
-    public List<Endpoint> getEndpoints() {
-        var endpoints = super.getEndpoints();
+    protected List<Endpoint> getInternalEndpoints() {
+        var endpoints = super.getInternalEndpoints();
 
         if(ManagementApiResolver.isSupported(config)) {
             var managementApiPort = container.getMappedPort(MANAGEMENT_API_LISTENING_PORT);

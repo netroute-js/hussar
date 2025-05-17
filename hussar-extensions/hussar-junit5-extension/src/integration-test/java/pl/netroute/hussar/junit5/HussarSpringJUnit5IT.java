@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.HussarApplication;
 import pl.netroute.hussar.core.environment.api.HussarEnvironment;
+import pl.netroute.hussar.core.network.api.HussarNetworkRestore;
+import pl.netroute.hussar.core.network.api.NetworkRestore;
 import pl.netroute.hussar.core.service.api.HussarService;
 import pl.netroute.hussar.junit5.api.HussarJUnit5Extension;
 import pl.netroute.hussar.junit5.config.SpringTestEnvironmentConfigurerProvider;
@@ -26,6 +28,7 @@ import static pl.netroute.hussar.junit5.assertion.KafkaAssertionHelper.assertKaf
 import static pl.netroute.hussar.junit5.assertion.MariaDBAssertionHelper.assertMariaDBBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.MongoDBAssertionHelper.assertMongoDBBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.MySQLAssertionHelper.assertMySQLBootstrapped;
+import static pl.netroute.hussar.junit5.assertion.NetworkRestoreAssertionHelper.assertNetworkRestoreInjected;
 import static pl.netroute.hussar.junit5.assertion.PostgreSQLAssertionHelper.assertPostgreSQLBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.RabbitMQAssertionHelper.assertRabbitMQBootstrapped;
 import static pl.netroute.hussar.junit5.assertion.RedisAssertionHelper.assertRedisBootstrapped;
@@ -75,6 +78,9 @@ public class HussarSpringJUnit5IT {
     @HussarService(name = POSTGRESQL_NAME)
     PostgreSQLDockerService postgreSQLService;
 
+    @HussarNetworkRestore
+    private NetworkRestore networkRestore;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -85,6 +91,7 @@ public class HussarSpringJUnit5IT {
         // then
         assertApplicationBootstrapped(application);
         assertApplicationDependencyInjected(objectMapper);
+        assertNetworkRestoreInjected(networkRestore);
         assertWiremockBootstrapped(wiremockService, application);
         assertRedisBootstrapped(redisService, application);
         assertRedisClusterBootstrapped(redisClusterService, application);

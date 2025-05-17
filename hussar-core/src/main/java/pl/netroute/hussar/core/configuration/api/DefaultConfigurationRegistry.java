@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An actual implementation of {@link ConfigurationRegistry}.
@@ -37,6 +39,14 @@ public class DefaultConfigurationRegistry implements ConfigurationRegistry {
     @Override
     public Set<ConfigurationEntry> getEntries() {
         return Set.copyOf(registeredConfigurations);
+    }
+
+    public static DefaultConfigurationRegistry of(@NonNull ConfigurationEntry... configurations) {
+        var registeredConfigurations = Stream
+                .of(configurations)
+                .collect(Collectors.toUnmodifiableSet());
+
+        return new DefaultConfigurationRegistry(registeredConfigurations);
     }
 
 }

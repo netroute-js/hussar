@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
@@ -35,6 +36,7 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
      * @param config - the {@link RedisDockerServiceConfig} used by this {@link RedisDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link RedisDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link RedisDockerService}.
+     * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link RedisDockerService}.
      * @param credentialsRegisterer - the {@link RedisCredentialsRegisterer} used by this {@link RedisDockerService}.
      * @param passwordConfigurer - the {@link RedisPasswordConfigurer} used by this {@link RedisDockerService}.
      */
@@ -42,9 +44,10 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
                        @NonNull RedisDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,
                        @NonNull EndpointRegisterer endpointRegisterer,
+                       @NonNull NetworkConfigurer networkConfigurer,
                        @NonNull RedisCredentialsRegisterer credentialsRegisterer,
                        @NonNull RedisPasswordConfigurer passwordConfigurer) {
-        super(container, config, configurationRegistry, endpointRegisterer);
+        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         if(isPasswordEnabled()) {
             this.credentials = new RedisCredentials(REDIS_USERNAME, REDIS_PASSWORD);

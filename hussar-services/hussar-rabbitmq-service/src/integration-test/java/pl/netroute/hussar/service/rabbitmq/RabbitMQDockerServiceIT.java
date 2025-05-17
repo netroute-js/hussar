@@ -1,9 +1,8 @@
 package pl.netroute.hussar.service.rabbitmq;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerService;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerServiceConfigurer;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
@@ -11,47 +10,38 @@ import pl.netroute.hussar.service.rabbitmq.assertion.RabbitMQAssertionHelper;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class RabbitMQDockerServiceIT {
+public class RabbitMQDockerServiceIT extends BaseServiceIT<RabbitMQDockerService> {
     private static final String DOCKER_IMAGE_VERSION = "3.12.14-management-alpine";
 
     private static final boolean DURABLE = false;
     private static final boolean EXCLUSIVE = false;
     private static final boolean AUTO_DELETE = false;
 
-    private RabbitMQDockerService rabbitMQService;
+    @Override
+    protected ServiceTestMetadata<RabbitMQDockerService, Consumer<RabbitMQDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
+        var service = RabbitMQDockerServiceTestFactory.createMinimallyConfigured(DOCKER_IMAGE_VERSION, context);
 
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(rabbitMQService)
-                .ifPresent(RabbitMQDockerService::shutdown);
+        var assertion = (Consumer<RabbitMQDockerService>) actualService -> {
+            var rabbitMQAssertion = new RabbitMQAssertionHelper(actualService);
+            rabbitMQAssertion.assertSingleEndpoint();
+            rabbitMQAssertion.asserRabbitMQAccessible();
+            rabbitMQAssertion.assertRabbitMQManagementApiAccessible();
+            rabbitMQAssertion.assertNoQueuesCreated();
+            rabbitMQAssertion.assertNoEntriesRegistered();
+        };
+
+        return ServiceTestMetadata
+                .<RabbitMQDockerService, Consumer<RabbitMQDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldStartRabbitMQService() {
-        // given
-        rabbitMQService = RabbitMQDockerServiceConfigurer
-                .newInstance()
-                .dockerImageVersion(DOCKER_IMAGE_VERSION)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
-
-        // when
-        rabbitMQService.start(ServiceStartupContext.defaultContext());
-
-        // then
-        var rabbitMQAssertion = new RabbitMQAssertionHelper(rabbitMQService);
-        rabbitMQAssertion.assertSingleEndpoint();
-        rabbitMQAssertion.asserRabbitMQAccessible();
-        rabbitMQAssertion.assertNoQueuesCreated();
-        rabbitMQAssertion.assertNoEntriesRegistered();
-    }
-
-    @Test
-    public void shouldStartExtendedRabbitMQService() {
-        // given
+    @Override
+    protected ServiceTestMetadata<RabbitMQDockerService, Consumer<RabbitMQDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "rabbitmq-instance";
 
         var queueA = createQueue("queueA");
@@ -69,7 +59,7 @@ public class RabbitMQDockerServiceIT {
         var passwordProperty = "rabbitmq.password";
         var passwordEnvVariable = "RABBITMQ_PASSWORD";
 
-        rabbitMQService = RabbitMQDockerServiceConfigurer
+        var service = RabbitMQDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(DOCKER_IMAGE_VERSION)
@@ -84,49 +74,47 @@ public class RabbitMQDockerServiceIT {
                 .registerManagementEndpointUnderProperty(managementEndpointProperty)
                 .registerManagementEndpointUnderEnvironmentVariable(managementEndpointEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        rabbitMQService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<RabbitMQDockerService>) actualService -> {
+            var rabbitMQAssertion = new RabbitMQAssertionHelper(actualService);
+            rabbitMQAssertion.assertSingleEndpoint();
+            rabbitMQAssertion.asserRabbitMQAccessible();
+            rabbitMQAssertion.assertRabbitMQManagementApiAccessible();
+            rabbitMQAssertion.assertQueuesCreated(List.of(queueA, queueB));
+            rabbitMQAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
+            rabbitMQAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
+            rabbitMQAssertion.assertRegisteredManagementEndpointUnderProperty(managementEndpointProperty);
+            rabbitMQAssertion.assertRegisteredManagementEndpointUnderEnvironmentVariable(managementEndpointEnvVariable);
+            rabbitMQAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            rabbitMQAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            rabbitMQAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            rabbitMQAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var rabbitMQAssertion = new RabbitMQAssertionHelper(rabbitMQService);
-        rabbitMQAssertion.assertSingleEndpoint();
-        rabbitMQAssertion.asserRabbitMQAccessible();
-        rabbitMQAssertion.assertQueuesCreated(List.of(queueA, queueB));
-        rabbitMQAssertion.assertRegisteredEndpointUnderProperty(endpointProperty);
-        rabbitMQAssertion.assertRegisteredEndpointUnderEnvironmentVariable(endpointEnvVariable);
-        rabbitMQAssertion.assertRegisteredManagementEndpointUnderProperty(managementEndpointProperty);
-        rabbitMQAssertion.assertRegisteredManagementEndpointUnderEnvironmentVariable(managementEndpointEnvVariable);
-        rabbitMQAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        rabbitMQAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        rabbitMQAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        rabbitMQAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<RabbitMQDockerService, Consumer<RabbitMQDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownRabbitMQService() {
-        var name = "rabbitmq-instance";
+    @Override
+    protected ServiceTestMetadata<RabbitMQDockerService, BiConsumer<RabbitMQDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
+        var service = RabbitMQDockerServiceTestFactory.createMinimallyConfigured(DOCKER_IMAGE_VERSION, context);
 
-        rabbitMQService = RabbitMQDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(DOCKER_IMAGE_VERSION)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var assertion = (BiConsumer<RabbitMQDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var endpoint = endpoints.getFirst();
 
-        // when
-        rabbitMQService.start(ServiceStartupContext.defaultContext());
+            var rabbitMQAssertion = new RabbitMQAssertionHelper(actualService);
+            rabbitMQAssertion.asserRabbitMQNotAccessible(endpoint);
+        };
 
-        var endpoint = rabbitMQService
-                .getManagementEndpoint()
-                .orElseThrow(() -> new IllegalStateException("Expected RabbitMQ ManagementAPI"));
-
-        rabbitMQService.shutdown();
-
-        // then
-        var rabbitMQAssertion = new RabbitMQAssertionHelper(rabbitMQService);
-        rabbitMQAssertion.asserRabbitMQNotAccessible(endpoint);
+        return ServiceTestMetadata
+                .<RabbitMQDockerService, BiConsumer<RabbitMQDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
     private RabbitMQQueue createQueue(String name) {

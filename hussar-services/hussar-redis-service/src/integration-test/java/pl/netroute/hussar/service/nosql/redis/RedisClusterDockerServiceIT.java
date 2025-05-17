@@ -1,67 +1,63 @@
 package pl.netroute.hussar.service.nosql.redis;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.api.Endpoint;
+import pl.netroute.hussar.core.service.BaseServiceIT;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.service.nosql.redis.api.RedisClusterDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisClusterDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisClusterAssertionHelper;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @Slf4j
-public class RedisClusterDockerServiceIT {
-    private RedisClusterDockerService redisClusterService;
-
-    @AfterEach
-    public void cleanup() {
-        Optional
-                .ofNullable(redisClusterService)
-                .ifPresent(RedisClusterDockerService::shutdown);
-    }
-
-    @Test
-    public void shouldStartRedisClusterService() {
-        // given
-        redisClusterService = RedisClusterDockerServiceConfigurer
-                .newInstance()
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
-
-        // when
-        redisClusterService.start(ServiceStartupContext.defaultContext());
-
-        // then
-        var redisClusterAssertion = new RedisClusterAssertionHelper(redisClusterService);
-        redisClusterAssertion.assertMultipleEndpoints();
-        redisClusterAssertion.asserRedisClusterAccessible();
-        redisClusterAssertion.assertNoEntriesRegistered();
-    }
+public class RedisClusterDockerServiceIT extends BaseServiceIT<RedisClusterDockerService> {
 
     @Test
     public void shouldStartSecuredRedisClusterService() {
         // given
-        redisClusterService = RedisClusterDockerServiceConfigurer
+        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+
+        service = RedisClusterDockerServiceConfigurer
                 .newInstance()
                 .enablePassword(true)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
         // when
-        redisClusterService.start(ServiceStartupContext.defaultContext());
+        service.start(ServiceStartupContext.defaultContext());
 
         // then
-        var redisClusterAssertion = new RedisClusterAssertionHelper(redisClusterService);
+        var redisClusterAssertion = new RedisClusterAssertionHelper(service);
         redisClusterAssertion.assertMultipleEndpoints();
-        redisClusterAssertion.asserRedisClusterAccessible();
+        redisClusterAssertion.assertRedisClusterAccessible();
         redisClusterAssertion.assertNoEntriesRegistered();
     }
 
-    @Test
-    public void shouldStartRedisClusterServiceWithFullConfiguration() {
-        // given
+    @Override
+    protected ServiceTestMetadata<RedisClusterDockerService, Consumer<RedisClusterDockerService>> provideMinimallyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
+        var service = RedisClusterDockerServiceTestFactory.createMinimallyConfigured(context);
+
+        var assertion = (Consumer<RedisClusterDockerService>) actualService -> {
+            var redisClusterAssertion = new RedisClusterAssertionHelper(actualService);
+            redisClusterAssertion.assertMultipleEndpoints();
+            redisClusterAssertion.assertRedisClusterAccessible();
+            redisClusterAssertion.assertNoEntriesRegistered();
+        };
+
+        return ServiceTestMetadata
+                .<RedisClusterDockerService, Consumer<RedisClusterDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
+    }
+
+    @Override
+    protected ServiceTestMetadata<RedisClusterDockerService, Consumer<RedisClusterDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "redis-cluster-instance";
         var dockerVersion = "6.2.0";
 
@@ -74,7 +70,7 @@ public class RedisClusterDockerServiceIT {
         var passwordProperty = "redis.cluster.password";
         var passwordEnvVariable = "REDIS_CLUSTER_PASSWORD";
 
-        redisClusterService = RedisClusterDockerServiceConfigurer
+        var service = RedisClusterDockerServiceConfigurer
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
@@ -86,45 +82,41 @@ public class RedisClusterDockerServiceIT {
                 .registerPasswordUnderProperty(passwordProperty)
                 .registerPasswordUnderEnvironmentVariable(passwordEnvVariable)
                 .done()
-                .configure(ServiceConfigureContext.defaultContext());
+                .configure(context);
 
-        // when
-        redisClusterService.start(ServiceStartupContext.defaultContext());
+        var assertion = (Consumer<RedisClusterDockerService>) actualService -> {
+            var redisClusterAssertion = new RedisClusterAssertionHelper(actualService);
+            redisClusterAssertion.assertMultipleEndpoints();
+            redisClusterAssertion.assertRedisClusterAccessible();
+            redisClusterAssertion.assertRegisteredEndpointsUnderProperty(endpointProperty);
+            redisClusterAssertion.assertRegisteredEndpointsUnderEnvironmentVariable(endpointEnvVariable);
+            redisClusterAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
+            redisClusterAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
+            redisClusterAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
+            redisClusterAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        };
 
-        // then
-        var redisClusterAssertion = new RedisClusterAssertionHelper(redisClusterService);
-        redisClusterAssertion.assertMultipleEndpoints();
-        redisClusterAssertion.asserRedisClusterAccessible();
-        redisClusterAssertion.assertRegisteredEndpointsUnderProperty(endpointProperty);
-        redisClusterAssertion.assertRegisteredEndpointsUnderEnvironmentVariable(endpointEnvVariable);
-        redisClusterAssertion.assertRegisteredUsernameUnderProperty(usernameProperty);
-        redisClusterAssertion.assertRegisteredUsernameUnderEnvironmentVariable(usernameEnvVariable);
-        redisClusterAssertion.assertRegisteredPasswordUnderProperty(passwordProperty);
-        redisClusterAssertion.assertRegisteredPasswordUnderEnvironmentVariable(passwordEnvVariable);
+        return ServiceTestMetadata
+                .<RedisClusterDockerService, Consumer<RedisClusterDockerService>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
-    @Test
-    public void shouldShutdownRedisClusterService() {
-        var name = "redis-cluster-instance";
-        var dockerVersion = "6.2.0";
+    @Override
+    protected ServiceTestMetadata<RedisClusterDockerService, BiConsumer<RedisClusterDockerService, List<Endpoint>>> provideShutdownServiceTestMetadata(ServiceConfigureContext context) {
+        var service = RedisClusterDockerServiceTestFactory.createMinimallyConfigured(context);
 
-        redisClusterService = RedisClusterDockerServiceConfigurer
-                .newInstance()
-                .name(name)
-                .dockerImageVersion(dockerVersion)
-                .done()
-                .configure(ServiceConfigureContext.defaultContext());
+        var assertion = (BiConsumer<RedisClusterDockerService, List<Endpoint>>) (actualService, endpoints) -> {
+            var redisClusterAssertion = new RedisClusterAssertionHelper(actualService);
+            redisClusterAssertion.assertRedisClusterNotAccessible(endpoints);
+        };
 
-        // when
-        redisClusterService.start(ServiceStartupContext.defaultContext());
-
-        var endpoints = redisClusterService.getEndpoints();
-
-        redisClusterService.shutdown();
-
-        // then
-        var redisClusterAssertion = new RedisClusterAssertionHelper(redisClusterService);
-        redisClusterAssertion.assertRedisClusterNotAccessible(endpoints);
+        return ServiceTestMetadata
+                .<RedisClusterDockerService, BiConsumer<RedisClusterDockerService, List<Endpoint>>>newInstance()
+                .service(service)
+                .assertion(assertion)
+                .done();
     }
 
 }

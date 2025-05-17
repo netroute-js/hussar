@@ -3,6 +3,7 @@ package pl.netroute.hussar.service.nosql.mongodb.api;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
@@ -31,6 +32,7 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
      * @param config - the {@link MongoDBDockerServiceConfig} used by this {@link MongoDBDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link MongoDBDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link MongoDBDockerService}.
+     * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link MongoDBDockerService}.
      * @param endpointWithCredentialsRegisterer - the  {@link MongoDBEndpointWithCredentialsRegisterer} used by this {@link MongoDBDockerService}.
      * @param credentialsRegisterer - the {@link MongoDBCredentialsRegisterer} used by this {@link MongoDBDockerService}.
      */
@@ -38,12 +40,13 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
                          @NonNull MongoDBDockerServiceConfig config,
                          @NonNull ConfigurationRegistry configurationRegistry,
                          @NonNull EndpointRegisterer endpointRegisterer,
+                         @NonNull NetworkConfigurer networkConfigurer,
                          @NonNull MongoDBEndpointWithCredentialsRegisterer endpointWithCredentialsRegisterer,
                          @NonNull MongoDBCredentialsRegisterer credentialsRegisterer) {
-        super(container, config, configurationRegistry, endpointRegisterer);
+        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
-        this.credentials = new MongoDBCredentials(MONGO_DB_USERNAME, MONGO_DB_PASSWORD);
         this.endpointWithCredentialsRegisterer = endpointWithCredentialsRegisterer;
+        this.credentials = defaultCredentials();
         this.credentialsRegisterer = credentialsRegisterer;
     }
 
@@ -104,5 +107,9 @@ public class MongoDBDockerService extends BaseDockerService<MongoDBDockerService
 
         config.getRegisterPasswordUnderEnvironmentVariables()
               .forEach(passwordEnvVariable -> credentialsRegisterer.registerPasswordUnderEnvironmentVariable(credentials, passwordEnvVariable));
+    }
+
+    private static MongoDBCredentials defaultCredentials() {
+        return new MongoDBCredentials(MONGO_DB_USERNAME, MONGO_DB_PASSWORD);
     }
 }

@@ -12,9 +12,11 @@ dependencies {
 	implementation libs.testcontainers
 
 	testImplementation libs.bundles.testing
+	testImplementation testFixtures(project(":hussar-core"))
 	testImplementation testFixtures(project(":hussar-services:hussar-core-service"))
 
 	integrationTestImplementation libs.logback.classic
 	integrationTestImplementation libs.okhttp
 	integrationTestImplementation libs.wiremock
+	integrationTestImplementation libs.toxiproxy.testcontainers
 }

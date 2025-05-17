@@ -15,5 +15,6 @@ dependencies {
 
 	testFixturesImplementation libs.bundles.testing
 	testFixturesImplementation libs.testcontainers
+	testFixturesImplementation libs.toxiproxy.testcontainers
 	testFixturesImplementation project(":hussar-core")
 }
