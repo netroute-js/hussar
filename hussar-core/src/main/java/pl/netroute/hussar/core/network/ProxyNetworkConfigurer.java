@@ -8,6 +8,7 @@ import org.testcontainers.containers.ToxiproxyContainer;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
+import pl.netroute.hussar.core.logging.NetworkConfigurerLogger;
 import pl.netroute.hussar.core.network.api.Network;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Slf4j
 @InternalUseOnly
@@ -42,6 +44,12 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
         var proxyEndpoints = extractProxyEndpoints(proxiesMetadata);
         var networkControl = createNetworkControl(proxiesMetadata);
 
+        var endpointsMap = proxiesMetadata
+                .stream()
+                .collect(Collectors.toMap(ProxyMetadata::proxyEndpoint, ProxyMetadata::upstreamEndpoint));
+
+        NetworkConfigurerLogger.logNetworkConfigured(networkPrefix, endpointsMap);
+
         return new DefaultNetwork(proxyEndpoints, networkControl);
     }
 
@@ -52,7 +60,6 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
                 .stream()
                 .map(endpoint -> rewriteUpstreamEndpoint(gatewayAddress, endpoint))
                 .map(endpoint -> configureProxy(networkPrefix, endpoint))
-                .peek(this::logConfiguredProxy)
                 .toList();
     }
 
@@ -96,10 +103,6 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
                 .filter(Endpoint::isLocalhost)
                 .map(endpoint -> Endpoint.of(endpoint.scheme(), gatewayHost, endpoint.port()))
                 .orElse(upstreamEndpoint);
-    }
-
-    private void logConfiguredProxy(ProxyMetadata proxy) {
-        log.info("Configuring Network[{} -> {}] for {}", proxy.proxyEndpoint().address(), proxy.upstreamEndpoint().address(), proxy.networkPrefix());
     }
 
     private record ProxyMetadata(@NonNull String networkPrefix,

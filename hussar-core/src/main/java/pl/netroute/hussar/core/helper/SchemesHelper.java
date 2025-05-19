@@ -1,11 +1,14 @@
 package pl.netroute.hussar.core.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 
 /**
  * A class enumerating a set of schemes.
  */
 @InternalUseOnly
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SchemesHelper {
 
     /**

@@ -3,18 +3,17 @@ package pl.netroute.hussar.core;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import pl.netroute.hussar.core.api.InternalUseOnly;
-import pl.netroute.hussar.core.service.api.HussarService;
 import pl.netroute.hussar.core.environment.api.Environment;
+import pl.netroute.hussar.core.helper.ReflectionHelper;
+import pl.netroute.hussar.core.logging.InjectionLogger;
+import pl.netroute.hussar.core.service.api.HussarService;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.api.ServiceRegistry;
-import pl.netroute.hussar.core.helper.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-@Slf4j
 @InternalUseOnly
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class ServiceInjector {
@@ -77,9 +76,9 @@ class ServiceInjector {
     }
 
     private void doServiceInjection(Object targetInstance, Field serviceField, Service service) {
-        log.info("Injecting {} into {}", service.getClass().getSimpleName(), targetInstance.getClass().getSimpleName());
-
         ReflectionHelper.setValue(targetInstance, serviceField, service);
+
+        InjectionLogger.logServiceInjected(targetInstance, serviceField, service);
     }
 
     static ServiceInjector newInstance(@NonNull Environment environment) {

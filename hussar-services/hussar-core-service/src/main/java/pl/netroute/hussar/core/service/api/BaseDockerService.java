@@ -63,8 +63,6 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
 
     @Override
     protected final void bootstrapService(ServiceStartupContext context) {
-        log.info("Using DockerImage[{}] for {} Service", config.getDockerImage(), config.getName());
-
         configureContainer(container);
         container.start();
     }

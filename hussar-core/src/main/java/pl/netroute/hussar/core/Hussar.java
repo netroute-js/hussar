@@ -5,6 +5,7 @@ import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.api.HussarApplicationRestart;
 import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.logging.BannerLogger;
 
 import java.lang.reflect.Method;
 
@@ -112,6 +113,8 @@ public class Hussar {
      * @return the Hussar instance
      */
     public static Hussar newInstance() {
+        BannerLogger.logBanner();
+
         var environmentConfigurerResolver = new EnvironmentConfigurerProviderResolver();
         var environmentOrchestrator = new EnvironmentOrchestrator();
         var environmentRegistry = new EnvironmentRegistry();
