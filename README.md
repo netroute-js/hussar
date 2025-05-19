@@ -72,6 +72,7 @@ Overall, **Hussar** provides a powerful, flexible, and efficient solution for in
   - [RabbitMQ configuration](#rabbitmq-configuration-example)
   - [Kafka configuration](#kafka-configuration-example)
   - [Setting custom Docker Registry](#setting-custom-docker-registry-example)
+  - [Simulate network conditions](#simulate-network-conditions-example)
 - [Contributors](#contributors)
 
 <a id="vocabulary"></a>
@@ -1527,6 +1528,50 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >          .withDockerRegistry(dockerRegistry) // it sets custom DockerRegistry
 >          ... // more configuration
 >          .done();
+>```
+---
+> **Simulate network conditions** <a id="simulate-network-conditions-example"/>
+>
+> Hussar makes it very easy to simulate different network conditions that may occur in production environments. It's always a good practice to test such edge cases during development.
+> Every Service exposes a method to obtain NetworkControl which allows to simulate network conditions such as:
+> - enable network,
+> - disable network,
+> - reset network,
+> - set network latency
+>
+>```java
+>@ExtendWith(HussarJUnit5Extension.class) // it glues Hussar and JUnit5 together. It's basically everything you need to make them work together
+>@HussarEnvironment(configurerProvider = TestEnvironmentConfigurerProvider.class) // it provides Hussar tests environment configuration
+>public class HussarJUnit5IT {
+>    
+>   @HussarService // it injects the Hussar's MongoDB service
+>   private MongoDBDockerService mongoService;
+>
+>   @HussarNetworkRestore // it injects Hussar's class to restore all Service's network conditions to default state
+>   private NetworkRestore networkRestore;
+>
+>   @AfterEach
+>   public void cleanup() {
+>       networkRestore.restoreToDefault(); // after each test, it restores all Service's network conditions to default state
+>   }  
+>
+>   @Test
+>   public void testMongoNotAccessible() {
+>       mongoService.getNetworkControl().disable();
+>       
+>       // some MongoDB assertions will fail because the database is not accessible
+>   }
+>    
+>   @Test
+>   public void testMongo() {
+>       var extraLatency = Duration.ofSeconds(1L);
+> 
+>       mongoService.getNetworkControl().delay(extraLatency);
+>       
+>       // each call to MongoDB will have a delay of 1 second
+>   }
+>
+>}
 >```
 
 <a id="contributors"></a>
