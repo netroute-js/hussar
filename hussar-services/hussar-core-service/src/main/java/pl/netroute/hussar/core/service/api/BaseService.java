@@ -12,6 +12,7 @@ import pl.netroute.hussar.core.network.api.Network;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.network.api.NetworkControl;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
+import pl.netroute.hussar.core.service.logger.ServiceLogger;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
@@ -57,29 +58,21 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
 
     @Override
     public final void start(@NonNull ServiceStartupContext context) {
-        var serviceName = getName();
-
-        log.info("Starting {} Service", serviceName);
-
         doBeforeServiceStartup(context);
         bootstrapService(context);
         configureNetwork();
         doAfterServiceStartup(context);
 
-        log.info("Started {} Service", serviceName);
+        ServiceLogger.logServiceStartup(this, config);
     }
 
     @Override
     public final void shutdown() {
-        var serviceName = getName();
-
-        log.info("Stopping {} Service", serviceName);
-
         doBeforeServiceShutdown();
         shutdownService();
         doAfterServiceShutdown();
 
-        log.info("Stopped {} Service", serviceName);
+        ServiceLogger.logServiceShutdown(this);
     }
 
     @Override

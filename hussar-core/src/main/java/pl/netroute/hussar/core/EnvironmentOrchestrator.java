@@ -9,7 +9,9 @@ import pl.netroute.hussar.core.environment.EnvironmentStartupContext;
 import pl.netroute.hussar.core.environment.api.Environment;
 import pl.netroute.hussar.core.environment.EnvironmentConfigurerContext;
 import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
+import pl.netroute.hussar.core.helper.TimerHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
+import pl.netroute.hussar.core.logging.EnvironmentLogger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +30,7 @@ class EnvironmentOrchestrator {
     }
 
     void shutdown() {
-        log.info("Shutting down all environments");
+        log.info("Shutting down all Hussar environments");
 
         lockedAction.exclusiveAction(() -> {
             initializedEnvironments
@@ -40,13 +42,13 @@ class EnvironmentOrchestrator {
     }
 
     private Environment initializeEnvironment(EnvironmentConfigurerProvider provider) {
-        log.info("Initializing environment for {}", provider.getClass());
-
         var environment = provider
                 .provide()
                 .configure(EnvironmentConfigurerContext.defaultContext());
 
-        environment.start(EnvironmentStartupContext.defaultContext());
+        var startupDuration = TimerHelper.measure(() -> environment.start(EnvironmentStartupContext.defaultContext()));
+
+        EnvironmentLogger.logEnvironmentStartup(provider, environment, startupDuration);
 
         return environment;
     }
