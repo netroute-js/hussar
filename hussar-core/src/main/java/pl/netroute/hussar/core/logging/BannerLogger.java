@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 @InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BannerLogger {
-    private static final String BANNER_FILE_NAME = "banner.txt";
+    private static final String BANNER_FILE_NAME = "hussar-banner.txt";
 
     public static void logBanner() {
         try(var bannerStream = getBannerInputStream()) {
@@ -22,6 +22,7 @@ public class BannerLogger {
 
             log.info(bannerText);
         } catch (IOException ex) {
+            log.warn("Could not log Hussar banner", ex);
         }
     }
 
