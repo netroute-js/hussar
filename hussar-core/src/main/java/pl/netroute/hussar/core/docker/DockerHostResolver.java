@@ -3,14 +3,13 @@ package pl.netroute.hussar.core.docker;
 import lombok.NoArgsConstructor;
 import org.testcontainers.DockerClientFactory;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.helper.IpHelper;
 
 import java.util.List;
 
 @InternalUseOnly
 @NoArgsConstructor
 public class DockerHostResolver {
-    private static final String NON_LINUX_DOCKER_GATEWAY_HOST = "host.docker.internal";
-
     private static final String DOCKER_BRIDGE_NETWORK = "bridge";
 
     private static final String OPERATION_SYSTEM_PROPERTY = "os.name";
@@ -44,7 +43,7 @@ public class DockerHostResolver {
                     .getGateway();
         }
 
-        return NON_LINUX_DOCKER_GATEWAY_HOST;
+        return IpHelper.getRoutableIP();
     }
 
     private boolean isLinuxEnvironment() {
