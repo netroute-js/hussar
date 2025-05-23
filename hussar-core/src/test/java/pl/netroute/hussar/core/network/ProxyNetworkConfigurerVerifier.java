@@ -32,7 +32,7 @@ class ProxyNetworkConfigurerVerifier {
                                  @NonNull List<Endpoint> internalEndpoints) {
         verifyNetworkPresent(network);
         verifyNetworkControlPresent(network);
-        verifyEndpoints(network, internalEndpoints);
+        verifyEndpoints(network, gatewayAddress, internalEndpoints);
         verifyProxiesCreated(networkPrefix, gatewayAddress, internalEndpoints);
     }
 
@@ -46,12 +46,12 @@ class ProxyNetworkConfigurerVerifier {
         assertThat(networkControl).isInstanceOf(ProxyNetworkControl.class);
     }
 
-    private void verifyEndpoints(Network network, List<Endpoint> internalEndpoints) {
+    private void verifyEndpoints(Network network, String gatewayHost, List<Endpoint> internalEndpoints) {
         var schema = internalEndpoints.getFirst().scheme();
         var actualEndpoints = network.getEndpoints();
         var expectedEndpoints = IntStream
                 .range(0, internalEndpoints.size())
-                .mapToObj(index -> Endpoint.of(schema, PROXY_BIND_IP, PROXY_MAPPED_INITIAL_PORT + index))
+                .mapToObj(index -> Endpoint.of(schema, gatewayHost, PROXY_MAPPED_INITIAL_PORT + index))
                 .toList();
 
         assertThat(actualEndpoints).doesNotContainAnyElementsOf(internalEndpoints);
