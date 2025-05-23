@@ -59,7 +59,7 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
         return endpoints
                 .stream()
                 .map(endpoint -> rewriteUpstreamEndpoint(gatewayAddress, endpoint))
-                .map(endpoint -> configureProxy(networkPrefix, endpoint))
+                .map(endpoint -> configureProxy(networkPrefix, gatewayAddress, endpoint))
                 .toList();
     }
 
@@ -79,7 +79,7 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
         return new ProxyNetworkControl(proxies);
     }
 
-    private ProxyMetadata configureProxy(String proxyPrefix, Endpoint upstreamEndpoint) {
+    private ProxyMetadata configureProxy(String proxyPrefix, String gatewayHost, Endpoint upstreamEndpoint) {
         try {
             var proxyName = ProxyNameResolver.resolve(proxyPrefix);
             var proxyScheme = upstreamEndpoint.scheme();
@@ -88,7 +88,7 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
             var internalProxyEndpoint = Endpoint.of(proxyScheme, PROXY_BIND_IP, internalProxyPort);
 
             var proxyPort = toxiproxyContainer.getMappedPort(internalProxyPort);
-            var proxyEndpoint = Endpoint.of(proxyScheme, PROXY_BIND_IP, proxyPort);
+            var proxyEndpoint = Endpoint.of(proxyScheme, gatewayHost, proxyPort);
             var proxy = toxiproxyClient.createProxy(proxyName, internalProxyEndpoint.hostPort(), upstreamEndpoint.hostPort());
 
             return new ProxyMetadata(proxyPrefix, proxy, proxyEndpoint, upstreamEndpoint);
