@@ -2,6 +2,9 @@
 
 ---
 
+[![build](https://github.com/netroute-js/hussar/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/netroute-js/hussar/actions/workflows/build.yml)
+[![Maven Central Version](https://img.shields.io/maven-central/v/pl.netroute/hussar-core)](https://central.sonatype.com/artifact/pl.netroute/hussar-core/versions)
+
 **Hussar** is a **highly extensible integration testing framework** engineered to provide robust and flexible testing capabilities. It is designed to seamlessly integrate with a wide range of testing environments, offering the following key features:
 
 - **Framework-Agnostic Integration:**  
