@@ -11,9 +11,6 @@ import java.net.InetAddress;
  * Helper class for IP address related operations.
  * This utility class provides methods to retrieve network information
  * such as the local machine's routable IP address.
- * 
- * <p>This class is for internal use only and should not be used directly
- * by external applications.</p>
  */
 @InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,15 +20,7 @@ public class IpHelper {
 
     /**
      * Retrieves the local machine's routable IP address.
-     * 
-     * <p>This method works by creating a UDP socket and connecting it to a public IP address
-     * (Google's DNS server 8.8.8.8). When a socket is "connected" to a remote address,
-     * the operating system selects the local interface that would be used to reach that
-     * address, which gives us the routable IP address of the machine.</p>
-     * 
-     * <p>Note that this method does not actually send any data to the remote address,
-     * it only uses the socket connection mechanism to determine the appropriate local interface.</p>
-     * 
+     *
      * @return the routable IP address of the local machine as a string
      * @throws IllegalStateException if the routable IP address cannot be determined
      */

@@ -20,6 +20,7 @@ import java.util.Optional;
  * @param <C> the {@link BaseDockerServiceConfig} parameter used by the {@link BaseDockerService}.
  */
 public abstract class BaseDockerService<C extends BaseDockerServiceConfig> extends BaseService<C> {
+    private static final String CONTAINER_HOST = "localhost";
 
     /**
      * An instance of {@link GenericContainer}. This is actual Docker container.
@@ -47,8 +48,6 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
 
     @Override
     protected List<Endpoint> getInternalEndpoints() {
-        var host = container.getHost();
-
         var scheme = Optional
                 .ofNullable(config.getScheme())
                 .orElse(SchemesHelper.EMPTY_SCHEME);
@@ -57,7 +56,7 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
                 .getExposedPorts()
                 .stream()
                 .map(container::getMappedPort)
-                .map(mappedPort -> Endpoint.of(scheme, host, mappedPort))
+                .map(mappedPort -> Endpoint.of(scheme, CONTAINER_HOST, mappedPort))
                 .toList();
     }
 
