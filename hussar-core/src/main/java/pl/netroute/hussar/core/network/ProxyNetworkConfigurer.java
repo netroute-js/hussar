@@ -8,6 +8,7 @@ import org.testcontainers.containers.ToxiproxyContainer;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
+import pl.netroute.hussar.core.helper.IpHelper;
 import pl.netroute.hussar.core.logging.NetworkConfigurerLogger;
 import pl.netroute.hussar.core.network.api.Network;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
@@ -55,11 +56,11 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
 
     private List<ProxyMetadata> configureProxies(String networkPrefix, List<Endpoint> endpoints) {
         var dockerHost = dockerHostResolver.getHost();
-        var gatewayAddress = dockerHostResolver.getGatewayHost();
+        var routableIP = IpHelper.getRoutableIP();
 
         return endpoints
                 .stream()
-                .map(endpoint -> rewriteUpstreamEndpoint(gatewayAddress, endpoint))
+                .map(endpoint -> rewriteUpstreamEndpoint(routableIP, endpoint))
                 .map(endpoint -> configureProxy(networkPrefix, dockerHost, endpoint))
                 .toList();
     }
@@ -98,11 +99,11 @@ public class ProxyNetworkConfigurer implements NetworkConfigurer {
         }
     }
 
-    private Endpoint rewriteUpstreamEndpoint(String gatewayHost, Endpoint upstreamEndpoint) {
+    private Endpoint rewriteUpstreamEndpoint(String routableIP, Endpoint upstreamEndpoint) {
         return Optional
                 .of(upstreamEndpoint)
                 .filter(Endpoint::isLocalhost)
-                .map(endpoint -> Endpoint.of(endpoint.scheme(), gatewayHost, endpoint.port()))
+                .map(endpoint -> Endpoint.of(endpoint.scheme(), routableIP, endpoint.port()))
                 .orElse(upstreamEndpoint);
     }
 

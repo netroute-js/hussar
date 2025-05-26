@@ -28,13 +28,13 @@ class ProxyNetworkConfigurerVerifier {
 
     void verifyNetworkConfigured(@NonNull Network network,
                                  @NonNull String networkPrefix,
-                                 @NonNull String gatewayHost,
+                                 @NonNull String routableIP,
                                  @NonNull String dockerHost,
                                  @NonNull List<Endpoint> internalEndpoints) {
         verifyNetworkPresent(network);
         verifyNetworkControlPresent(network);
         verifyEndpoints(network, dockerHost, internalEndpoints);
-        verifyProxiesCreated(networkPrefix, gatewayHost, internalEndpoints);
+        verifyProxiesCreated(networkPrefix, routableIP, internalEndpoints);
     }
 
     private void verifyNetworkPresent(Network network) {
@@ -59,15 +59,15 @@ class ProxyNetworkConfigurerVerifier {
         assertThat(actualEndpoints).containsExactlyElementsOf(expectedEndpoints);
     }
 
-    private void verifyProxiesCreated(String networkPrefix, String gatewayHost, List<Endpoint> internalEndpoints) {
+    private void verifyProxiesCreated(String networkPrefix, String routableIP, List<Endpoint> internalEndpoints) {
         var portCounter = new AtomicInteger(PROXY_INITIAL_PORT);
 
-        internalEndpoints.forEach(internalEndpoint -> verifyProxyCreated(networkPrefix, gatewayHost, portCounter.getAndIncrement(), internalEndpoint));
+        internalEndpoints.forEach(internalEndpoint -> verifyProxyCreated(networkPrefix, routableIP, portCounter.getAndIncrement(), internalEndpoint));
     }
 
-    private void verifyProxyCreated(String networkPrefix, String gatewayHost, int proxyPort, Endpoint internalEndpoint) {
+    private void verifyProxyCreated(String networkPrefix, String routableIP, int proxyPort, Endpoint internalEndpoint) {
         try {
-            var rewritedInternalEndpoint = rewriteInternalEndpoint(gatewayHost, internalEndpoint);
+            var rewritedInternalEndpoint = rewriteInternalEndpoint(routableIP, internalEndpoint);
             var proxyEndpoint = Endpoint.of(rewritedInternalEndpoint.scheme(), PROXY_BIND_IP, proxyPort);
 
             verify(proxyClient).createProxy(startsWith(networkPrefix), eq(proxyEndpoint.hostPort()), eq(rewritedInternalEndpoint.hostPort()));
@@ -76,11 +76,11 @@ class ProxyNetworkConfigurerVerifier {
         }
     }
 
-    private Endpoint rewriteInternalEndpoint(String gatewayHost, Endpoint endpoint) {
+    private Endpoint rewriteInternalEndpoint(String routableIP, Endpoint endpoint) {
         return Optional
                 .of(endpoint)
                 .filter(Endpoint::isLocalhost)
-                .map(actualEndpoint -> Endpoint.of(endpoint.scheme(), gatewayHost, endpoint.port()))
+                .map(actualEndpoint -> Endpoint.of(endpoint.scheme(), routableIP, endpoint.port()))
                 .orElse(endpoint);
     }
 
