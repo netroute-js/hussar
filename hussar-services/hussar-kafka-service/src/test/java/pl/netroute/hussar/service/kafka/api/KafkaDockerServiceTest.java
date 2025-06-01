@@ -5,13 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
@@ -22,27 +21,23 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
 import static pl.netroute.hussar.core.helper.SchemesHelper.EMPTY_SCHEME;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
-import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
 import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 
 public class KafkaDockerServiceTest {
-    private static final String KAFKA_HOST = "localhost";
-
     private static final int KAFKA_LISTENING_PORT = 9093;
-    private static final int KAFKA_MAPPED_PORT = 19093;
 
     private static final String KAFKA_SERVICE_NAME = "kafka-service";
     private static final String KAFKA_SERVICE_IMAGE = "confluentinc/cp-kafka";
@@ -59,24 +54,17 @@ public class KafkaDockerServiceTest {
     private static final boolean KAFKA_AUTO_CREATE_TOPICS_DISABLED = false;
     private static final boolean KAFKA_AUTO_CREATE_TOPICS_ENABLED = true;
 
+    private DockerNetwork dockerNetwork;
     private NetworkConfigurer networkConfigurer;
     private KafkaTopicConfigurer topicConfigurer;
     private KafkaKraftModeConfigurer kraftModeConfigurer;
 
-    private GenericContainerAccessibility containerAccessibility;
-
     @BeforeEach
     public void setup() {
+        dockerNetwork = StubHelper.defaultStub(DockerNetwork.class);
         networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
         topicConfigurer = StubHelper.defaultStub(KafkaTopicConfigurer.class);
         kraftModeConfigurer = StubHelper.defaultStub(KafkaKraftModeConfigurer.class);
-
-        containerAccessibility = GenericContainerAccessibility
-                .builder()
-                .host(KAFKA_HOST)
-                .exposedPort(KAFKA_LISTENING_PORT)
-                .mappedPort(KAFKA_LISTENING_PORT, KAFKA_MAPPED_PORT)
-                .build();
     }
 
     @Test
@@ -92,13 +80,10 @@ public class KafkaDockerServiceTest {
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var endpoint = Endpoint.of(EMPTY_SCHEME, KAFKA_HOST, KAFKA_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(KafkaContainer.class);
         var service = createKafkaService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, EMPTY_SCHEME, KAFKA_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -114,15 +99,15 @@ public class KafkaDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, KAFKA_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, KAFKA_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertNoTopicsCreated(topicConfigurer);
         assertNoKraftModeConfigured(kraftModeConfigurer);
         assertNoEntriesRegistered(service);
-        assertNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -148,18 +133,16 @@ public class KafkaDockerServiceTest {
                 .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
                 .build();
 
-        var endpoint = Endpoint.of(EMPTY_SCHEME, KAFKA_HOST, KAFKA_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(KafkaContainer.class);
         var service = createKafkaService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, EMPTY_SCHEME, KAFKA_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
+        var endpoint = network.getEndpoints().getFirst();
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
 
@@ -178,15 +161,15 @@ public class KafkaDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, KAFKA_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, KAFKA_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertTopicsCreated(topicConfigurer, topics);
         assertKraftModeConfigured(kraftModeConfigurer, container);
         assertEntriesRegistered(service, registeredEntries);
-        assertNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -205,8 +188,6 @@ public class KafkaDockerServiceTest {
         var container = StubHelper.defaultStub(KafkaContainer.class);
         var service = createKafkaService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-
         // when
         service.shutdown();
 
@@ -223,6 +204,7 @@ public class KafkaDockerServiceTest {
 
         return new KafkaDockerService(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,

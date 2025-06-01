@@ -4,13 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
@@ -18,19 +17,18 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNoEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
-import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
 import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisPasswordConfigurerAssertionHelper.assertNoPasswordConfigured;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisPasswordConfigurerAssertionHelper.assertPasswordConfigured;
@@ -40,30 +38,20 @@ import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_PAS
 import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_USERNAME;
 
 public class RedisDockerServiceTest {
-    private static final String REDIS_HOST = "localhost";
-    private static final int REDIS_MAPPED_PORT = 7000;
-
     private static final String REDIS_SERVICE_NAME = "redis-service";
     private static final String REDIS_SERVICE_IMAGE = "redis";
 
     private static final String REDIS_SCHEME = "redis://";
 
+    private DockerNetwork dockerNetwork;
     private NetworkConfigurer networkConfigurer;
     private RedisPasswordConfigurer passwordConfigurer;
 
-    private GenericContainerAccessibility containerAccessibility;
-
     @BeforeEach
     public void setup() {
+        dockerNetwork = StubHelper.defaultStub(DockerNetwork.class);
         networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
         passwordConfigurer = StubHelper.defaultStub(RedisPasswordConfigurer.class);
-
-        containerAccessibility = GenericContainerAccessibility
-                .builder()
-                .host(REDIS_HOST)
-                .exposedPort(REDIS_LISTENING_PORT)
-                .mappedPort(REDIS_LISTENING_PORT, REDIS_MAPPED_PORT)
-                .build();
     }
 
     @Test
@@ -82,13 +70,10 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var endpoint = Endpoint.of(REDIS_SCHEME, REDIS_HOST, REDIS_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, REDIS_SCHEME, REDIS_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -97,14 +82,14 @@ public class RedisDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
         assertNoPasswordConfigured(passwordConfigurer);
-        assertNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -133,18 +118,16 @@ public class RedisDockerServiceTest {
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                 .build();
 
-        var endpoint = Endpoint.of(REDIS_SCHEME, REDIS_HOST, REDIS_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, REDIS_SCHEME, REDIS_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
+        var endpoint = network.getEndpoints().getFirst();
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
 
@@ -167,15 +150,15 @@ public class RedisDockerServiceTest {
 
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertEntriesRegistered(service, registeredEntries);
         assertPasswordConfigured(passwordConfigurer, credentials, container);
-        assertNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -201,7 +184,6 @@ public class RedisDockerServiceTest {
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createRedisService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
         givenPasswordConfigurationFails(passwordConfigurer, container);
 
         // when
@@ -229,8 +211,6 @@ public class RedisDockerServiceTest {
 
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createRedisService(config, container);
-
-        givenContainerAccessible(container, containerAccessibility);
 
         // when
         service.shutdown();
@@ -300,6 +280,7 @@ public class RedisDockerServiceTest {
 
         return new RedisDockerService(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,

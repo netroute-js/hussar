@@ -25,7 +25,7 @@ public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
         var partitions = 1;
         var topic = new KafkaTopic("topic", partitions);
         var message = "a-message";
-        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var context = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
 
         service = KafkaDockerServiceConfigurer
                 .newInstance()
@@ -52,7 +52,7 @@ public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
     public void shouldFailStartingKafkaServiceWhenKraftModeNotSupported() {
         // given
         var dockerVersion = "3.0.0";
-        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var context = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
 
         service = KafkaDockerServiceConfigurer
                 .newInstance()

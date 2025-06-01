@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.testcontainers.containers.ToxiproxyContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkOperator;
 
 @InternalUseOnly
@@ -52,8 +53,9 @@ public class ProxyNetworkOperator implements NetworkOperator {
         networkConfigurer.setNetworkConfigurer(null);
     }
 
-    public static ProxyNetworkOperator newInstance() {
-        var toxiproxyContainer = new ToxiproxyContainer(PROXY_DOCKER_IMAGE);
+    public static ProxyNetworkOperator newInstance(@NonNull DockerNetwork dockerNetwork) {
+        var network = dockerNetwork.network();
+        var toxiproxyContainer = new ToxiproxyContainer(PROXY_DOCKER_IMAGE).withNetwork(network);
 
         return new ProxyNetworkOperator(toxiproxyContainer);
     }

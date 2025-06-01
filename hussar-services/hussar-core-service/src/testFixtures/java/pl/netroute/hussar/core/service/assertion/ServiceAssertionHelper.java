@@ -3,8 +3,8 @@ package pl.netroute.hussar.core.service.assertion;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
+import pl.netroute.hussar.core.network.api.Network;
 import pl.netroute.hussar.core.service.api.Service;
 
 import java.util.List;
@@ -19,14 +19,12 @@ public class ServiceAssertionHelper {
         assertThat(service.getName()).isEqualTo(expectedName);
     }
 
-    public static void assertSingleEndpoint(@NonNull Service service,
-                                            @NonNull Endpoint expectedEndpoint) {
-        assertThat(service.getEndpoints()).containsExactly(expectedEndpoint);
-    }
+    public static void assertEndpoints(@NonNull Service service,
+                                       @NonNull Network network) {
+        var actualEndpoints = service.getEndpoints();
+        var expectedEndpoints = network.getEndpoints();
 
-    public static void assertMultipleEndpoints(@NonNull Service service,
-                                               @NonNull List<Endpoint> expectedEndpoints) {
-        assertThat(service.getEndpoints()).containsExactlyInAnyOrderElementsOf(expectedEndpoints);
+        assertThat(actualEndpoints).containsExactlyInAnyOrderElementsOf(expectedEndpoints);
     }
 
     public static void assertNetworkControl(@NonNull Service service) {

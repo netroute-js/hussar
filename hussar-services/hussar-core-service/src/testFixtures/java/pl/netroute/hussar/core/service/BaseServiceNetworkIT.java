@@ -5,10 +5,11 @@ import lombok.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.NetworkOperatorStartupContext;
+import pl.netroute.hussar.core.network.ProxyNetworkOperator;
 import pl.netroute.hussar.core.network.api.NetworkOperator;
 import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.test.factory.NetworkOperatorTestFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,12 +19,15 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class BaseServiceNetworkIT<S extends Service> {
+    protected DockerNetwork dockerNetwork;
     protected NetworkOperator networkOperator;
     protected S service;
 
     @BeforeEach
     public void setup() {
-        networkOperator = NetworkOperatorTestFactory.createProxy();
+        dockerNetwork = DockerNetwork.newNetwork();
+
+        networkOperator = ProxyNetworkOperator.newInstance(dockerNetwork);
         networkOperator.start(NetworkOperatorStartupContext.defaultContext());
     }
 
@@ -39,7 +43,7 @@ public abstract class BaseServiceNetworkIT<S extends Service> {
     @Test
     public void shouldEnableNetwork() {
         // given
-        var serviceContext = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var serviceContext = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
         var networkMetadata = provideEnableNetworkTestMetadata(serviceContext);
         var assertion = networkMetadata.assertion();
 
@@ -59,7 +63,7 @@ public abstract class BaseServiceNetworkIT<S extends Service> {
     @Test
     public void shouldDisableNetwork() {
         // given
-        var serviceContext = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var serviceContext = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
         var networkMetadata = provideDisableNetworkTestMetadata(serviceContext);
         var assertion = networkMetadata.assertion();
 
@@ -78,7 +82,7 @@ public abstract class BaseServiceNetworkIT<S extends Service> {
     @Test
     public void shouldIntroduceNetworkLatency() {
         // given
-        var serviceContext = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var serviceContext = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
         var networkMetadata = provideIntroduceNetworkLatencyTestMetadata(serviceContext);
         var assertion = networkMetadata.assertion();
         var latency = Duration.ofSeconds(2L);
@@ -100,7 +104,7 @@ public abstract class BaseServiceNetworkIT<S extends Service> {
     @Test
     public void shouldResetNetwork() {
         // given
-        var serviceContext = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var serviceContext = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
         var networkMetadata = provideResetNetworkTestMetadata(serviceContext);
         var assertion = networkMetadata.assertion();
         var latency = Duration.ofSeconds(5L);

@@ -4,11 +4,14 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
+
+import java.util.List;
 
 import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_LISTENING_PORT;
 import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_PASSWORD;
@@ -33,6 +36,7 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
      * Creates new {@link RedisDockerService}.
      *
      * @param container - the {@link GenericContainer} used by this {@link RedisDockerService}.
+     * @param dockerNetwork - the {@link DockerNetwork} used by this {@link RedisDockerService}.
      * @param config - the {@link RedisDockerServiceConfig} used by this {@link RedisDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link RedisDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link RedisDockerService}.
@@ -41,13 +45,14 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
      * @param passwordConfigurer - the {@link RedisPasswordConfigurer} used by this {@link RedisDockerService}.
      */
     RedisDockerService(@NonNull GenericContainer<?> container,
+                       @NonNull DockerNetwork dockerNetwork,
                        @NonNull RedisDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,
                        @NonNull EndpointRegisterer endpointRegisterer,
                        @NonNull NetworkConfigurer networkConfigurer,
                        @NonNull RedisCredentialsRegisterer credentialsRegisterer,
                        @NonNull RedisPasswordConfigurer passwordConfigurer) {
-        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
+        super(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         if(isPasswordEnabled()) {
             this.credentials = new RedisCredentials(REDIS_USERNAME, REDIS_PASSWORD);
@@ -60,13 +65,6 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
     }
 
     @Override
-    protected void configureContainer(GenericContainer<?> container) {
-        super.configureContainer(container);
-
-        container.withExposedPorts(REDIS_LISTENING_PORT);
-    }
-
-    @Override
     protected void doAfterServiceStartup(ServiceStartupContext context) {
         super.doAfterServiceStartup(context);
 
@@ -76,6 +74,11 @@ public class RedisDockerService extends BaseDockerService<RedisDockerServiceConf
 
         registerCredentialsUnderProperties();
         registerCredentialsUnderEnvironmentVariables();
+    }
+
+    @Override
+    protected List<Integer> getInternalPorts() {
+        return List.of(REDIS_LISTENING_PORT);
     }
 
     private boolean isPasswordEnabled() {

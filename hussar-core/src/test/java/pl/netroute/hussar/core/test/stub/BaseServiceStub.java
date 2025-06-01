@@ -20,7 +20,7 @@ abstract class BaseServiceStub implements Service {
     private static final Faker FAKER = new Faker();
 
     @Builder.Default
-    private final String name = FAKER.app().name();
+    private final String name = FAKER.internet().domainName();
 
     @Builder.Default
     private final ConfigurationRegistry configurationRegistry = ConfigurationRegistryTestFactory.create();

@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.containers.ToxiproxyContainer;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
-import pl.netroute.hussar.core.helper.IpHelper;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
@@ -43,7 +42,6 @@ public class ProxyNetworkConfigurerTest {
         // given
         var networkPrefix = "net";
         var dockerHost = "docker-host";
-        var routableIP = IpHelper.getRoutableIP();
 
         IntStream
                 .range(0, endpoints.size())
@@ -55,7 +53,7 @@ public class ProxyNetworkConfigurerTest {
         var network = configurer.configure(networkPrefix, endpoints);
 
         // then
-        verifier.verifyNetworkConfigured(network, networkPrefix, routableIP, dockerHost, endpoints);
+        verifier.verifyNetworkConfigured(network, networkPrefix, dockerHost, endpoints);
     }
 
     private static List<Arguments> endpointVariants() {

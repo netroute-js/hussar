@@ -22,6 +22,7 @@ public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceCon
 
     public MariaDBDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerRegistry = context.dockerRegistry();
+        var dockerNetwork = context.dockerNetwork();
         var networkConfigurer = context.networkConfigurer();
         var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
@@ -33,6 +34,7 @@ public class MariaDBDockerServiceConfigurer extends BaseDatabaseDockerServiceCon
 
         return new MariaDBDockerService(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,

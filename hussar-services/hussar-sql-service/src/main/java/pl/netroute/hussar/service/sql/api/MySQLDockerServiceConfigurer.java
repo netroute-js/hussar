@@ -22,6 +22,7 @@ public class MySQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfi
 
     public MySQLDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerRegistry = context.dockerRegistry();
+        var dockerNetwork = context.dockerNetwork();
         var networkConfigurer = context.networkConfigurer();
         var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
@@ -33,6 +34,7 @@ public class MySQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfi
 
         return new MySQLDockerService(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,

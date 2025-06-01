@@ -1,8 +1,10 @@
 package pl.netroute.hussar.service.sql.api;
 
+import lombok.Getter;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.helper.EndpointHelper;
@@ -16,14 +18,22 @@ import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
  * @param <C> the {@link SQLDatabaseDockerServiceConfig} parameter used by the {@link BaseDatabaseDockerService}.
  */
 abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfig> extends BaseDockerService<C> implements SQLDatabaseDockerService {
+
+    @Getter
+    @NonNull
     private final SQLDatabaseCredentials credentials;
+
+    @NonNull
     private final DatabaseCredentialsRegisterer credentialsRegisterer;
+
+    @NonNull
     private final DatabaseSchemaInitializer schemaInitializer;
 
     /**
      * Creates new {@link BaseDatabaseDockerService}.
      *
      * @param container - the {@link GenericContainer} used by this {@link BaseDatabaseDockerService}.
+     * @param dockerNetwork - the {@link DockerNetwork} used by this {@link BaseDatabaseDockerService}.
      * @param config - the configuration <C> used by this {@link BaseDatabaseDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link BaseDatabaseDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link BaseDatabaseDockerService}.
@@ -33,6 +43,7 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
      * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link BaseDatabaseDockerService}.
      */
     BaseDatabaseDockerService(@NonNull GenericContainer<?> container,
+                              @NonNull DockerNetwork dockerNetwork,
                               @NonNull C config,
                               @NonNull ConfigurationRegistry configurationRegistry,
                               @NonNull EndpointRegisterer endpointRegisterer,
@@ -40,7 +51,7 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
                               @NonNull DatabaseCredentialsRegisterer credentialsRegisterer,
                               @NonNull SQLDatabaseCredentials credentials,
                               @NonNull DatabaseSchemaInitializer schemaInitializer) {
-        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
+        super(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.credentialsRegisterer = credentialsRegisterer;
         this.credentials = credentials;
@@ -55,11 +66,6 @@ abstract class BaseDatabaseDockerService<C extends SQLDatabaseDockerServiceConfi
         registerCredentialsUnderEnvironmentVariables();
 
         initializeDatabaseSchemas();
-    }
-
-    @Override
-    public SQLDatabaseCredentials getCredentials() {
-        return credentials;
     }
 
     private void registerCredentialsUnderProperties() {

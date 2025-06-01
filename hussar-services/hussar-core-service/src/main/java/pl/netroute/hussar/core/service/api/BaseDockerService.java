@@ -6,6 +6,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.docker.DockerAliasGenerator;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
@@ -20,7 +22,6 @@ import java.util.Optional;
  * @param <C> the {@link BaseDockerServiceConfig} parameter used by the {@link BaseDockerService}.
  */
 public abstract class BaseDockerService<C extends BaseDockerServiceConfig> extends BaseService<C> {
-    private static final String CONTAINER_HOST = "localhost";
 
     /**
      * An instance of {@link GenericContainer}. This is actual Docker container.
@@ -28,15 +29,27 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
     protected final GenericContainer<?> container;
 
     /**
+     * An instance of {@link DockerNetwork}. This is actual Docker network.
+     */
+    protected final DockerNetwork dockerNetwork;
+
+    /**
+     * Docker alias used in the Network.
+     */
+    protected final String dockerAlias;
+
+    /**
      * Creates new instance of {@link BaseDockerService}.
      *
      * @param container - the {@link GenericContainer} used by this {@link BaseDockerService}.
+     * @param dockerNetwork - the {@link DockerNetwork} used by this {@link BaseDockerService}.
      * @param config - the {@link BaseDockerServiceConfig} used by this {@link BaseDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link BaseDockerService}.
      * @param endpointRegisterer - the {@link EndpointRegisterer} used by this {@link BaseDockerService}.
      * @param networkConfigurer - the {@link NetworkConfigurer} used by this {@link BaseDockerService}.
      */
     protected BaseDockerService(@NonNull GenericContainer<?> container,
+                                @NonNull DockerNetwork dockerNetwork,
                                 @NonNull C config,
                                 @NonNull ConfigurationRegistry configurationRegistry,
                                 @NonNull EndpointRegisterer endpointRegisterer,
@@ -44,6 +57,8 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
         super(config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.container = container;
+        this.dockerNetwork = dockerNetwork;
+        this.dockerAlias = DockerAliasGenerator.generate();
     }
 
     @Override
@@ -52,11 +67,11 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
                 .ofNullable(config.getScheme())
                 .orElse(SchemesHelper.EMPTY_SCHEME);
 
-        return container
-                .getExposedPorts()
+        var internalPorts = getInternalPorts();
+
+        return internalPorts
                 .stream()
-                .map(container::getMappedPort)
-                .map(mappedPort -> Endpoint.of(scheme, CONTAINER_HOST, mappedPort))
+                .map(internalPort -> Endpoint.of(scheme, dockerAlias, internalPort))
                 .toList();
     }
 
@@ -77,12 +92,36 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
      * @param container - the {@link GenericContainer} to configure.
      */
     protected void configureContainer(GenericContainer<?> container) {
+        configureDockerNetwork(container);
+        configureExposedPorts(container);
+        configureEnvVariables(container);
         configureLogging(container);
         configureWaitStrategy(container);
     }
 
     /**
-     * Configure logging of the {@link GenericContainer}.
+     * Configures Docker network of the {@link GenericContainer}.
+     *
+     * @param container - the {@link GenericContainer} to configure.
+     */
+    protected void configureDockerNetwork(GenericContainer<?> container) {
+        var network = dockerNetwork.network();
+
+        container.withNetwork(network);
+        container.withNetworkAliases(dockerAlias);
+    }
+
+    /**
+     * Configures exposed ports of {@link GenericContainer}.
+     *
+     * @param container - the {@link GenericContainer} to configure.
+     */
+    protected void configureExposedPorts(GenericContainer<?> container) {
+        getInternalPorts().forEach(container::withExposedPorts);
+    }
+
+    /**
+     * Configures logging of the {@link GenericContainer}.
      *
      * @param container - the {@link GenericContainer} to configure.
      */
@@ -91,7 +130,7 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
     }
 
     /**
-     * Configure wait strategy of {@link GenericContainer}.
+     * Configures wait strategy of {@link GenericContainer}.
      *
      * @param container - the {@link GenericContainer} to configure.
      */
@@ -99,4 +138,18 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
         container.waitingFor(Wait.forListeningPort());
     }
 
+    /**
+     * Configures environment variables of {@link GenericContainer}.
+     *
+     * @param container - the {@link GenericContainer} to configure.
+     */
+    protected void configureEnvVariables(GenericContainer<?> container) {
+    }
+
+    /**
+     * Returns internal ports used by this {@link BaseDockerService}.
+     *
+     * @return internal ports.
+     */
+    protected abstract List<Integer> getInternalPorts();
 }

@@ -4,10 +4,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
-import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.api.BaseDockerService;
@@ -15,7 +14,6 @@ import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static pl.netroute.hussar.service.nosql.redis.api.RedisClusterSettings.REDIS_CLUSTER_FIRST_PORT;
@@ -60,7 +58,11 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
     @NonNull
     private final DockerHostResolver dockerHostResolver;
 
+    @NonNull
+    private final List<Integer> clusterNodesPorts;
+
     RedisClusterDockerService(@NonNull FixedHostPortGenericContainer<?> container,
+                              @NonNull DockerNetwork dockerNetwork,
                               @NonNull RedisClusterDockerServiceConfig config,
                               @NonNull ConfigurationRegistry configurationRegistry,
                               @NonNull EndpointRegisterer endpointRegisterer,
@@ -72,7 +74,7 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
                               @NonNull RedisClusterNoProtectionConfigurer redisClusterNoProtectionConfigurer,
                               @NonNull RedisClusterWaitStrategy clusterWaitStrategy,
                               @NonNull DockerHostResolver dockerHostResolver) {
-        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
+        super(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         if(isClusterPasswordEnabled()) {
             this.credentials = new RedisCredentials(REDIS_CLUSTER_USERNAME, REDIS_CLUSTER_PASSWORD);
@@ -87,21 +89,17 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
         this.redisClusterNoProtectionConfigurer = redisClusterNoProtectionConfigurer;
         this.clusterWaitStrategy = clusterWaitStrategy;
         this.dockerHostResolver = dockerHostResolver;
+
+        this.clusterNodesPorts = IntStream
+                .range(0, REDIS_CLUSTER_NODES)
+                .map(node -> REDIS_CLUSTER_FIRST_PORT + node)
+                .boxed()
+                .toList();
     }
 
     @Override
-    public List<Endpoint> getInternalEndpoints() {
-        var host = container.getHost();
-
-        var scheme = Optional
-                .ofNullable(config.getScheme())
-                .orElse(SchemesHelper.EMPTY_SCHEME);
-
-        return container
-                .getBoundPortNumbers()
-                .stream()
-                .map(mappedPort -> Endpoint.of(scheme, host, mappedPort))
-                .toList();
+    protected List<Integer> getInternalPorts() {
+        return clusterNodesPorts;
     }
 
     @Override
@@ -110,15 +108,26 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
 
         var fixedHostPortContainer = (FixedHostPortGenericContainer<?>) container;
 
-        fixedHostPortContainer.withEnv(REDIS_CLUSTER_IP_ENV, REDIS_CLUSTER_IP);
-        fixedHostPortContainer.withEnv(REDIS_CLUSTER_MASTERS_ENV, REDIS_CLUSTER_MASTERS + "");
-        fixedHostPortContainer.withEnv(REDIS_CLUSTER_SLAVES_PER_MASTER_ENV, REDIS_CLUSTER_SLAVES_PER_MASTER + "");
-
         if(!dockerHostResolver.isLocalHost()) {
             configureClusterDockerHost(fixedHostPortContainer);
         }
+    }
 
-        configureClusterNodesPorts(fixedHostPortContainer);
+    @Override
+    protected void configureExposedPorts(GenericContainer<?> container) {
+        var fixedHostPortContainer = (FixedHostPortGenericContainer<?>) container;
+
+        getInternalPorts().forEach(port -> fixedHostPortContainer.withFixedExposedPort(port, port));
+    }
+
+    @Override
+    protected void configureEnvVariables(GenericContainer<?> container) {
+        super.configureEnvVariables(container);
+
+        var fixedHostPortContainer = (FixedHostPortGenericContainer<?>) container;
+        fixedHostPortContainer.withEnv(REDIS_CLUSTER_IP_ENV, REDIS_CLUSTER_IP);
+        fixedHostPortContainer.withEnv(REDIS_CLUSTER_MASTERS_ENV, REDIS_CLUSTER_MASTERS + "");
+        fixedHostPortContainer.withEnv(REDIS_CLUSTER_SLAVES_PER_MASTER_ENV, REDIS_CLUSTER_SLAVES_PER_MASTER + "");
     }
 
     @Override
@@ -170,18 +179,6 @@ public class RedisClusterDockerService extends BaseDockerService<RedisClusterDoc
 
     private void disableProtectionMode(FixedHostPortGenericContainer<?> container) {
         redisClusterNoProtectionConfigurer.configure(container);
-    }
-
-    private void configureClusterNodesPorts(FixedHostPortGenericContainer<?> container) {
-        getClusterNodesPorts().forEach(port -> container.withFixedExposedPort(port, port));
-    }
-
-    private List<Integer> getClusterNodesPorts() {
-        return IntStream
-                .range(0, REDIS_CLUSTER_NODES)
-                .map(node -> REDIS_CLUSTER_FIRST_PORT + node)
-                .boxed()
-                .toList();
     }
 
     private void registerCredentialsUnderProperties() {

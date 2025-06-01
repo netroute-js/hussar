@@ -3,10 +3,13 @@ package pl.netroute.hussar.service.sql.api;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.api.Service;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
+
+import java.util.List;
 
 /**
  * Hussar Docker {@link Service} representing PostgreSQL.
@@ -23,6 +26,7 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
      * Creates new {@link PostgreSQLDockerService}.
      *
      * @param container - the {@link GenericContainer} used by this {@link PostgreSQLDockerService}.
+     * @param dockerNetwork - the {@link DockerNetwork} used by this {@link PostgreSQLDockerService}.
      * @param config - the {@link SQLDatabaseDockerServiceConfig} used by this {@link PostgreSQLDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link PostgreSQLDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link PostgreSQLDockerService}.
@@ -31,6 +35,7 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
      * @param schemaInitializer - the {@link DatabaseSchemaInitializer} used by this {@link PostgreSQLDockerService}.
      */
     PostgreSQLDockerService(@NonNull GenericContainer<?> container,
+                            @NonNull DockerNetwork dockerNetwork,
                             @NonNull SQLDatabaseDockerServiceConfig config,
                             @NonNull ConfigurationRegistry configurationRegistry,
                             @NonNull EndpointRegisterer endpointRegisterer,
@@ -39,6 +44,7 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
                             @NonNull DatabaseSchemaInitializer schemaInitializer) {
         super(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,
@@ -50,11 +56,15 @@ public class PostgreSQLDockerService extends BaseDatabaseDockerService<SQLDataba
     }
 
     @Override
-    protected void configureContainer(GenericContainer<?> container) {
-        super.configureContainer(container);
+    protected void configureEnvVariables(GenericContainer<?> container) {
+        super.configureEnvVariables(container);
 
-        container.withExposedPorts(LISTENING_PORT);
         container.withEnv(POSTGRE_SQL_PASSWORD_ENV, POSTGRE_SQL_PASSWORD);
+    }
+
+    @Override
+    protected List<Integer> getInternalPorts() {
+        return List.of(LISTENING_PORT);
     }
 
     private static SQLDatabaseCredentials defaultCredentials() {

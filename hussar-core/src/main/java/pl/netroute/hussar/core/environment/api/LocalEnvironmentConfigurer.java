@@ -6,6 +6,7 @@ import lombok.Singular;
 import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.docker.api.DockerRegistry;
 import pl.netroute.hussar.core.environment.EnvironmentConfigurerContext;
 import pl.netroute.hussar.core.environment.LocalEnvironment;
@@ -48,8 +49,9 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
 
     @Override
     public Environment configure(@NonNull EnvironmentConfigurerContext context) {
-        var networkOperator = ProxyNetworkOperator.newInstance();
-        var configuredServices = configureServices(networkOperator);
+        var dockerNetwork = DockerNetwork.newNetwork();
+        var networkOperator = ProxyNetworkOperator.newInstance(dockerNetwork);
+        var configuredServices = configureServices(dockerNetwork, networkOperator);
         var serviceRegistry = DefaultServiceRegistry.of(configuredServices);
 
         var configurations = mergeConfigurations();
@@ -63,9 +65,9 @@ public final class LocalEnvironmentConfigurer implements EnvironmentConfigurer {
         );
     }
 
-    private Set<Service> configureServices(NetworkOperator networkOperator) {
+    private Set<Service> configureServices(DockerNetwork dockerNetwork, NetworkOperator networkOperator) {
         var networkConfigurer = networkOperator.getNetworkConfigurer();
-        var context = new ServiceConfigureContext(dockerRegistry, networkConfigurer);
+        var context = new ServiceConfigureContext(dockerRegistry, dockerNetwork, networkConfigurer);
 
         return services
                 .stream()

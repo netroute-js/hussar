@@ -1,19 +1,20 @@
 package pl.netroute.hussar.service.rabbitmq.api;
 
 import com.rabbitmq.client.ConnectionFactory;
+import lombok.Getter;
 import lombok.NonNull;
 import org.testcontainers.containers.GenericContainer;
-import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.service.api.Service;
-import pl.netroute.hussar.core.service.ServiceStartupContext;
+import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.helper.SchemesHelper;
-import pl.netroute.hussar.core.service.api.BaseDockerService;
-import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
+import pl.netroute.hussar.core.service.ServiceStartupContext;
+import pl.netroute.hussar.core.service.api.BaseDockerService;
+import pl.netroute.hussar.core.service.api.Service;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,14 +31,21 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
     private static final String RABBITMQ_USERNAME = "guest";
     private static final String RABBITMQ_PASSWORD = "password";
 
+    @NonNull
     private final RabbitMQCredentialsRegisterer credentialsRegisterer;
+
+    @NonNull
     private final RabbitMQQueueConfigurer queueConfigurer;
+
+    @Getter
+    @NonNull
     private final RabbitMQCredentials credentials;
 
     /**
      * Creates new {@link RabbitMQDockerService}.
      *
      * @param container - the {@link GenericContainer} used by this {@link RabbitMQDockerService}.
+     * @param dockerNetwork - the {@link DockerNetwork} used by this {@link RabbitMQDockerService}.
      * @param config - the {@link RabbitMQDockerServiceConfig} used by this {@link RabbitMQDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link RabbitMQDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link RabbitMQDockerService}.
@@ -46,13 +54,14 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
      * @param queueConfigurer - the {@link RabbitMQQueueConfigurer} used by this {@link RabbitMQDockerService}.
      */
     RabbitMQDockerService(@NonNull GenericContainer<?> container,
+                          @NonNull DockerNetwork dockerNetwork,
                           @NonNull RabbitMQDockerServiceConfig config,
                           @NonNull ConfigurationRegistry configurationRegistry,
                           @NonNull EndpointRegisterer endpointRegisterer,
                           @NonNull NetworkConfigurer networkConfigurer,
                           @NonNull RabbitMQCredentialsRegisterer credentialsRegisterer,
                           @NonNull RabbitMQQueueConfigurer queueConfigurer) {
-        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
+        super(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.credentialsRegisterer = credentialsRegisterer;
         this.queueConfigurer = queueConfigurer;
@@ -65,11 +74,9 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
         var endpoints = super.getInternalEndpoints();
 
         if(ManagementApiResolver.isSupported(config)) {
-            var managementApiPort = container.getMappedPort(MANAGEMENT_API_LISTENING_PORT);
-
             return endpoints
                     .stream()
-                    .filter(endpoint -> endpoint.port() != managementApiPort)
+                    .filter(endpoint -> endpoint.port() != MANAGEMENT_API_LISTENING_PORT)
                     .toList();
         }
 
@@ -77,10 +84,17 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
     }
 
     @Override
-    protected void configureContainer(GenericContainer<?> container) {
-        super.configureContainer(container);
+    protected List<Integer> getInternalPorts() {
+        if(ManagementApiResolver.isSupported(config)) {
+            return List.of(LISTENING_PORT, MANAGEMENT_API_LISTENING_PORT);
+        }
 
-        configureExposedPorts(container);
+        return List.of(LISTENING_PORT);
+    }
+
+    @Override
+    protected void configureEnvVariables(GenericContainer<?> container) {
+        super.configureEnvVariables(container);
 
         container.withEnv(RABBITMQ_DEFAULT_USER_ENV, RABBITMQ_USERNAME);
         container.withEnv(RABBITMQ_DEFAULT_PASS_ENV, RABBITMQ_PASSWORD);
@@ -98,15 +112,6 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
         registerCredentialsUnderEnvironmentVariables();
         registerManagementEndpointUnderProperties();
         registerManagementEndpointUnderEnvironmentVariables();
-    }
-
-    /**
-     * Returns {@link RabbitMQCredentials}.
-     *
-     * @return the actual {@link RabbitMQCredentials}.
-     */
-    public RabbitMQCredentials getCredentials() {
-        return credentials;
     }
 
     /**
@@ -142,17 +147,6 @@ public class RabbitMQDockerService extends BaseDockerService<RabbitMQDockerServi
         var queues = config.getQueues();
 
         queues.forEach(queue -> queueConfigurer.configure(connectionFactory, queue));
-    }
-
-    private void configureExposedPorts(GenericContainer<?> container) {
-        var exposedPorts = new ArrayList<Integer>();
-        exposedPorts.add(LISTENING_PORT);
-
-        if(ManagementApiResolver.isSupported(config)) {
-            exposedPorts.add(MANAGEMENT_API_LISTENING_PORT);
-        }
-
-        container.withExposedPorts(exposedPorts.toArray(new Integer[0]));
     }
 
     private void registerCredentialsUnderProperties() {
