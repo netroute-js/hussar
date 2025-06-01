@@ -6,6 +6,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.helper.EndpointHelper;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
@@ -19,15 +20,24 @@ import java.util.List;
  * Hussar Docker {@link Service} representing Kafka.
  */
 public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConfig> {
+
+    @NonNull
     private final KafkaListenerConfigurer listenerConfigurer;
+
+    @NonNull
     private final KafkaTopicConfigurer topicConfigurer;
+
+    @NonNull
     private final KafkaTopicAutoCreationConfigurer topicAutoCreationConfigurer;
+
+    @NonNull
     private final KafkaKraftModeConfigurer kraftModeConfigurer;
 
     /**
      * Creates new instance of {@link KafkaDockerService}.
      *
      * @param container - the {@link KafkaContainer} used by this {@link KafkaDockerService}.
+     * @param dockerNetwork - the {@link DockerNetwork} used by this {@link KafkaDockerService}.
      * @param config - the {@link KafkaDockerServiceConfig} used by this {@link KafkaDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link KafkaDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link KafkaDockerService}.
@@ -38,6 +48,7 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
      * @param kraftModeConfigurer - the {@link KafkaKraftModeConfigurer} used by this {@link KafkaDockerService}.
      */
     KafkaDockerService(@NonNull KafkaContainer container,
+                       @NonNull DockerNetwork dockerNetwork,
                        @NonNull KafkaDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,
                        @NonNull EndpointRegisterer endpointRegisterer,
@@ -46,7 +57,7 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
                        @NonNull KafkaTopicConfigurer topicConfigurer,
                        @NonNull KafkaTopicAutoCreationConfigurer topicAutoCreationConfigurer,
                        @NonNull KafkaKraftModeConfigurer kraftModeConfigurer) {
-        super(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
+        super(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
         this.listenerConfigurer = listenerConfigurer;
         this.topicConfigurer = topicConfigurer;
@@ -55,14 +66,16 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
     }
 
     @Override
-    public List<Endpoint> getInternalEndpoints() {
+    protected List<Endpoint> getInternalEndpoints() {
         var externalListener = KafkaListenerConfigurer.EXTERNAL_LISTENER;
-
-        var host = container.getHost();
-        var port = container.getMappedPort(externalListener.port());
-        var endpoint = Endpoint.schemeLess(host, port);
+        var endpoint = Endpoint.schemeLess(dockerAlias, externalListener.port());
 
         return List.of(endpoint);
+    }
+
+    @Override
+    protected List<Integer> getInternalPorts() {
+        return List.of(KafkaListenerConfigurer.EXTERNAL_LISTENER.port());
     }
 
     @Override
@@ -73,9 +86,9 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
         listenerConfigurer.configure(kafkaContainer);
         topicAutoCreationConfigurer.configure(config.isTopicAutoCreation(), kafkaContainer);
 
-        configureKraftMode(kafkaContainer);
-
-        kafkaContainer.withExposedPorts(KafkaListenerConfigurer.EXTERNAL_LISTENER.port());
+        if(config.isKraftMode()) {
+            kraftModeConfigurer.configure(kafkaContainer);
+        }
     }
 
     @Override
@@ -86,12 +99,6 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
         var adminClient = KafkaAdminClientFactory.create(endpoint);
 
         configureTopics(adminClient);
-    }
-
-    private void configureKraftMode(KafkaContainer container) {
-        if(config.isKraftMode()) {
-            kraftModeConfigurer.configure(container);
-        }
     }
 
     private void configureTopics(AdminClient adminClient) {

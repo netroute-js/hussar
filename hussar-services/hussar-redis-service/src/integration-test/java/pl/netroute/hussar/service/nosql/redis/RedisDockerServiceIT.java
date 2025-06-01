@@ -18,7 +18,7 @@ public class RedisDockerServiceIT extends BaseServiceIT<RedisDockerService> {
     @Test
     public void shouldStartSecuredService() {
         // given
-        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var context = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
 
         service = RedisDockerServiceConfigurer
                 .newInstance()

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.helper.UUIDHelper;
 
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ class ProxyNameResolver {
     private static final String PROXY_NAME_TEMPLATE = "%s-%s";
 
     static String resolve(@NonNull String proxyPrefix) {
-        var proxySuffix = UUID.randomUUID().toString();
+        var proxySuffix = UUIDHelper.extractFirstPart(UUID.randomUUID());
 
         return String.format(PROXY_NAME_TEMPLATE, proxyPrefix, proxySuffix);
     }

@@ -4,56 +4,45 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.helper.SchemesHelper;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
 import java.util.List;
 import java.util.Set;
 
-import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
+import static pl.netroute.hussar.core.helper.SchemesHelper.HTTP_SCHEME;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNoEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
-import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
 import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 
 public class WiremockDockerServiceTest {
-    private static final String WIREMOCK_HOST = "localhost";
     private static final int WIREMOCK_LISTENING_PORT = 8080;
-    private static final int WIREMOCK_MAPPED_PORT = 9080;
 
     private static final String WIREMOCK_SERVICE_NAME = "wiremock-service";
     private static final String WIREMOCK_SERVICE_IMAGE = "wiremock/wiremock";
 
+    private DockerNetwork dockerNetwork;
     private NetworkConfigurer networkConfigurer;
-
-    private GenericContainerAccessibility containerAccessibility;
 
     @BeforeEach
     public void setup() {
+        dockerNetwork = StubHelper.defaultStub(DockerNetwork.class);
         networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
-
-        containerAccessibility = GenericContainerAccessibility
-                .builder()
-                .host(WIREMOCK_HOST)
-                .exposedPort(WIREMOCK_LISTENING_PORT)
-                .mappedPort(WIREMOCK_LISTENING_PORT, WIREMOCK_MAPPED_PORT)
-                .build();
     }
 
     @Test
@@ -63,18 +52,15 @@ public class WiremockDockerServiceTest {
                 .builder()
                 .name(WIREMOCK_SERVICE_NAME)
                 .dockerImage(WIREMOCK_SERVICE_IMAGE)
-                .scheme(SchemesHelper.HTTP_SCHEME)
+                .scheme(HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var endpoint = Endpoint.of(SchemesHelper.HTTP_SCHEME, WIREMOCK_HOST, WIREMOCK_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createWireMockService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, HTTP_SCHEME, WIREMOCK_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -83,13 +69,13 @@ public class WiremockDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, WIREMOCK_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, WIREMOCK_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
-        assertNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -102,23 +88,21 @@ public class WiremockDockerServiceTest {
                 .builder()
                 .name(WIREMOCK_SERVICE_NAME)
                 .dockerImage(WIREMOCK_SERVICE_IMAGE)
-                .scheme(SchemesHelper.HTTP_SCHEME)
+                .scheme(HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
                 .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
                 .build();
 
-        var endpoint = Endpoint.of(SchemesHelper.HTTP_SCHEME, WIREMOCK_HOST, WIREMOCK_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createWireMockService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, HTTP_SCHEME, WIREMOCK_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
+        var endpoint = network.getEndpoints().getFirst();
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
         var endpointEntries = List.<ConfigurationEntry>of(endpointPropertyEntry, endpointEnvVariableEntry);
@@ -126,13 +110,13 @@ public class WiremockDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, WIREMOCK_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, WIREMOCK_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertEntriesRegistered(service, endpointEntries);
-        assertNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -142,7 +126,7 @@ public class WiremockDockerServiceTest {
                 .builder()
                 .name(WIREMOCK_SERVICE_NAME)
                 .dockerImage(WIREMOCK_SERVICE_IMAGE)
-                .scheme(SchemesHelper.HTTP_SCHEME)
+                .scheme(HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
                 .build();
@@ -162,7 +146,7 @@ public class WiremockDockerServiceTest {
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
 
-        return new WiremockDockerService(container, config, configurationRegistry, endpointRegisterer, networkConfigurer);
+        return new WiremockDockerService(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
     }
 
 }

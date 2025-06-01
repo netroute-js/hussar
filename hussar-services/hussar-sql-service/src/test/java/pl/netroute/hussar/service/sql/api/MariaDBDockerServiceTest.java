@@ -4,13 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
+import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.network.api.NetworkConfigurer;
 import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
-import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
@@ -18,55 +17,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static pl.netroute.hussar.core.assertion.helper.NetworkConfigurerAssertionHelper.assertNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerExposedPortConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
-import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertSingleEndpoint;
-import static pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.givenContainerAccessible;
 import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.givenNetworkConfigured;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertNoSchemaInitialized;
 import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializerAssertionHelper.assertSchemasInitialized;
 
 public class MariaDBDockerServiceTest  {
-    private static final String MARIA_DB_HOST = "localhost";
     private static final int MARIA_DB_LISTENING_PORT = 3306;
-    private static final int MARIA_DB_MAPPED_PORT = 30120;
 
     private static final String MARIA_DB_SERVICE_NAME = "mariadb-service";
     private static final String MARIA_DB_SERVICE_IMAGE = "mariadb";
 
     private static final String MARIA_DB_SCHEME = "jdbc:mariadb://";
-
     private static final String MARIA_DB_PASSWORD_ENV = "MARIADB_ROOT_PASSWORD";
 
     private static final String MARIA_DB_USERNAME = "root";
     private static final String MARIA_DB_PASSWORD = "test";
     private static final SQLDatabaseCredentials MARIA_DB_CREDENTIALS = new SQLDatabaseCredentials(MARIA_DB_USERNAME, MARIA_DB_PASSWORD);
 
+    private DockerNetwork dockerNetwork;
     private NetworkConfigurer networkConfigurer;
     private DatabaseSchemaInitializer schemaInitializer;
 
-    private GenericContainerAccessibility containerAccessibility;
-
     @BeforeEach
     public void setup() {
+        dockerNetwork = StubHelper.defaultStub(DockerNetwork.class);
         networkConfigurer = StubHelper.defaultStub(NetworkConfigurer.class);
         schemaInitializer = StubHelper.defaultStub(DatabaseSchemaInitializer.class);
-
-        containerAccessibility = GenericContainerAccessibility
-                .builder()
-                .host(MARIA_DB_HOST)
-                .exposedPort(MARIA_DB_LISTENING_PORT)
-                .mappedPort(MARIA_DB_LISTENING_PORT, MARIA_DB_MAPPED_PORT)
-                .build();
     }
 
     @Test
@@ -86,13 +74,10 @@ public class MariaDBDockerServiceTest  {
                 .registerPasswordUnderEnvironmentVariables(Set.of())
                 .build();
 
-        var endpoint = Endpoint.of(MARIA_DB_SCHEME, MARIA_DB_HOST, MARIA_DB_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createDatabaseService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, MARIA_DB_SCHEME, MARIA_DB_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -103,14 +88,14 @@ public class MariaDBDockerServiceTest  {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MARIA_DB_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MARIA_DB_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertNoSchemaInitialized(schemaInitializer);
         assertNoEntriesRegistered(service);
-        assertNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -143,18 +128,16 @@ public class MariaDBDockerServiceTest  {
                 .registerPasswordUnderEnvironmentVariables(Set.of(passwordEnvVariable))
                 .build();
 
-        var endpoint = Endpoint.of(MARIA_DB_SCHEME, MARIA_DB_HOST, MARIA_DB_MAPPED_PORT);
-
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createDatabaseService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-        givenNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, endpoint);
+        var network = givenNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, MARIA_DB_SCHEME, MARIA_DB_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
 
         // then
+        var endpoint = network.getEndpoints().getFirst();
         var endpointPropertyEntry = ConfigurationEntry.property(endpointProperty, endpoint.address());
         var endpointEnvVariableEntry = ConfigurationEntry.envVariable(endpointEnvVariable, endpoint.address());
 
@@ -180,14 +163,14 @@ public class MariaDBDockerServiceTest  {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MARIA_DB_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MARIA_DB_SERVICE_NAME);
-        assertSingleEndpoint(service, endpoint);
+        assertEndpoints(service, network);
         assertNetworkControl(service);
         assertSchemasInitialized(schemaInitializer, service, MARIA_DB_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);
-        assertNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, endpoint);
     }
 
     @Test
@@ -210,8 +193,6 @@ public class MariaDBDockerServiceTest  {
         var container = StubHelper.defaultStub(GenericContainer.class);
         var service = createDatabaseService(config, container);
 
-        givenContainerAccessible(container, containerAccessibility);
-
         // when
         service.shutdown();
 
@@ -227,6 +208,7 @@ public class MariaDBDockerServiceTest  {
 
         return new MariaDBDockerService(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,

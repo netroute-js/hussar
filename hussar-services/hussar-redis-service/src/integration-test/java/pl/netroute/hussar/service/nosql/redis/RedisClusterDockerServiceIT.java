@@ -20,7 +20,7 @@ public class RedisClusterDockerServiceIT extends BaseServiceIT<RedisClusterDocke
     @Test
     public void shouldStartSecuredRedisClusterService() {
         // given
-        var context = ServiceConfigureContext.defaultContext(networkOperator.getNetworkConfigurer());
+        var context = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
 
         service = RedisClusterDockerServiceConfigurer
                 .newInstance()

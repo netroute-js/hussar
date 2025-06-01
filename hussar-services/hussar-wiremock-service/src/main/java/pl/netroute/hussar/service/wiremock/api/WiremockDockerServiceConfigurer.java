@@ -23,6 +23,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
     @Override
     public WiremockDockerService configure(@NonNull ServiceConfigureContext context) {
         var dockerRegistry = context.dockerRegistry();
+        var dockerNetwork = context.dockerNetwork();
         var networkConfigurer = context.networkConfigurer();
         var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var config = createConfig(dockerImage);
@@ -32,6 +33,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
 
         return new WiremockDockerService(
                 container,
+                dockerNetwork,
                 config,
                 configurationRegistry,
                 endpointRegisterer,
