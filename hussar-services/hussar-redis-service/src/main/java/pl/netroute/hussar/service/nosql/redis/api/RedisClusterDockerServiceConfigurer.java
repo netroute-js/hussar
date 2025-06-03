@@ -10,6 +10,7 @@ import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
 import pl.netroute.hussar.core.docker.DockerHostResolver;
 import pl.netroute.hussar.core.docker.DockerImageResolver;
+import pl.netroute.hussar.core.docker.DockerRegistryResolver;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
 import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
@@ -58,10 +59,10 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
 
     @Override
     public RedisClusterDockerService configure(@NonNull ServiceConfigureContext context) {
-        var dockerRegistry = context.dockerRegistry();
+        var resolvedDockerRegistry = DockerRegistryResolver.resolve(dockerRegistry, context);
         var dockerNetwork = context.dockerNetwork();
         var networkConfigurer = context.networkConfigurer();
-        var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
+        var dockerImage = DockerImageResolver.resolve(resolvedDockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var dockerCommandLineRunner = new DockerCommandLineRunner();
         var config = createConfig(dockerImage);
         var container = new FixedHostPortGenericContainer<>(dockerImage.asCanonicalNameString());

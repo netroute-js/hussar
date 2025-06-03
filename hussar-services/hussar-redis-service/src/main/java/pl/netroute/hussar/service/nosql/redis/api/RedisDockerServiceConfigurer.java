@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
 import pl.netroute.hussar.core.docker.DockerCommandLineRunner;
+import pl.netroute.hussar.core.docker.DockerRegistryResolver;
 import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
 import pl.netroute.hussar.core.docker.GenericContainerFactory;
 import pl.netroute.hussar.core.service.ServiceConfigureContext;
@@ -57,10 +58,10 @@ public class RedisDockerServiceConfigurer extends BaseDockerServiceConfigurer<Re
 
     @Override
     public RedisDockerService configure(@NonNull ServiceConfigureContext context) {
-        var dockerRegistry = context.dockerRegistry();
+        var resolvedDockerRegistry = DockerRegistryResolver.resolve(dockerRegistry, context);
         var dockerNetwork = context.dockerNetwork();
         var networkConfigurer = context.networkConfigurer();
-        var dockerImage = DockerImageResolver.resolve(dockerRegistry, DOCKER_IMAGE, dockerImageVersion);
+        var dockerImage = DockerImageResolver.resolve(resolvedDockerRegistry, DOCKER_IMAGE, dockerImageVersion);
         var dockerCommandLineRunner = new DockerCommandLineRunner();
         var config = createConfig(dockerImage);
         var container = GenericContainerFactory.create(dockerImage);

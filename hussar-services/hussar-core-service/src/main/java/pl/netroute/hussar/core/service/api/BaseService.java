@@ -1,6 +1,7 @@
 package pl.netroute.hussar.core.service.api;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
      * All the dynamic {@link ConfigurationEntry} will be registered in this instance.
      */
     @NonNull
+    @Getter(AccessLevel.PUBLIC)
     protected final ConfigurationRegistry configurationRegistry;
 
     /**
@@ -81,11 +83,6 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
                 .ofNullable(network)
                 .map(Network::getEndpoints)
                 .orElse(List.of());
-    }
-
-    @Override
-    public final ConfigurationRegistry getConfigurationRegistry() {
-        return configurationRegistry;
     }
 
     @Override
