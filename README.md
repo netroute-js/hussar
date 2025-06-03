@@ -1532,6 +1532,16 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >          ... // more configuration
 >          .done();
 >```
+> It's also possible to override/set DockerRegistry for a specific Service. Below you can find an example:
+>```java
+> var dockerRegistry = new DockerRegistry("custom-registry.netroute.pl"); // it sets DockerRegistry URL to custom-registry.netroute.pl
+>
+> var kafkaService = KafkaDockerServiceConfigurer
+>          .newInstance()
+>          .dockerRegistry(dockerRegistry)
+>          ... // more configuration
+>          .done();
+>```
 ---
 > **Simulate network conditions** <a id="simulate-network-conditions-example"/>
 >
