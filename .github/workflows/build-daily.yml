@@ -1,0 +1,10 @@
+name: Daily Scheduled Hussar Build
+
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  scheduled_build_hussar:
+    uses: ./.github/workflows/build.yml
