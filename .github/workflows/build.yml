@@ -1,5 +1,5 @@
 name: Building Hussar
-on: [push]
+on: [push, workflow_call]
 
 jobs:
   build_hussar:
