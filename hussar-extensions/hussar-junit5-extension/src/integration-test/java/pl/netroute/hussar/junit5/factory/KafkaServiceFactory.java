@@ -25,7 +25,6 @@ public class KafkaServiceFactory {
                 .newInstance()
                 .name(KAFKA_NAME)
                 .dockerImageVersion(dockerImageVersion)
-                .kraftMode(true)
                 .topicAutoCreation(true)
                 .topic(KAFKA_EVENTS_TOPIC)
                 .registerEndpointUnderProperty(KAFKA_ALTERNATIVE_URL_PROPERTY)
