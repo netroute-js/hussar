@@ -91,6 +91,7 @@ public class MongoDBDockerServiceConfigurer extends BaseDockerServiceConfigurer<
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
+                .startupTimeout(startupTimeout)
                 .scheme(MONGODB_SCHEME)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)
                 .registerUsernameUnderEnvironmentVariables(registerUsernameUnderEnvironmentVariables)

@@ -15,6 +15,7 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.helper.GenericContainerStubHelper.GenericContainerAccessibility;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
@@ -44,6 +46,8 @@ public class RabbitMQDockerServiceTest {
     private static final String RABBITMQ_HOST = "localhost";
 
     private static final int RABBITMQ_LISTENING_PORT = 5672;
+
+    private static final Duration RABBITMQ_STARTUP_TIMEOUT = Duration.ofSeconds(90L);
 
     private static final int RABBITMQ_MANAGEMENT_API_LISTENING_PORT = 15672;
     private static final int RABBITMQ_MANAGEMENT_API_MAPPED_PORT = 35672;
@@ -82,6 +86,7 @@ public class RabbitMQDockerServiceTest {
                 .builder()
                 .name(RABBITMQ_SERVICE_NAME)
                 .dockerImage(RABBITMQ_SERVICE_IMAGE)
+                .startupTimeout(RABBITMQ_STARTUP_TIMEOUT)
                 .scheme(RABBITMQ_SCHEME)
                 .queues(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -111,6 +116,7 @@ public class RabbitMQDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, RABBITMQ_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, RABBITMQ_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -129,6 +135,7 @@ public class RabbitMQDockerServiceTest {
                 .builder()
                 .name(RABBITMQ_SERVICE_NAME)
                 .dockerImage(RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE)
+                .startupTimeout(RABBITMQ_STARTUP_TIMEOUT)
                 .scheme(RABBITMQ_SCHEME)
                 .queues(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -168,6 +175,7 @@ public class RabbitMQDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, RABBITMQ_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, RABBITMQ_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -209,6 +217,7 @@ public class RabbitMQDockerServiceTest {
                 .builder()
                 .name(RABBITMQ_SERVICE_NAME)
                 .dockerImage(RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE)
+                .startupTimeout(RABBITMQ_STARTUP_TIMEOUT)
                 .scheme(RABBITMQ_SCHEME)
                 .queues(queues)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
@@ -271,6 +280,7 @@ public class RabbitMQDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, RABBITMQ_LISTENING_PORT, RABBITMQ_MANAGEMENT_API_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, RABBITMQ_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -289,6 +299,7 @@ public class RabbitMQDockerServiceTest {
                 .builder()
                 .name(RABBITMQ_SERVICE_NAME)
                 .dockerImage(RABBITMQ_SERVICE_IMAGE)
+                .startupTimeout(RABBITMQ_STARTUP_TIMEOUT)
                 .scheme(RABBITMQ_SCHEME)
                 .queues(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -318,6 +329,7 @@ public class RabbitMQDockerServiceTest {
                 .builder()
                 .name(RABBITMQ_SERVICE_NAME)
                 .dockerImage(RABBITMQ_SERVICE_IMAGE)
+                .startupTimeout(RABBITMQ_STARTUP_TIMEOUT)
                 .scheme(RABBITMQ_SCHEME)
                 .queues(Set.of())
                 .registerEndpointUnderProperties(Set.of())

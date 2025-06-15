@@ -89,6 +89,7 @@ public class RedisDockerServiceConfigurer extends BaseDockerServiceConfigurer<Re
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
+                .startupTimeout(startupTimeout)
                 .scheme(SCHEME)
                 .enablePassword(enablePassword)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)

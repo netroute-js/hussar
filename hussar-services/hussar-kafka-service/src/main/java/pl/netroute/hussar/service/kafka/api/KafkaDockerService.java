@@ -3,8 +3,7 @@ package pl.netroute.hussar.service.kafka.api;
 import lombok.NonNull;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
-import pl.netroute.hussar.core.api.Endpoint;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 import pl.netroute.hussar.core.configuration.api.ConfigurationRegistry;
 import pl.netroute.hussar.core.docker.api.DockerNetwork;
 import pl.netroute.hussar.core.helper.EndpointHelper;
@@ -20,9 +19,7 @@ import java.util.List;
  * Hussar Docker {@link Service} representing Kafka.
  */
 public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConfig> {
-
-    @NonNull
-    private final KafkaListenerConfigurer listenerConfigurer;
+    private static final int KAFKA_LISTENING_PORT = 9092;
 
     @NonNull
     private final KafkaTopicConfigurer topicConfigurer;
@@ -30,65 +27,43 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
     @NonNull
     private final KafkaTopicAutoCreationConfigurer topicAutoCreationConfigurer;
 
-    @NonNull
-    private final KafkaKraftModeConfigurer kraftModeConfigurer;
-
     /**
      * Creates new instance of {@link KafkaDockerService}.
      *
-     * @param container - the {@link KafkaContainer} used by this {@link KafkaDockerService}.
+     * @param container - the {@link ConfluentKafkaContainer} used by this {@link KafkaDockerService}.
      * @param dockerNetwork - the {@link DockerNetwork} used by this {@link KafkaDockerService}.
      * @param config - the {@link KafkaDockerServiceConfig} used by this {@link KafkaDockerService}.
      * @param configurationRegistry - the {@link ConfigurationRegistry} used by this {@link KafkaDockerService}.
      * @param endpointRegisterer - the  {@link EndpointRegisterer} used by this {@link KafkaDockerService}.
      * @param networkConfigurer - the  {@link NetworkConfigurer} used by this {@link KafkaDockerService}.
-     * @param listenerConfigurer - the {@link KafkaListenerConfigurer} used by this {@link KafkaDockerService}.
      * @param topicConfigurer - the {@link KafkaTopicConfigurer} used by this {@link KafkaDockerService}.
      * @param topicAutoCreationConfigurer - the {@link KafkaTopicConfigurer} used by this {@link KafkaDockerService}.
-     * @param kraftModeConfigurer - the {@link KafkaKraftModeConfigurer} used by this {@link KafkaDockerService}.
      */
-    KafkaDockerService(@NonNull KafkaContainer container,
+    KafkaDockerService(@NonNull ConfluentKafkaContainer container,
                        @NonNull DockerNetwork dockerNetwork,
                        @NonNull KafkaDockerServiceConfig config,
                        @NonNull ConfigurationRegistry configurationRegistry,
                        @NonNull EndpointRegisterer endpointRegisterer,
                        @NonNull NetworkConfigurer networkConfigurer,
-                       @NonNull KafkaListenerConfigurer listenerConfigurer,
                        @NonNull KafkaTopicConfigurer topicConfigurer,
-                       @NonNull KafkaTopicAutoCreationConfigurer topicAutoCreationConfigurer,
-                       @NonNull KafkaKraftModeConfigurer kraftModeConfigurer) {
+                       @NonNull KafkaTopicAutoCreationConfigurer topicAutoCreationConfigurer) {
         super(container, dockerNetwork, config, configurationRegistry, endpointRegisterer, networkConfigurer);
 
-        this.listenerConfigurer = listenerConfigurer;
         this.topicConfigurer = topicConfigurer;
         this.topicAutoCreationConfigurer = topicAutoCreationConfigurer;
-        this.kraftModeConfigurer = kraftModeConfigurer;
-    }
-
-    @Override
-    protected List<Endpoint> getInternalEndpoints() {
-        var externalListener = KafkaListenerConfigurer.EXTERNAL_LISTENER;
-        var endpoint = Endpoint.schemeLess(dockerAlias, externalListener.port());
-
-        return List.of(endpoint);
     }
 
     @Override
     protected List<Integer> getInternalPorts() {
-        return List.of(KafkaListenerConfigurer.EXTERNAL_LISTENER.port());
+        return List.of(KAFKA_LISTENING_PORT);
     }
 
     @Override
     protected void configureContainer(GenericContainer<?> container) {
         super.configureContainer(container);
 
-        var kafkaContainer = (KafkaContainer) container;
-        listenerConfigurer.configure(kafkaContainer);
+        var kafkaContainer = (ConfluentKafkaContainer) container;
         topicAutoCreationConfigurer.configure(config.isTopicAutoCreation(), kafkaContainer);
-
-        if(config.isKraftMode()) {
-            kraftModeConfigurer.configure(kafkaContainer);
-        }
     }
 
     @Override

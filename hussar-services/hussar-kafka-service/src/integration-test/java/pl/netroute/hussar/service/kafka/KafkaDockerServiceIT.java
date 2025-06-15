@@ -11,11 +11,10 @@ import pl.netroute.hussar.service.kafka.api.KafkaTopic;
 import pl.netroute.hussar.service.kafka.assertion.KafkaAssertionHelper;
 import pl.netroute.hussar.service.kafka.helper.KafkaSenderFactory;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
 
@@ -45,27 +44,6 @@ public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
         kafkaAssertion.assertSingleEndpoint();
         kafkaAssertion.asserKafkaAccessible();
         kafkaAssertion.assertTopicsCreated(List.of(topic));
-    }
-
-
-    @Test
-    public void shouldFailStartingKafkaServiceWhenKraftModeNotSupported() {
-        // given
-        var dockerVersion = "3.0.0";
-        var context = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
-
-        service = KafkaDockerServiceConfigurer
-                .newInstance()
-                .dockerImageVersion(dockerVersion)
-                .kraftMode(true)
-                .done()
-                .configure(context);
-
-        // when
-        // then
-        assertThatThrownBy(() -> service.start(ServiceStartupContext.defaultContext()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Provided Confluent Platform's version 3.0.0 is not supported in Kraft mode (must be 7.0.0 or above)");
     }
 
     @Override
@@ -99,6 +77,8 @@ public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
         var topicA = new KafkaTopic("topicA", partitions);
         var topicB = new KafkaTopic("topicB", partitions);
 
+        var startupTimeout = Duration.ofSeconds(90L);
+
         var endpointProperty = "kafka.url";
         var endpointEnvVariable = "KAFKA_URL";
 
@@ -108,8 +88,8 @@ public class KafkaDockerServiceIT extends BaseServiceIT<KafkaDockerService> {
                 .topic(topicA)
                 .topic(topicB)
                 .topicAutoCreation(true)
-                .kraftMode(true)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()

@@ -10,6 +10,7 @@ import pl.netroute.hussar.service.nosql.redis.api.RedisClusterDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisClusterDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisClusterAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -61,6 +62,8 @@ public class RedisClusterDockerServiceIT extends BaseServiceIT<RedisClusterDocke
         var name = "redis-cluster-instance";
         var dockerVersion = "6.2.0";
 
+        var startupTimeout = Duration.ofSeconds(100L);
+
         var endpointProperty = "redis.cluster.url";
         var endpointEnvVariable = "REDIS_CLUSTER_URL";
 
@@ -74,6 +77,7 @@ public class RedisClusterDockerServiceIT extends BaseServiceIT<RedisClusterDocke
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .enablePassword(true)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)

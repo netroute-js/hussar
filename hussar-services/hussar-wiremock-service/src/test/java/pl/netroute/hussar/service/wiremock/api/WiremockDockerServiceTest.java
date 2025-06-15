@@ -12,6 +12,7 @@ import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNoEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
@@ -32,6 +34,8 @@ import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.gi
 
 public class WiremockDockerServiceTest {
     private static final int WIREMOCK_LISTENING_PORT = 8080;
+
+    private static final Duration WIREMOCK_STARTUP_TIMEOUT = Duration.ofSeconds(90);
 
     private static final String WIREMOCK_SERVICE_NAME = "wiremock-service";
     private static final String WIREMOCK_SERVICE_IMAGE = "wiremock/wiremock";
@@ -52,6 +56,7 @@ public class WiremockDockerServiceTest {
                 .builder()
                 .name(WIREMOCK_SERVICE_NAME)
                 .dockerImage(WIREMOCK_SERVICE_IMAGE)
+                .startupTimeout(WIREMOCK_STARTUP_TIMEOUT)
                 .scheme(HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -69,6 +74,7 @@ public class WiremockDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, WIREMOCK_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, WIREMOCK_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
@@ -88,6 +94,7 @@ public class WiremockDockerServiceTest {
                 .builder()
                 .name(WIREMOCK_SERVICE_NAME)
                 .dockerImage(WIREMOCK_SERVICE_IMAGE)
+                .startupTimeout(WIREMOCK_STARTUP_TIMEOUT)
                 .scheme(HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
                 .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
@@ -110,6 +117,7 @@ public class WiremockDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, WIREMOCK_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, WIREMOCK_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
@@ -126,6 +134,7 @@ public class WiremockDockerServiceTest {
                 .builder()
                 .name(WIREMOCK_SERVICE_NAME)
                 .dockerImage(WIREMOCK_SERVICE_IMAGE)
+                .startupTimeout(WIREMOCK_STARTUP_TIMEOUT)
                 .scheme(HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())

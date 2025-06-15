@@ -9,6 +9,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import pl.netroute.hussar.core.docker.api.DockerNetwork;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -62,6 +63,11 @@ public class GenericContainerAssertionHelper {
         var waitStrategyType = waitStrategy.getClass();
 
         verify(container).waitingFor(any(waitStrategyType));
+    }
+
+    public static void assertContainerStartupTimeoutConfigured(@NonNull GenericContainer<?> container,
+                                                               @NonNull Duration startupTimeout) {
+        verify(container).withStartupTimeout(startupTimeout);
     }
 
     public static void assertContainerLoggingConfigured(@NonNull GenericContainer<?> container) {

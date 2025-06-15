@@ -100,6 +100,7 @@ public class RedisClusterDockerServiceConfigurer extends BaseDockerServiceConfig
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
+                .startupTimeout(startupTimeout)
                 .scheme(SchemesHelper.EMPTY_SCHEME)
                 .enablePassword(enablePassword)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)

@@ -52,6 +52,7 @@ public class MySQLDockerServiceConfigurer extends BaseDatabaseDockerServiceConfi
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
+                .startupTimeout(startupTimeout)
                 .scheme(JDBC_SCHEME)
                 .databaseSchemas(databaseSchemas)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)

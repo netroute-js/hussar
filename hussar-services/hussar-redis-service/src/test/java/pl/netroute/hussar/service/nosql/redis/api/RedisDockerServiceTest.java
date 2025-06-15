@@ -12,6 +12,7 @@ import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNoEnvVariablesConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
@@ -38,6 +40,8 @@ import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_PAS
 import static pl.netroute.hussar.service.nosql.redis.api.RedisSettings.REDIS_USERNAME;
 
 public class RedisDockerServiceTest {
+    private static final Duration REDIS_STARTUP_TIMEOUT = Duration.ofSeconds(90L);
+
     private static final String REDIS_SERVICE_NAME = "redis-service";
     private static final String REDIS_SERVICE_IMAGE = "redis";
 
@@ -61,6 +65,7 @@ public class RedisDockerServiceTest {
                 .builder()
                 .name(REDIS_SERVICE_NAME)
                 .dockerImage(REDIS_SERVICE_IMAGE)
+                .startupTimeout(REDIS_STARTUP_TIMEOUT)
                 .scheme(REDIS_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -82,6 +87,7 @@ public class RedisDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, REDIS_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
@@ -108,6 +114,7 @@ public class RedisDockerServiceTest {
                 .builder()
                 .name(REDIS_SERVICE_NAME)
                 .dockerImage(REDIS_SERVICE_IMAGE)
+                .startupTimeout(REDIS_STARTUP_TIMEOUT)
                 .scheme(REDIS_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
@@ -152,6 +159,7 @@ public class RedisDockerServiceTest {
         assertContainerExposedPortConfigured(container, REDIS_LISTENING_PORT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, REDIS_STARTUP_TIMEOUT);
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
@@ -171,6 +179,7 @@ public class RedisDockerServiceTest {
                 .builder()
                 .name(REDIS_SERVICE_NAME)
                 .dockerImage(REDIS_SERVICE_IMAGE)
+                .startupTimeout(REDIS_STARTUP_TIMEOUT)
                 .scheme(REDIS_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of())
@@ -200,6 +209,7 @@ public class RedisDockerServiceTest {
                 .builder()
                 .name(REDIS_SERVICE_NAME)
                 .dockerImage(REDIS_SERVICE_IMAGE)
+                .startupTimeout(REDIS_STARTUP_TIMEOUT)
                 .scheme(REDIS_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -226,6 +236,7 @@ public class RedisDockerServiceTest {
                 .builder()
                 .name(REDIS_SERVICE_NAME)
                 .dockerImage(REDIS_SERVICE_IMAGE)
+                .startupTimeout(REDIS_STARTUP_TIMEOUT)
                 .scheme(REDIS_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -252,6 +263,7 @@ public class RedisDockerServiceTest {
                 .builder()
                 .name(REDIS_SERVICE_NAME)
                 .dockerImage(REDIS_SERVICE_IMAGE)
+                .startupTimeout(REDIS_STARTUP_TIMEOUT)
                 .scheme(REDIS_SCHEME)
                 .enablePassword(true)
                 .registerEndpointUnderProperties(Set.of())

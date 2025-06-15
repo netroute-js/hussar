@@ -99,6 +99,7 @@ public class RabbitMQDockerServiceConfigurer extends BaseDockerServiceConfigurer
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
                 .scheme(SCHEME)
+                .startupTimeout(startupTimeout)
                 .queues(queues)
                 .registerUsernameUnderProperties(registerUsernameUnderProperties)
                 .registerUsernameUnderEnvironmentVariables(registerUsernameUnderEnvironmentVariables)

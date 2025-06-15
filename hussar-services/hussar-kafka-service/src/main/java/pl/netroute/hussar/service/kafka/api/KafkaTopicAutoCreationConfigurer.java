@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 
 @Slf4j
@@ -13,7 +13,7 @@ import pl.netroute.hussar.core.api.InternalUseOnly;
 class KafkaTopicAutoCreationConfigurer {
     private static final String KAFKA_AUTO_CREATE_TOPICS_ENABLE_ENV = "KAFKA_AUTO_CREATE_TOPICS_ENABLE";
 
-    void configure(boolean autoTopicCreation, @NonNull KafkaContainer container) {
+    void configure(boolean autoTopicCreation, @NonNull ConfluentKafkaContainer container) {
         log.info("Configuring Topic auto creation - {}", autoTopicCreation);
 
         container.withEnv(KAFKA_AUTO_CREATE_TOPICS_ENABLE_ENV, autoTopicCreation + "");
