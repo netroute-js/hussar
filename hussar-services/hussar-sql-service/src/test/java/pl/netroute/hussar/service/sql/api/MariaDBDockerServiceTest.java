@@ -13,6 +13,7 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
@@ -35,6 +37,8 @@ import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializer
 
 public class MariaDBDockerServiceTest  {
     private static final int MARIA_DB_LISTENING_PORT = 3306;
+
+    private static final Duration MARIA_DB_STARTUP_TIMEOUT = Duration.ofSeconds(90);
 
     private static final String MARIA_DB_SERVICE_NAME = "mariadb-service";
     private static final String MARIA_DB_SERVICE_IMAGE = "mariadb";
@@ -64,6 +68,7 @@ public class MariaDBDockerServiceTest  {
                 .builder()
                 .name(MARIA_DB_SERVICE_NAME)
                 .dockerImage(MARIA_DB_SERVICE_IMAGE)
+                .startupTimeout(MARIA_DB_STARTUP_TIMEOUT)
                 .scheme(MARIA_DB_SCHEME)
                 .databaseSchemas(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -88,6 +93,7 @@ public class MariaDBDockerServiceTest  {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MARIA_DB_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, MARIA_DB_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -118,6 +124,7 @@ public class MariaDBDockerServiceTest  {
                 .builder()
                 .name(MARIA_DB_SERVICE_NAME)
                 .dockerImage(MARIA_DB_SERVICE_IMAGE)
+                .startupTimeout(MARIA_DB_STARTUP_TIMEOUT)
                 .scheme(MARIA_DB_SCHEME)
                 .databaseSchemas(schemas)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
@@ -163,6 +170,7 @@ public class MariaDBDockerServiceTest  {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MARIA_DB_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, MARIA_DB_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -180,6 +188,7 @@ public class MariaDBDockerServiceTest  {
                 .builder()
                 .name(MARIA_DB_SERVICE_NAME)
                 .dockerImage(MARIA_DB_SERVICE_IMAGE)
+                .startupTimeout(MARIA_DB_STARTUP_TIMEOUT)
                 .scheme(MARIA_DB_SCHEME)
                 .databaseSchemas(Set.of())
                 .registerEndpointUnderProperties(Set.of())

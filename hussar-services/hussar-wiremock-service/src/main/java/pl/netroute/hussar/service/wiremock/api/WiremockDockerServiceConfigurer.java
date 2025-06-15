@@ -50,6 +50,7 @@ public class WiremockDockerServiceConfigurer extends BaseDockerServiceConfigurer
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
+                .startupTimeout(startupTimeout)
                 .scheme(scheme)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
                 .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)

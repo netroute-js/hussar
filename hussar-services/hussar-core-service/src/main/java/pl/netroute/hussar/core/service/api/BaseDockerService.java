@@ -97,6 +97,7 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
         configureEnvVariables(container);
         configureLogging(container);
         configureWaitStrategy(container);
+        configureStartupTimeout(container);
     }
 
     /**
@@ -136,6 +137,12 @@ public abstract class BaseDockerService<C extends BaseDockerServiceConfig> exten
      */
     protected void configureWaitStrategy(GenericContainer<?> container) {
         container.waitingFor(Wait.forListeningPort());
+    }
+
+    protected void configureStartupTimeout(GenericContainer<?> container) {
+        var startupTimeout = config.getStartupTimeout();
+
+        container.withStartupTimeout(startupTimeout);
     }
 
     /**

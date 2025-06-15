@@ -8,6 +8,7 @@ import pl.netroute.hussar.service.sql.api.MariaDBDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -42,6 +43,8 @@ class MariaDBDockerServiceIT extends BaseServiceIT<MariaDBDockerService> {
         var name = "mariadb-instance";
         var dockerVersion = "10.5.23";
 
+        var startupTimeout = Duration.ofSeconds(100L);
+
         var endpointProperty = "mariadb.url";
         var endpointEnvVariable = "MARIADB_URL";
 
@@ -59,6 +62,7 @@ class MariaDBDockerServiceIT extends BaseServiceIT<MariaDBDockerService> {
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .databaseSchema(databaseSchema)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)

@@ -8,6 +8,7 @@ import pl.netroute.hussar.service.rabbitmq.api.RabbitMQDockerServiceConfigurer;
 import pl.netroute.hussar.service.rabbitmq.api.RabbitMQQueue;
 import pl.netroute.hussar.service.rabbitmq.assertion.RabbitMQAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -47,6 +48,8 @@ public class RabbitMQDockerServiceIT extends BaseServiceIT<RabbitMQDockerService
         var queueA = createQueue("queueA");
         var queueB = createQueue("queueB");
 
+        var startupTimeout = Duration.ofSeconds(100L);
+
         var endpointProperty = "rabbitmq.url";
         var endpointEnvVariable = "RABBITMQ_URL";
 
@@ -63,6 +66,7 @@ public class RabbitMQDockerServiceIT extends BaseServiceIT<RabbitMQDockerService
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(DOCKER_IMAGE_VERSION)
+                .startupTimeout(startupTimeout)
                 .queue(queueA)
                 .queue(queueB)
                 .registerEndpointUnderProperty(endpointProperty)

@@ -31,7 +31,7 @@ dependencyResolutionManagement {
             def kafkaClientsVersion = version("kafkaClients", "3.7.0")
             def slf4jVersion = version("slf4j", "1.7.36")
             def logbackVersion = version("logback", "1.5.18")
-            def testcontainersVersion = version("testcontainers", "1.19.7")
+            def testcontainersVersion = version("testcontainers", "1.21.1")
             def wiremockVersion = version("wiremock", "3.3.1")
             def mockitoVersion = version("mockito", "5.14.2")
             def assertjVersion = version("assertj", "3.22.0")

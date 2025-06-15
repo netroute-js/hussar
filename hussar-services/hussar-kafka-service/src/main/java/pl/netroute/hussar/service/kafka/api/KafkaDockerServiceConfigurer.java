@@ -3,14 +3,14 @@ package pl.netroute.hussar.service.kafka.api;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.SuperBuilder;
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 import pl.netroute.hussar.core.configuration.api.DefaultConfigurationRegistry;
-import pl.netroute.hussar.core.docker.DockerRegistryResolver;
-import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
-import pl.netroute.hussar.core.service.ServiceConfigureContext;
-import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.docker.DockerImageResolver;
+import pl.netroute.hussar.core.docker.DockerRegistryResolver;
+import pl.netroute.hussar.core.service.ServiceConfigureContext;
+import pl.netroute.hussar.core.service.api.BaseDockerServiceConfigurer;
+import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.service.resolver.ServiceNameResolver;
 
 import java.util.Set;
@@ -23,11 +23,6 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
     private static final String DOCKER_IMAGE = "confluentinc/cp-kafka";
     private static final String SERVICE = "kafka_service";
     private static final String KAFKA_SCHEME = "";
-
-    /**
-     * Shall configure Kafka to run in kraft mode.
-     */
-    boolean kraftMode;
 
     /**
      * Shall configure auto topic creation.
@@ -50,10 +45,8 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
         var container = createContainer(dockerImage);
         var configurationRegistry = new DefaultConfigurationRegistry();
         var endpointRegisterer = new EndpointRegisterer(configurationRegistry);
-        var listenerConfigurer = new KafkaListenerConfigurer();
         var topicConfigurer = new KafkaTopicConfigurer();
         var topicAutoCreationConfigurer = new KafkaTopicAutoCreationConfigurer();
-        var kraftModeConfigurer = new KafkaKraftModeConfigurer();
 
         return new KafkaDockerService(
                 container,
@@ -62,29 +55,13 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
                 configurationRegistry,
                 endpointRegisterer,
                 networkConfigurer,
-                listenerConfigurer,
                 topicConfigurer,
-                topicAutoCreationConfigurer,
-                kraftModeConfigurer
+                topicAutoCreationConfigurer
         );
     }
 
-    private KafkaContainer createContainer(DockerImageName dockerImage) {
-        return new KafkaContainer(dockerImage) {
-
-            @Override
-            public String getBootstrapServers() {
-                var externalListener = KafkaListenerConfigurer.EXTERNAL_LISTENER;
-
-                var host = getHost();
-                var port = getMappedPort(externalListener.port());
-
-                return KafkaListener
-                        .newListener(externalListener, host, port)
-                        .configuredListener();
-            }
-
-        };
+    private ConfluentKafkaContainer createContainer(DockerImageName dockerImage) {
+        return new ConfluentKafkaContainer(dockerImage);
     }
 
     private KafkaDockerServiceConfig createConfig(DockerImageName dockerImage) {
@@ -94,9 +71,9 @@ public class KafkaDockerServiceConfigurer extends BaseDockerServiceConfigurer<Ka
                 .builder()
                 .name(resolvedName)
                 .dockerImage(dockerImage.asCanonicalNameString())
+                .startupTimeout(startupTimeout)
                 .scheme(KAFKA_SCHEME)
                 .topics(topics)
-                .kraftMode(kraftMode)
                 .topicAutoCreation(topicAutoCreation)
                 .registerEndpointUnderProperties(registerEndpointUnderProperties)
                 .registerEndpointUnderEnvironmentVariables(registerEndpointUnderEnvironmentVariables)

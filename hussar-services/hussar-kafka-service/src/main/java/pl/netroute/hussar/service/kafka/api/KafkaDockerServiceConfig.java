@@ -14,7 +14,6 @@ import java.util.Set;
 @InternalUseOnly
 @EqualsAndHashCode(callSuper = true)
 class KafkaDockerServiceConfig extends BaseDockerServiceConfig {
-    boolean kraftMode;
     boolean topicAutoCreation;
 
     @NonNull

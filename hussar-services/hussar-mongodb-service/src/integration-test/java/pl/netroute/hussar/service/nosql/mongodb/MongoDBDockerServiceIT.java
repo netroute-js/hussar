@@ -7,6 +7,7 @@ import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerService;
 import pl.netroute.hussar.service.nosql.mongodb.api.MongoDBDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.mongodb.assertion.MongoDBAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,6 +37,8 @@ public class MongoDBDockerServiceIT extends BaseServiceIT<MongoDBDockerService> 
         var name = "mongodb-instance";
         var dockerVersion = "6.0.13";
 
+        var startupTimeout = Duration.ofSeconds(90L);
+
         var endpointProperty = "mongodb.url";
         var endpointEnvVariable = "MONGODB_URL";
 
@@ -52,6 +55,7 @@ public class MongoDBDockerServiceIT extends BaseServiceIT<MongoDBDockerService> 
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .registerEndpointWithCredentialsUnderProperty(endpointWithCredentialsProperty)

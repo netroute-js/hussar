@@ -9,6 +9,7 @@ import pl.netroute.hussar.service.nosql.redis.api.RedisDockerService;
 import pl.netroute.hussar.service.nosql.redis.api.RedisDockerServiceConfigurer;
 import pl.netroute.hussar.service.nosql.redis.assertion.RedisAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -59,6 +60,8 @@ public class RedisDockerServiceIT extends BaseServiceIT<RedisDockerService> {
         var name = "redis-instance";
         var dockerVersion = "6.2";
 
+        var startupTimeout = Duration.ofSeconds(100L);
+
         var endpointProperty = "redis.url";
         var endpointEnvVariable = "REDIS_URL";
 
@@ -72,6 +75,7 @@ public class RedisDockerServiceIT extends BaseServiceIT<RedisDockerService> {
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .enablePassword(true)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)

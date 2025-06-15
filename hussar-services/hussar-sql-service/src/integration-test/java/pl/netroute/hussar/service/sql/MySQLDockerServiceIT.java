@@ -8,6 +8,7 @@ import pl.netroute.hussar.service.sql.api.MySQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -42,6 +43,8 @@ class MySQLDockerServiceIT extends BaseServiceIT<MySQLDockerService> {
         var name = "mysql-instance";
         var dockerVersion = "8.2.0";
 
+        var startupTimeout = Duration.ofSeconds(100L);
+
         var endpointProperty = "mysql.url";
         var endpointEnvVariable = "MYSQL_URL";
 
@@ -59,6 +62,7 @@ class MySQLDockerServiceIT extends BaseServiceIT<MySQLDockerService> {
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .databaseSchema(databaseSchema)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)

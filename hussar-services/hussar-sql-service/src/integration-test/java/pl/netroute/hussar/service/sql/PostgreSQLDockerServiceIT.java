@@ -8,6 +8,7 @@ import pl.netroute.hussar.service.sql.api.PostgreSQLDockerServiceConfigurer;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 import pl.netroute.hussar.service.sql.assertion.SQLDBAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -42,6 +43,8 @@ class PostgreSQLDockerServiceIT extends BaseServiceIT<PostgreSQLDockerService> {
         var name = "postgres-instance";
         var dockerVersion = "16";
 
+        var startupTimeout = Duration.ofSeconds(100L);
+
         var endpointProperty = "postgres.url";
         var endpointEnvVariable = "POSTGRES_URL";
 
@@ -59,6 +62,7 @@ class PostgreSQLDockerServiceIT extends BaseServiceIT<PostgreSQLDockerService> {
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .databaseSchema(databaseSchema)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)

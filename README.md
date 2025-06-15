@@ -257,13 +257,14 @@ This section provides a detailed overview of all **supported Hussar services** t
 > 
 > The table below shows the most important methods that you can use to configure **WireMock**:
 > 
->| Method                                   	    | Description                                                                    	              | Default                 	 |
->|-----------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	  | Sets the name of Hussar WireMock service.                                      	              | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	  | Sets the docker image version of WireMock.                                     	              | Latest.                 	 |
->| `registerEndpointUnderProperty`            	  | Dynamically registers WireMock's endpoint under given property(ies).           	              | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	  | Dynamically registers WireMock's endpoint under given environment variable(s). 	              | Empty Set.              	 |
->| `done`                                     	  | Finishes configuring WireMock's configurer.                                                 	 | N/A                     	 |
+>| Method                                   	   | Description                                                                    	              | Default                 	     |
+>|----------------------------------------------|-----------------------------------------------------------------------------------------------|-------------------------------|
+>| `name`                                     	 | Sets the name of Hussar WireMock.                                      	                      | Uniquely generated one. 	     |
+>| `dockerImageVersion`                       	 | Sets the docker image version of WireMock.                                     	              | Latest.                 	     |
+>| `startupTimeout`                       	     | Sets the startup timeout of WireMock.                                     	                   | 90 seconds.                 	 |
+>| `registerEndpointUnderProperty`            	 | Dynamically registers WireMock's endpoint under given property(ies).           	              | Empty Set.              	     |
+>| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers WireMock's endpoint under given environment variable(s). 	              | Empty Set.              	     |
+>| `done`                                     	 | Finishes configuring WireMock's configurer.                                                 	 | N/A                     	     |
 > If you want to see a proper example, you can find it under [WireMock configuration](#wiremock-configuration-example) section.
 ---
 > **MySQL** <a id="mysql-service-component"/>
@@ -276,8 +277,9 @@ This section provides a detailed overview of all **supported Hussar services** t
 > 
 >| Method                                   	   | Description                                                                    	           | Default                 	 |
 >|----------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar MySQL service.                                      	              | Uniquely generated one. 	 |
+>| `name`                                     	 | Sets the name of Hussar MySQL.                                      	                      | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of MySQL.                                     	              | Latest.                 	 |
+>| `startupTimeout`                       	     | Sets the startup timeout of MySQL.                                     	                   | 90 seconds.                 	 |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers MySQL's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers MySQL's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers MySQL's username under given property(ies).                          | Empty Set.                |
@@ -299,8 +301,9 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 >| Method                                   	   | Description                                                                    	             | Default                 	 |
 >|----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar MariaDB service.                                      	              | Uniquely generated one. 	 |
+>| `name`                                     	 | Sets the name of Hussar MariaDB.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of MariaDB.                                     	              | Latest.                 	 |
+>| `startupTimeout`                       	     | Sets the startup timeout of MariaDB.                                     	                   | 90 seconds.                 	 |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers MariaDB's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers MariaDB's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `registerUsernameUnderProperty`              | Dynamically registers MariaDB's username under given property(ies).                          | Empty Set.                |
@@ -320,17 +323,18 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > The table below shows the most important methods that you can use to configure **PostgreSQL**:
 >
->| Method                                   	   | Description                                                                    	                | Default                 	 |
->|----------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar PostgreSQL service.                                      	              | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	 | Sets the docker image version of PostgreSQL.                                     	              | Latest.                 	 |
->| `registerEndpointUnderProperty`            	 | Dynamically registers PostgreSQL's endpoint under given property(ies).           	              | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers PostgreSQL's endpoint under given environment variable(s). 	              | Empty Set.              	 |
->| `registerUsernameUnderProperty`              | Dynamically registers PostgreSQL's username under given property(ies).                          | Empty Set.                |
->| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers PostgreSQL's username under given environment variable(s).                | Empty Set.                |
->| `registerPasswordUnderProperties`            | Dynamically registers PostgreSQL's password under given property(ies).                          | Empty Set.                |
->| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers PostgreSQL's password under given environment variable(s).                | Empty Set.                |
->| `databaseSchemas`                            | Creates schema(s).                                                                              | Empty Set.                |
+>| Method                                   	   | Description                                                                    	               | Default                 	 |
+>|----------------------------------------------|------------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	 | Sets the name of Hussar PostgreSQL.                                      	              | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	 | Sets the docker image version of PostgreSQL.                                     	             | Latest.                 	 |
+>| `startupTimeout`                       	     | Sets the startup timeout of PostgreSQL.                                     	                  | 90 seconds.                 	 |
+>| `registerEndpointUnderProperty`            	 | Dynamically registers PostgreSQL's endpoint under given property(ies).           	             | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers PostgreSQL's endpoint under given environment variable(s). 	             | Empty Set.              	 |
+>| `registerUsernameUnderProperty`              | Dynamically registers PostgreSQL's username under given property(ies).                         | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers PostgreSQL's username under given environment variable(s).               | Empty Set.                |
+>| `registerPasswordUnderProperties`            | Dynamically registers PostgreSQL's password under given property(ies).                         | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers PostgreSQL's password under given environment variable(s).               | Empty Set.                |
+>| `databaseSchemas`                            | Creates schema(s).                                                                             | Empty Set.                |
 >| `done`                                     	 | Finishes configuring PostgreSQL's configurer.                                                 	 | N/A                     	 |
 >
 > If you want to see a proper example, you can find it under [PostgreSQL configuration](#postgresql-configuration-example) section.
@@ -343,19 +347,20 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > The table below shows the most important methods that you can use to configure **MongoDB**:
 >
->| Method                                   	                  | Description                                                                    	                 | Default                 	 |
->|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	                | Sets the name of Hussar MongoDB service.                                      	                  | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	                | Sets the docker image version of MongoDB.                                     	                  | Latest.                 	 |
->| `registerEndpointUnderProperty`            	                | Dynamically registers MongoDB's endpoint under given property(ies).           	                  | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	                | Dynamically registers MongoDB's endpoint under given environment variable(s). 	                  | Empty Set.              	 |
+>| Method                                   	                  | Description                                                                    	                | Default                 	 |
+>|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	                | Sets the name of Hussar MongoDB.                                      	                  | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	                | Sets the docker image version of MongoDB.                                     	                 | Latest.                 	 |
+>| `startupTimeout`                       	                    | Sets the startup timeout of MongoDB.                                     	                  | 90 seconds.                 	 |
+>| `registerEndpointUnderProperty`            	                | Dynamically registers MongoDB's endpoint under given property(ies).           	                 | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	                | Dynamically registers MongoDB's endpoint under given environment variable(s). 	                 | Empty Set.              	 |
 >| `registerEndpointWithCredentialsUnderProperty`            	 | Dynamically registers MongoDB's endpoint with credentials under given property(ies).           	 | Empty Set.              	 |
 >| `registerEndpointWithCredentialsUnderEnvironmentVariable` 	 | Dynamically registers MongoDB's endpoint with credentials under given environment variable(s). 	 | Empty Set.              	 |
->| `registerUsernameUnderProperty`                             | Dynamically registers MongoDB's username under given property(ies).                              | Empty Set.                |
->| `registerUsernameUnderEnvironmentVariables`                 | Dynamically registers MongoDB's username under given environment variable(s).                    | Empty Set.                |
->| `registerPasswordUnderProperties`                           | Dynamically registers MongoDB's password under given property(ies).                              | Empty Set.                |
->| `registerPasswordUnderEnvironmentVariables`                 | Dynamically registers MongoDB's password under given environment variable(s).                    | Empty Set.                |
->| `done`                                     	                | Finishes configuring MongoDB's configurer.                                                 	     | N/A                     	 |
+>| `registerUsernameUnderProperty`                             | Dynamically registers MongoDB's username under given property(ies).                             | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`                 | Dynamically registers MongoDB's username under given environment variable(s).                   | Empty Set.                |
+>| `registerPasswordUnderProperties`                           | Dynamically registers MongoDB's password under given property(ies).                             | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`                 | Dynamically registers MongoDB's password under given environment variable(s).                   | Empty Set.                |
+>| `done`                                     	                | Finishes configuring MongoDB's configurer.                                                 	    | N/A                     	 |
 >
 > If you want to see a proper example, you can find it under [MongoDB configuration](#mongodb-configuration-example) section.
 ---
@@ -367,17 +372,18 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > The table below shows the most important methods that you can use to configure **Redis**:
 >
->| Method                                   	   | Description                                                                    	           | Default                 	 |
->|----------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar Redis service.                                      	              | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	 | Sets the docker image version of Redis.                                     	              | Latest.                 	 |
->| `registerEndpointUnderProperty`            	 | Dynamically registers Redis's endpoint under given property(ies).           	              | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers Redis's endpoint under given environment variable(s). 	              | Empty Set.              	 |
->| `registerUsernameUnderProperty`              | Dynamically registers Redis's username under given property(ies).                          | Empty Set.                |
->| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers Redis's username under given environment variable(s).                | Empty Set.                |
->| `registerPasswordUnderProperties`            | Dynamically registers Redis's password under given property(ies).                          | Empty Set.                |
->| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers Redis's password under given environment variable(s).                | Empty Set.                |
->| `enablePassword`                             | Enable/Disable password.                                                                   | False.                    |
+>| Method                                   	   | Description                                                                    	          | Default                 	 |
+>|----------------------------------------------|-------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	 | Sets the name of Hussar Redis.                                      	              | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	 | Sets the docker image version of Redis.                                     	             | Latest.                 	 |
+>| `startupTimeout`                       	     | Sets the startup timeout of Redis.                                     	                 | 90 seconds.                 	 |
+>| `registerEndpointUnderProperty`            	 | Dynamically registers Redis's endpoint under given property(ies).           	             | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers Redis's endpoint under given environment variable(s). 	             | Empty Set.              	 |
+>| `registerUsernameUnderProperty`              | Dynamically registers Redis's username under given property(ies).                         | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers Redis's username under given environment variable(s).               | Empty Set.                |
+>| `registerPasswordUnderProperties`            | Dynamically registers Redis's password under given property(ies).                         | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers Redis's password under given environment variable(s).               | Empty Set.                |
+>| `enablePassword`                             | Enable/Disable password.                                                                  | False.                    |
 >| `done`                                     	 | Finishes configuring Redis's configurer.                                                 	 | N/A                     	 |
 >
 > If you want to see a proper example, you can find it under [Redis configuration](#redis-configuration-example) section.
@@ -392,18 +398,19 @@ This section provides a detailed overview of all **supported Hussar services** t
 >
 > The table below shows the most important methods that you can use to configure **Redis Cluster**:
 >
->| Method                                   	             | Description                                                                    	                 | Default                 	 |
->|--------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	           | Sets the name of Hussar Redis Cluster service.                                      	            | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	           | Sets the docker image version of Redis Cluster.                                     	            | Latest.                 	 |
->| `registerEndpointUnderProperty`            	           | Dynamically registers Redis Cluster's endpoint under given property(ies).           	            | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	           | Dynamically registers Redis Cluster's endpoint under given environment variable(s). 	            | Empty Set.              	 |
->| `registerUsernameUnderProperty`                        | Dynamically registers Redis Cluster's username under given property(ies).                        | Empty Set.                |
->| `registerUsernameUnderEnvironmentVariables`            | Dynamically registers Redis Cluster's username under given environment variable(s).              | Empty Set.                |
->| `registerPasswordUnderProperties`                      | Dynamically registers Redis Cluster's password under given property(ies).                        | Empty Set.                |
->| `registerPasswordUnderEnvironmentVariables`            | Dynamically registers Redis Cluster's password under given environment variable(s).              | Empty Set.                |
->| `enablePassword`                                       | Enable/Disable password.                                                                         | False.                    |
->| `done`                                     	           | Finishes configuring Redis Cluster's configurer.                                                 | N/A                     	 |
+>| Method                                   	     | Description                                                                    	                 | Default                 	 |
+>|------------------------------------------------|--------------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	   | Sets the name of Hussar Redis Cluster.                                      	            | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	   | Sets the docker image version of Redis Cluster.                                     	            | Latest.                 	 |
+>| `startupTimeout`                       	       | Sets the startup timeout of Redis Cluster.                                     	                 | 90 seconds.                 	 |
+>| `registerEndpointUnderProperty`            	   | Dynamically registers Redis Cluster's endpoint under given property(ies).           	            | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	   | Dynamically registers Redis Cluster's endpoint under given environment variable(s). 	            | Empty Set.              	 |
+>| `registerUsernameUnderProperty`                | Dynamically registers Redis Cluster's username under given property(ies).                        | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`    | Dynamically registers Redis Cluster's username under given environment variable(s).              | Empty Set.                |
+>| `registerPasswordUnderProperties`              | Dynamically registers Redis Cluster's password under given property(ies).                        | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`    | Dynamically registers Redis Cluster's password under given environment variable(s).              | Empty Set.                |
+>| `enablePassword`                               | Enable/Disable password.                                                                         | False.                    |
+>| `done`                                     	   | Finishes configuring Redis Cluster's configurer.                                                 | N/A                     	 |
 >
 > If you want to see a proper example, you can find it under [Redis Cluster configuration](#redis-cluster-configuration-example) section.
 ___
@@ -415,19 +422,20 @@ ___
 >
 > The table below shows the most important methods that you can use to configure **RabbitMQ**:
 >
->| Method                                   	   | Description                                                                    	              | Default                 	 |
->|----------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar RabbitMQ service.                                      	              | Uniquely generated one. 	 |
->| `dockerImageVersion`                       	 | Sets the docker image version of RabbitMQ.                                     	              | Latest.                 	 |
->| `registerEndpointUnderProperty`            	 | Dynamically registers RabbitMQ's endpoint under given property(ies).           	              | Empty Set.              	 |
->| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers RabbitMQ's endpoint under given environment variable(s). 	              | Empty Set.              	 |
->| `registerManagementEndpointUnderProperty`              | Dynamically registers RabbitMQ's management endpoint under given property(ies).           	   | Empty Set.              	 |
->| `registerManagementEndpointUnderEnvironmentVariable`   | Dynamically registers RabbitMQ's management endpoint under given environment variable(s). 	   | Empty Set.              	 |
->| `registerUsernameUnderProperty`              | Dynamically registers RabbitMQ's username under given property(ies).                          | Empty Set.                |
->| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers RabbitMQ's username under given environment variable(s).                | Empty Set.                |
->| `registerPasswordUnderProperties`            | Dynamically registers RabbitMQ's password under given property(ies).                          | Empty Set.                |
->| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers RabbitMQ's password under given environment variable(s).                | Empty Set.                |
->| `queue`                                      | Creates queue(s).                                                                             | Empty Set.                |
+>| Method                                   	   | Description                                                                    	             | Default                 	 |
+>|----------------------------------------------|----------------------------------------------------------------------------------------------|---------------------------|
+>| `name`                                     	 | Sets the name of Hussar RabbitMQ.                                      	              | Uniquely generated one. 	 |
+>| `dockerImageVersion`                       	 | Sets the docker image version of RabbitMQ.                                     	             | Latest.                 	 |
+>| `startupTimeout`                       	       | Sets the startup timeout of RabbitMQ.                                     	                 | 90 seconds.                 	 |
+>| `registerEndpointUnderProperty`            	 | Dynamically registers RabbitMQ's endpoint under given property(ies).           	             | Empty Set.              	 |
+>| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers RabbitMQ's endpoint under given environment variable(s). 	             | Empty Set.              	 |
+>| `registerManagementEndpointUnderProperty`              | Dynamically registers RabbitMQ's management endpoint under given property(ies).           	  | Empty Set.              	 |
+>| `registerManagementEndpointUnderEnvironmentVariable`   | Dynamically registers RabbitMQ's management endpoint under given environment variable(s). 	  | Empty Set.              	 |
+>| `registerUsernameUnderProperty`              | Dynamically registers RabbitMQ's username under given property(ies).                         | Empty Set.                |
+>| `registerUsernameUnderEnvironmentVariables`  | Dynamically registers RabbitMQ's username under given environment variable(s).               | Empty Set.                |
+>| `registerPasswordUnderProperties`            | Dynamically registers RabbitMQ's password under given property(ies).                         | Empty Set.                |
+>| `registerPasswordUnderEnvironmentVariables`  | Dynamically registers RabbitMQ's password under given environment variable(s).               | Empty Set.                |
+>| `queue`                                      | Creates queue(s).                                                                            | Empty Set.                |
 >| `done`                                     	 | Finishes configuring RabbitMQ's configurer.                                                 	 | N/A                     	 |
 >
 > If you want to see a proper example, you can find it under [RabbitMQ configuration](#rabbitmq-configuration-example) section.
@@ -442,13 +450,13 @@ ___
 >
 >| Method                                   	   | Description                                                                    	           | Default                 	 |
 >|----------------------------------------------|--------------------------------------------------------------------------------------------|---------------------------|
->| `name`                                     	 | Sets the name of Hussar Kafka service.                                      	              | Uniquely generated one. 	 |
+>| `name`                                     	 | Sets the name of Hussar Kafka.                                      	              | Uniquely generated one. 	 |
 >| `dockerImageVersion`                       	 | Sets the docker image version of Kafka.                                     	              | Latest.                 	 |
+>| `startupTimeout`                       	       | Sets the startup timeout of Kafka.                                     	                 | 90 seconds.                 	 |
 >| `registerEndpointUnderProperty`            	 | Dynamically registers Kafka's endpoint under given property(ies).           	              | Empty Set.              	 |
 >| `registerEndpointUnderEnvironmentVariable` 	 | Dynamically registers Kafka's endpoint under given environment variable(s). 	              | Empty Set.              	 |
 >| `topic`                                      | Creates topic(s).                                                                          | Empty Set.                |
 >| `topicAutoCreation`                          | Enables/Disables auto topic creation.                                                      | False.                    |
->| `kraftMode`                                  | Enables/Disables Kafka kraft mode.                                                         | False.                    |
 >| `done`                                     	 | Finishes configuring Kafka's configurer.                                                 	 | N/A                     	 |
 >
 >If you want to see a proper example, you can find it under [Kafka configuration](#kafka-configuration-example) section.
@@ -1500,7 +1508,6 @@ This section provides a comprehensive collection of **examples** demonstrating t
 >            .name("kafka-service") // it sets the name of the service. It's optional parameter.
 >            .dockerImageVersion("7.5.4") // it sets the docker image version. It's optional parameter.
 >            .topic(queue) // it sets the topic that should be created. It's optional parameter.
->            .kraftMode(true) // it enables Kafka kraft mode. It's optional parameter.
 >            .topicAutoCreation(true) // it enables topic auto creation. It's optional parameter.
 >            .registerEndpointUnderProperty("application.kafka.url") // it registers service's URL under following property. It's optional parameter.
 >            .registerEndpointUnderEnvironmentVariable("KAFKA_URL") // it registers service's URL under following environment variable. It's optional parameter.

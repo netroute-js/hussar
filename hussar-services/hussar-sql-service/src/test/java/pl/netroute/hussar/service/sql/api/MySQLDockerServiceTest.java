@@ -13,6 +13,7 @@ import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 import pl.netroute.hussar.service.sql.schema.DatabaseSchemaInitializer;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
@@ -35,6 +37,8 @@ import static pl.netroute.hussar.service.sql.assertion.DatabaseSchemaInitializer
 
 public class MySQLDockerServiceTest {
     private static final int MYSQL_LISTENING_PORT = 3306;
+
+    private static final Duration MYSQL_STARTUP_TIMEOUT = Duration.ofSeconds(90);
 
     private static final String MYSQL_SERVICE_NAME = "mysql-service";
     private static final String MYSQL_SERVICE_IMAGE = "mysql";
@@ -65,6 +69,7 @@ public class MySQLDockerServiceTest {
                 .builder()
                 .name(MYSQL_SERVICE_NAME)
                 .dockerImage(MYSQL_SERVICE_IMAGE)
+                .startupTimeout(MYSQL_STARTUP_TIMEOUT)
                 .scheme(MYSQL_SCHEME)
                 .databaseSchemas(Set.of())
                 .registerEndpointUnderProperties(Set.of())
@@ -89,6 +94,7 @@ public class MySQLDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, MYSQL_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -119,6 +125,7 @@ public class MySQLDockerServiceTest {
                 .builder()
                 .name(MYSQL_SERVICE_NAME)
                 .dockerImage(MYSQL_SERVICE_IMAGE)
+                .startupTimeout(MYSQL_STARTUP_TIMEOUT)
                 .scheme(MYSQL_SCHEME)
                 .databaseSchemas(schemas)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
@@ -164,6 +171,7 @@ public class MySQLDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MYSQL_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, MYSQL_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -181,6 +189,7 @@ public class MySQLDockerServiceTest {
                 .builder()
                 .name(MYSQL_SERVICE_NAME)
                 .dockerImage(MYSQL_SERVICE_IMAGE)
+                .startupTimeout(MYSQL_STARTUP_TIMEOUT)
                 .scheme(MYSQL_SCHEME)
                 .databaseSchemas(Set.of())
                 .registerEndpointUnderProperties(Set.of())

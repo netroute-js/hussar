@@ -7,6 +7,7 @@ import pl.netroute.hussar.service.wiremock.api.WiremockDockerService;
 import pl.netroute.hussar.service.wiremock.api.WiremockDockerServiceConfigurer;
 import pl.netroute.hussar.service.wiremock.assertion.WiremockAssertionHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -35,6 +36,7 @@ class WiremockDockerServiceIT extends BaseServiceIT<WiremockDockerService> {
     protected ServiceTestMetadata<WiremockDockerService, Consumer<WiremockDockerService>> provideFullyConfiguredServiceTestMetadata(ServiceConfigureContext context) {
         var name = "wiremock-instance";
         var dockerVersion = "2.34.0";
+        var startupTimeout = Duration.ofSeconds(90L);
         var endpointProperty = "propertyA.wiremock.url";
         var endpointEnvVariable = "WIREMOCK_URL";
 
@@ -42,6 +44,7 @@ class WiremockDockerServiceIT extends BaseServiceIT<WiremockDockerService> {
                 .newInstance()
                 .name(name)
                 .dockerImageVersion(dockerVersion)
+                .startupTimeout(startupTimeout)
                 .registerEndpointUnderProperty(endpointProperty)
                 .registerEndpointUnderEnvironmentVariable(endpointEnvVariable)
                 .done()

@@ -2,6 +2,7 @@ package pl.netroute.hussar.service.nosql.redis.api;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,6 +21,7 @@ public class RedisDockerServiceConfigTest {
                     .builder()
                     .name("some-name")
                     .dockerImage("some-docker")
+                    .startupTimeout(Duration.ofSeconds(90L))
                     .enablePassword(false)
                     .registerEndpointUnderProperties(Set.of())
                     .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -45,6 +47,7 @@ public class RedisDockerServiceConfigTest {
                         .builder()
                         .name("some-name")
                         .dockerImage("some-docker")
+                        .startupTimeout(Duration.ofSeconds(90L))
                         .enablePassword(false)
                         .registerEndpointUnderProperties(Set.of())
                         .registerEndpointUnderEnvironmentVariables(Set.of())

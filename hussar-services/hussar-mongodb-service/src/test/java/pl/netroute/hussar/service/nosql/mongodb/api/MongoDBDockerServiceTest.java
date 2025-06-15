@@ -13,6 +13,7 @@ import pl.netroute.hussar.core.service.ServiceStartupContext;
 import pl.netroute.hussar.core.service.registerer.EndpointRegisterer;
 import pl.netroute.hussar.core.stub.helper.StubHelper;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerLoggingConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerNetworkConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStarted;
+import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
@@ -34,6 +36,8 @@ import static pl.netroute.hussar.core.stub.helper.NetworkConfigurerStubHelper.gi
 
 public class MongoDBDockerServiceTest {
     private static final int MONGO_DB_LISTENING_PORT = 27017;
+
+    private static final Duration MONGO_DB_STARTUP_TIMEOUT = Duration.ofSeconds(90L);
 
     private static final String MONGO_DB_ENDPOINT_WITH_CREDENTIALS_TEMPLATE = "%s%s:%s@%s:%d";
 
@@ -64,6 +68,7 @@ public class MongoDBDockerServiceTest {
                 .builder()
                 .name(MONGO_DB_SERVICE_NAME)
                 .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .startupTimeout(MONGO_DB_STARTUP_TIMEOUT)
                 .scheme(MONGO_DB_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -92,6 +97,7 @@ public class MongoDBDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MONGO_DB_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, MONGO_DB_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -120,6 +126,7 @@ public class MongoDBDockerServiceTest {
                 .builder()
                 .name(MONGO_DB_SERVICE_NAME)
                 .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .startupTimeout(MONGO_DB_STARTUP_TIMEOUT)
                 .scheme(MONGO_DB_SCHEME)
                 .registerEndpointUnderProperties(Set.of(endpointProperty))
                 .registerEndpointUnderEnvironmentVariables(Set.of(endpointEnvVariable))
@@ -173,6 +180,7 @@ public class MongoDBDockerServiceTest {
         assertContainerStarted(container);
         assertContainerExposedPortConfigured(container, MONGO_DB_LISTENING_PORT);
         assertContainerWaitStrategyConfigured(container, Wait.forListeningPort());
+        assertContainerStartupTimeoutConfigured(container, MONGO_DB_STARTUP_TIMEOUT);
         assertContainerNetworkConfigured(container, dockerNetwork);
         assertContainerLoggingConfigured(container);
         assertContainerEnvVariablesConfigured(container, envVariables);
@@ -189,6 +197,7 @@ public class MongoDBDockerServiceTest {
                 .builder()
                 .name(MONGO_DB_SERVICE_NAME)
                 .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .startupTimeout(MONGO_DB_STARTUP_TIMEOUT)
                 .scheme(SchemesHelper.HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
@@ -217,6 +226,7 @@ public class MongoDBDockerServiceTest {
                 .builder()
                 .name(MONGO_DB_SERVICE_NAME)
                 .dockerImage(MONGO_DB_SERVICE_IMAGE)
+                .startupTimeout(MONGO_DB_STARTUP_TIMEOUT)
                 .scheme(SchemesHelper.HTTP_SCHEME)
                 .registerEndpointUnderProperties(Set.of())
                 .registerEndpointUnderEnvironmentVariables(Set.of())
