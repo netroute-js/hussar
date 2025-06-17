@@ -11,8 +11,9 @@ dependencies {
 	implementation libs.testcontainers
 	implementation libs.toxiproxy.testcontainers
 
-	testImplementation libs.logback.classic
 	testImplementation libs.bundles.testing
+	testImplementation libs.logback.classic
+	testRuntimeOnly libs.junit.platform
 
 	testFixturesImplementation libs.bundles.testing
 	testFixturesImplementation libs.testcontainers

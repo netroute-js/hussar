@@ -36,4 +36,5 @@ dependencies {
 	testImplementation libs.flyway.postgres
 	testImplementation libs.rabbitmq.http.client
 	testImplementation libs.kafka.clients
+	testRuntimeOnly libs.junit.platform
 }

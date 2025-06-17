@@ -16,4 +16,5 @@ dependencies {
 	testImplementation libs.bundles.testing
 	testImplementation testFixtures(project(":hussar-core"))
 	testImplementation testFixtures(project(":hussar-services:hussar-core-service"))
+	testRuntimeOnly libs.junit.platform
 }

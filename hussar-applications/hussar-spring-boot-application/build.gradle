@@ -16,4 +16,5 @@ dependencies {
 	testImplementation libs.spring.cloud.openfeign.core
 	testImplementation libs.feign.core
 	testImplementation libs.okhttp
+	testRuntimeOnly libs.junit.platform
 }

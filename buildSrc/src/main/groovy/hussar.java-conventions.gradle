@@ -30,7 +30,8 @@ sourceSets {
 configurations {
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntime.extendsFrom testRuntime
-    integrationTestCompileOnly.extendsFrom compileOnly
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestCompileOnly.extendsFrom testCompileOnly
 }
 
 task integrationTest(type: Test) {

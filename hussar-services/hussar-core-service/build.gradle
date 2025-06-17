@@ -12,6 +12,7 @@ dependencies {
 	implementation libs.testcontainers
 
 	testImplementation libs.bundles.testing
+	testRuntimeOnly libs.junit.platform
 
 	testFixturesImplementation libs.bundles.testing
 	testFixturesImplementation libs.testcontainers
