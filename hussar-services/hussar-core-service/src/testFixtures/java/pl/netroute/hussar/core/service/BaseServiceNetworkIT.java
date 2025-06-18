@@ -38,6 +38,10 @@ public abstract class BaseServiceNetworkIT<S extends Service> {
 
         Optional.ofNullable(service)
                 .ifPresent(Service::shutdown);
+
+        dockerNetwork
+                .network()
+                .close();
     }
 
     @Test

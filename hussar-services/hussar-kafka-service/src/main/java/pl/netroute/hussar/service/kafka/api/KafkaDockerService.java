@@ -71,9 +71,10 @@ public class KafkaDockerService extends BaseDockerService<KafkaDockerServiceConf
         super.doAfterServiceStartup(context);
 
         var endpoint = EndpointHelper.getAnyEndpointOrFail(this);
-        var adminClient = KafkaAdminClientFactory.create(endpoint);
 
-        configureTopics(adminClient);
+        try(var adminClient = KafkaAdminClientFactory.create(endpoint)) {
+            configureTopics(adminClient);
+        }
     }
 
     private void configureTopics(AdminClient adminClient) {
