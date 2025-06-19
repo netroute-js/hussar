@@ -2,9 +2,9 @@ package pl.netroute.hussar.service.kafka.assertion;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.TopicListing;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
@@ -107,7 +107,9 @@ public class KafkaAssertionHelper {
 
     private AdminClient createClient(Endpoint endpoint) {
         var connectionProperties = Map.<String, Object>of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, endpoint.address()
+                CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, endpoint.address(),
+                CommonClientConfigs.REQUEST_TIMEOUT_MS_CONFIG, KAFKA_TIMEOUT.toMillis() + "",
+                CommonClientConfigs.DEFAULT_API_TIMEOUT_MS_CONFIG, KAFKA_TIMEOUT.toMillis() + ""
         );
 
         return AdminClient.create(connectionProperties);
