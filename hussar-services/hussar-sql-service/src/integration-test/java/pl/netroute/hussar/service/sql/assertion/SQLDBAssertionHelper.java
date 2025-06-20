@@ -37,11 +37,11 @@ public class SQLDBAssertionHelper {
     }
 
     public void asserDatabaseAccessible(@NonNull String schema) {
-        var template = createTemplate(schema);
-        var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
-        var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
+        var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
+        var directEndpoint = EndpointHelper.getAnyDirectEndpointOrFail(database);
 
-        assertThat(executeCommand(command, template)).isEmpty();
+        assertDatabaseAccessibility(schema, endpoint);
+        assertDatabaseAccessibility(schema, directEndpoint);
     }
 
     public void assertDatabaseNotAccessible(@NonNull String schema) {
@@ -131,6 +131,14 @@ public class SQLDBAssertionHelper {
                 .getEntries();
 
         assertThat(entriesRegistered).isEmpty();
+    }
+
+    private void assertDatabaseAccessibility(@NonNull String schema, @NonNull Endpoint endpoint) {
+        var template = createTemplate(schema, endpoint);
+        var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
+        var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
+
+        assertThat(executeCommand(command, template)).isEmpty();
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

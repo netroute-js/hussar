@@ -31,7 +31,9 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNetworkControl;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertNoEntriesRegistered;
@@ -44,6 +46,8 @@ public class KafkaDockerServiceTest {
 
     private static final String KAFKA_SERVICE_NAME = "kafka-service";
     private static final String KAFKA_SERVICE_IMAGE = "confluentinc/cp-kafka";
+
+    private static final String KAFKA_DIRECT_NETWORK = "direct-" + KAFKA_SERVICE_NAME;
 
     private static final String KAFKA_AUTO_CREATE_TOPICS_ENABLE_ENV = "KAFKA_AUTO_CREATE_TOPICS_ENABLE";
     private static final boolean KAFKA_AUTO_CREATE_TOPICS_DISABLED = false;
@@ -78,6 +82,7 @@ public class KafkaDockerServiceTest {
         var service = createKafkaService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, EMPTY_SCHEME, KAFKA_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, KAFKA_DIRECT_NETWORK, EMPTY_SCHEME, KAFKA_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -94,6 +99,7 @@ public class KafkaDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, KAFKA_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoTopicsCreated(topicConfigurer);
         assertNoEntriesRegistered(service);
@@ -126,6 +132,7 @@ public class KafkaDockerServiceTest {
         var service = createKafkaService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, KAFKA_SERVICE_NAME, EMPTY_SCHEME, KAFKA_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, KAFKA_DIRECT_NETWORK, EMPTY_SCHEME, KAFKA_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -151,8 +158,10 @@ public class KafkaDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, KAFKA_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertTopicsCreated(topicConfigurer, topics);
+        assertEntriesRegistered(service, registeredEntries);
     }
 
     @Test

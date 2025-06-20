@@ -26,6 +26,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -44,6 +45,8 @@ public class RedisDockerServiceTest {
 
     private static final String REDIS_SERVICE_NAME = "redis-service";
     private static final String REDIS_SERVICE_IMAGE = "redis";
+
+    private static final String REDIS_DIRECT_NETWORK = "direct-" + REDIS_SERVICE_NAME;
 
     private static final String REDIS_SCHEME = "redis://";
 
@@ -79,6 +82,7 @@ public class RedisDockerServiceTest {
         var service = createRedisService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, REDIS_SCHEME, REDIS_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, REDIS_DIRECT_NETWORK, REDIS_SCHEME, REDIS_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -93,6 +97,7 @@ public class RedisDockerServiceTest {
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
         assertNoPasswordConfigured(passwordConfigurer);
@@ -129,6 +134,7 @@ public class RedisDockerServiceTest {
         var service = createRedisService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, REDIS_SERVICE_NAME, REDIS_SCHEME, REDIS_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, REDIS_DIRECT_NETWORK, REDIS_SCHEME, REDIS_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -164,6 +170,7 @@ public class RedisDockerServiceTest {
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, REDIS_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertEntriesRegistered(service, registeredEntries);
         assertPasswordConfigured(passwordConfigurer, credentials, container);

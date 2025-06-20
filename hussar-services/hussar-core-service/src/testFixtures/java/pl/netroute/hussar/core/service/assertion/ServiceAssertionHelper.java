@@ -27,6 +27,14 @@ public class ServiceAssertionHelper {
         assertThat(actualEndpoints).containsExactlyInAnyOrderElementsOf(expectedEndpoints);
     }
 
+    public static void assertDirectEndpoints(@NonNull Service service,
+                                             @NonNull Network network) {
+        var actualDirectEndpoints = service.getDirectEndpoints();
+        var expectedDirectEndpoints = network.getEndpoints();
+
+        assertThat(actualDirectEndpoints).containsExactlyInAnyOrderElementsOf(expectedDirectEndpoints);
+    }
+
     public static void assertNetworkControl(@NonNull Service service) {
         assertThat(service.getNetworkControl()).isNotNull();
     }

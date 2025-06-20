@@ -33,6 +33,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertNoContainerExtraHostConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -72,6 +73,8 @@ public class RedisClusterDockerServiceTest {
 
     private static final String REDIS_CLUSTER_SERVICE_NAME = "redis-cluster-service";
     private static final String REDIS_CLUSTER_SERVICE_IMAGE = "grokzen/redis-cluster";
+
+    private static final String REDIS_CLUSTER_DIRECT_NETWORK = "direct-" + REDIS_CLUSTER_SERVICE_NAME;
 
     private DockerNetwork dockerNetwork;
     private NetworkConfigurer networkConfigurer;
@@ -115,6 +118,7 @@ public class RedisClusterDockerServiceTest {
         var service = createRedisClusterService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, EMPTY_SCHEME, REDIS_CLUSTER_LISTENING_PORTS);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_DIRECT_NETWORK, EMPTY_SCHEME, REDIS_CLUSTER_LISTENING_PORTS);
         givenDockerLocalhost(dockerHostResolver);
 
         // when
@@ -137,6 +141,7 @@ public class RedisClusterDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, REDIS_CLUSTER_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
         assertNoPasswordConfigured(passwordConfigurer);
@@ -176,6 +181,7 @@ public class RedisClusterDockerServiceTest {
         var service = createRedisClusterService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, EMPTY_SCHEME, REDIS_CLUSTER_LISTENING_PORTS);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_DIRECT_NETWORK, EMPTY_SCHEME, REDIS_CLUSTER_LISTENING_PORTS);
         givenDockerLocalhost(dockerHostResolver);
 
         // when
@@ -219,6 +225,7 @@ public class RedisClusterDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, REDIS_CLUSTER_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertEntriesRegistered(service, registeredEntries);
         assertPasswordConfigured(passwordConfigurer, credentials, container);
@@ -248,6 +255,7 @@ public class RedisClusterDockerServiceTest {
         var service = createRedisClusterService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_SERVICE_NAME, EMPTY_SCHEME, REDIS_CLUSTER_LISTENING_PORTS);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, REDIS_CLUSTER_DIRECT_NETWORK, EMPTY_SCHEME, REDIS_CLUSTER_LISTENING_PORTS);
         givenDockerNonLocalhost(dockerHostResolver);
 
         // when
@@ -270,6 +278,7 @@ public class RedisClusterDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, REDIS_CLUSTER_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
         assertNoPasswordConfigured(passwordConfigurer);

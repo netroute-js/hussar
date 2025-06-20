@@ -36,12 +36,10 @@ public class RedisAssertionHelper {
 
     public void asserRedisAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(redis);
+        var directEndpoint = EndpointHelper.getAnyDirectEndpointOrFail(redis);
 
-        try(var client = createClient(endpoint)) {
-            var result = client.ping();
-
-            assertThat(result).isEqualTo(PING_RESULT);
-        }
+        asserRedisAccessibility(endpoint);
+        asserRedisAccessibility(directEndpoint);
     }
 
     public void assertRedisNotAccessible() {
@@ -101,6 +99,14 @@ public class RedisAssertionHelper {
                 .getEntries();
 
         assertThat(entriesRegistered).isEmpty();
+    }
+
+    private void asserRedisAccessibility(Endpoint endpoint) {
+        try(var client = createClient(endpoint)) {
+            var result = client.ping();
+
+            assertThat(result).isEqualTo(PING_RESULT);
+        }
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

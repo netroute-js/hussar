@@ -31,6 +31,9 @@ abstract class BaseServiceStub implements Service {
     @Builder.Default
     private final List<Endpoint> endpoints = List.of(EndpointTestFactory.createHttp());
 
+    @Builder.Default
+    private final List<Endpoint> directEndpoints = List.of(EndpointTestFactory.createHttp());
+
     @Override
     public String getName() {
         return name;
@@ -39,6 +42,11 @@ abstract class BaseServiceStub implements Service {
     @Override
     public List<Endpoint> getEndpoints() {
         return endpoints;
+    }
+
+    @Override
+    public List<Endpoint> getDirectEndpoints() {
+        return directEndpoints;
     }
 
     @Override

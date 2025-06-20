@@ -26,6 +26,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -42,6 +43,8 @@ public class PostgreSQLDockerServiceTest {
 
     private static final String POSTGRE_SQL_SERVICE_NAME = "postgres-service";
     private static final String POSTGRE_SQL_SERVICE_IMAGE = "postgres";
+
+    private static final String POSTGRE_SQL_DIRECT_NETWORK = "direct-" + POSTGRE_SQL_SERVICE_NAME;
 
     private static final String POSTGRE_SQL_SCHEME = "jdbc:postgresql://";
 
@@ -84,6 +87,7 @@ public class PostgreSQLDockerServiceTest {
         var service = createDatabaseService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, POSTGRE_SQL_SERVICE_NAME, POSTGRE_SQL_SCHEME, POSTGRE_SQL_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, POSTGRE_SQL_DIRECT_NETWORK, POSTGRE_SQL_SCHEME, POSTGRE_SQL_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -100,6 +104,7 @@ public class PostgreSQLDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, POSTGRE_SQL_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoSchemaInitialized(schemaInitializer);
         assertNoEntriesRegistered(service);
@@ -140,6 +145,7 @@ public class PostgreSQLDockerServiceTest {
         var service = createDatabaseService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, POSTGRE_SQL_SERVICE_NAME, POSTGRE_SQL_SCHEME, POSTGRE_SQL_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, POSTGRE_SQL_DIRECT_NETWORK, POSTGRE_SQL_SCHEME, POSTGRE_SQL_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -177,6 +183,7 @@ public class PostgreSQLDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, POSTGRE_SQL_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertSchemasInitialized(schemaInitializer, service, POSTGRE_SQL_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);

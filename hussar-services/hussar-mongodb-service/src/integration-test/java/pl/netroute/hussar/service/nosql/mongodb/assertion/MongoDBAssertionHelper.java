@@ -42,10 +42,10 @@ public class MongoDBAssertionHelper {
 
     public void asserMongoDBAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(database);
+        var directEndpoint = EndpointHelper.getAnyDirectEndpointOrFail(database);
 
-        try(var client = createClient(endpoint)) {
-            assertThat(client.listDatabaseNames()).contains(DEFAULT_AUTH_DB);
-        }
+        assertMongoDBAccessibility(endpoint);
+        assertMongoDBAccessibility(directEndpoint);
     }
 
     public void assertMongoDBNotAccessible() {
@@ -125,6 +125,12 @@ public class MongoDBAssertionHelper {
                 .getEntries();
 
         assertThat(entriesRegistered).isEmpty();
+    }
+
+    private void assertMongoDBAccessibility(Endpoint endpoint) {
+        try(var client = createClient(endpoint)) {
+            assertThat(client.listDatabaseNames()).contains(DEFAULT_AUTH_DB);
+        }
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

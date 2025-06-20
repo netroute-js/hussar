@@ -26,6 +26,7 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseService<C extends BaseServiceConfig> implements Service {
+    private static final String DIRECT_NETWORK_PREFIX_TEMPLATE = "direct-%s";
 
     /**
      * An instance of a {@link Logger}.
@@ -57,6 +58,7 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
     protected final NetworkConfigurer networkConfigurer;
 
     protected Network network;
+    protected Network directNetwork;
 
     @Override
     public final void start(@NonNull ServiceStartupContext context) {
@@ -79,10 +81,12 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
 
     @Override
     public final List<Endpoint> getEndpoints() {
-        return Optional
-                .ofNullable(network)
-                .map(Network::getEndpoints)
-                .orElse(List.of());
+        return extractNetworkEndpoints(network);
+    }
+
+    @Override
+    public List<Endpoint> getDirectEndpoints() {
+        return extractNetworkEndpoints(directNetwork);
     }
 
     @Override
@@ -132,9 +136,11 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
 
     private void configureNetwork() {
         var networkPrefix = config.getName();
+        var directNetworkPrefix = DIRECT_NETWORK_PREFIX_TEMPLATE.formatted(networkPrefix);
         var endpoints = getInternalEndpoints();
 
         this.network = networkConfigurer.configure(networkPrefix, endpoints);
+        this.directNetwork = networkConfigurer.configure(directNetworkPrefix, endpoints);
     }
 
     private void registerEndpointUnderProperties(List<Endpoint> endpoints) {
@@ -147,6 +153,13 @@ public abstract class BaseService<C extends BaseServiceConfig> implements Servic
         config
                 .getRegisterEndpointUnderEnvironmentVariables()
                 .forEach(endpointEnvVariable -> endpointRegisterer.registerUnderEnvironmentVariable(endpoints, endpointEnvVariable));
+    }
+
+    private List<Endpoint> extractNetworkEndpoints(Network network) {
+        return Optional
+                .ofNullable(network)
+                .map(Network::getEndpoints)
+                .orElse(List.of());
     }
 
     /**

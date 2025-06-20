@@ -34,17 +34,10 @@ public class KafkaAssertionHelper {
 
     public void asserKafkaAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(kafka);
+        var directEndpoint = EndpointHelper.getAnyDirectEndpointOrFail(kafka);
 
-        try(var client = createClient(endpoint)) {
-            var nodes = client
-                    .describeCluster()
-                    .nodes()
-                    .get(KAFKA_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
-
-            assertThat(nodes).isNotEmpty();
-        } catch(Exception ex) {
-            throw new IllegalStateException("Could not check Kafka accessibility", ex);
-        }
+        assertKafkaAccessibility(endpoint);
+        assertKafkaAccessibility(directEndpoint);
     }
 
     public void assertKafkaNotAccessible() {
@@ -113,6 +106,19 @@ public class KafkaAssertionHelper {
         );
 
         return AdminClient.create(connectionProperties);
+    }
+
+    private void assertKafkaAccessibility(Endpoint endpoint) {
+        try(var client = createClient(endpoint)) {
+            var nodes = client
+                    .describeCluster()
+                    .nodes()
+                    .get(KAFKA_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+
+            assertThat(nodes).isNotEmpty();
+        } catch(Exception ex) {
+            throw new IllegalStateException("Could not check Kafka accessibility", ex);
+        }
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

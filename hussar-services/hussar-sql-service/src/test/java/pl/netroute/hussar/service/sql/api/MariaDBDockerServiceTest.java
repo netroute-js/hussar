@@ -26,6 +26,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -42,6 +43,8 @@ public class MariaDBDockerServiceTest  {
 
     private static final String MARIA_DB_SERVICE_NAME = "mariadb-service";
     private static final String MARIA_DB_SERVICE_IMAGE = "mariadb";
+
+    private static final String MARIA_DB_DIRECT_NETWORK = "direct-" + MARIA_DB_SERVICE_NAME;
 
     private static final String MARIA_DB_SCHEME = "jdbc:mariadb://";
     private static final String MARIA_DB_PASSWORD_ENV = "MARIADB_ROOT_PASSWORD";
@@ -83,6 +86,7 @@ public class MariaDBDockerServiceTest  {
         var service = createDatabaseService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, MARIA_DB_SCHEME, MARIA_DB_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, MARIA_DB_DIRECT_NETWORK, MARIA_DB_SCHEME, MARIA_DB_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -99,6 +103,7 @@ public class MariaDBDockerServiceTest  {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MARIA_DB_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoSchemaInitialized(schemaInitializer);
         assertNoEntriesRegistered(service);
@@ -139,6 +144,7 @@ public class MariaDBDockerServiceTest  {
         var service = createDatabaseService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, MARIA_DB_SERVICE_NAME, MARIA_DB_SCHEME, MARIA_DB_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, MARIA_DB_DIRECT_NETWORK, MARIA_DB_SCHEME, MARIA_DB_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -176,6 +182,7 @@ public class MariaDBDockerServiceTest  {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MARIA_DB_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertSchemasInitialized(schemaInitializer, service, MARIA_DB_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);

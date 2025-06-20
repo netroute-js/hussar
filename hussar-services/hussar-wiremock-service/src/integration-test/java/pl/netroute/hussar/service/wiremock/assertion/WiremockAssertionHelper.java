@@ -29,9 +29,10 @@ public class WiremockAssertionHelper {
 
     public void assertWiremockAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(wiremock);
-        var wiremockClient = new WireMock(endpoint.host(), endpoint.port());
+        var directEndpoint = EndpointHelper.getAnyDirectEndpointOrFail(wiremock);
 
-        wiremockClient.allStubMappings().getMappings();
+        assertWireMockAccessibility(endpoint);
+        assertWireMockAccessibility(directEndpoint);
     }
 
     public void assertWiremockNotAccessible() {
@@ -65,6 +66,12 @@ public class WiremockAssertionHelper {
                 .getEntries();
 
         assertThat(entriesRegistered).isEmpty();
+    }
+
+    private void assertWireMockAccessibility(Endpoint endpoint) {
+        var wiremockClient = new WireMock(endpoint.host(), endpoint.port());
+
+        wiremockClient.allStubMappings().getMappings();
     }
 
     private void assertRegisteredEndpointInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

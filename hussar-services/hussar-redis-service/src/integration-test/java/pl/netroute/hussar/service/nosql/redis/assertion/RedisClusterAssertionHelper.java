@@ -39,12 +39,10 @@ public class RedisClusterAssertionHelper {
 
     public void assertRedisClusterAccessible() {
         var endpoints = redisCluster.getEndpoints();
+        var directEndpoints = redisCluster.getDirectEndpoints();
 
-        try(var client = createClient(endpoints)) {
-            var result = client.ping();
-
-            assertThat(result).isEqualTo(PING_RESULT);
-        }
+        assertRedisClusterAccessibility(endpoints);
+        assertRedisClusterAccessibility(directEndpoints);
     }
 
     public void assertRedisClusterNotAccessible() {
@@ -106,6 +104,14 @@ public class RedisClusterAssertionHelper {
                 .getEntries();
 
         assertThat(entriesRegistered).isEmpty();
+    }
+
+    private void assertRedisClusterAccessibility(List<Endpoint> endpoints) {
+        try(var client = createClient(endpoints)) {
+            var result = client.ping();
+
+            assertThat(result).isEqualTo(PING_RESULT);
+        }
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

@@ -43,4 +43,18 @@ public class EndpointHelper {
                 .orElseThrow(() -> new IllegalStateException("Expected at least one Endpoint for a given Service: %s".formatted(service.getName())));
     }
 
+    /**
+     * It extracts the first available direct {@link Endpoint} of a given {@link Service} or fails fast.
+     *
+     * @param service - the {@link Service}.
+     * @return the first available {@link Endpoint}.
+     */
+    public static Endpoint getAnyDirectEndpointOrFail(@NonNull Service service) {
+        return service
+                .getDirectEndpoints()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Expected at least one direct Endpoint for a given Service: %s".formatted(service.getName())));
+    }
+
 }

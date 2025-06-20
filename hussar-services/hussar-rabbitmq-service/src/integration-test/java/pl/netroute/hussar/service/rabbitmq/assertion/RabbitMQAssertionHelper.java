@@ -35,13 +35,10 @@ public class RabbitMQAssertionHelper {
 
     public void asserRabbitMQAccessible() {
         var endpoint = EndpointHelper.getAnyEndpointOrFail(rabbitMQ);
-        var connectionFactory = createConnectionFactory(endpoint);
+        var directEndpoint = EndpointHelper.getAnyDirectEndpointOrFail(rabbitMQ);
 
-        try(var connection = connectionFactory.newConnection()) {
-            assertThat(connection.isOpen()).isTrue();
-        } catch (Exception ex) {
-            throw new AssertionError("Expected RabbitMQ to be accessible", ex);
-        }
+        assertRabbitMQAccessibility(endpoint);
+        assertRabbitMQAccessibility(directEndpoint);
     }
 
     public void asserRabbitMQNotAccessible() {
@@ -161,6 +158,16 @@ public class RabbitMQAssertionHelper {
                 .getEntries();
 
         assertThat(entriesRegistered).isEmpty();
+    }
+
+    private void assertRabbitMQAccessibility(Endpoint endpoint) {
+        var connectionFactory = createConnectionFactory(endpoint);
+
+        try(var connection = connectionFactory.newConnection()) {
+            assertThat(connection.isOpen()).isTrue();
+        } catch (Exception ex) {
+            throw new AssertionError("Expected RabbitMQ to be accessible", ex);
+        }
     }
 
     private void assertRegisteredEntryInConfigRegistry(String entryName, String entryValue, Class<? extends ConfigurationEntry> configType) {

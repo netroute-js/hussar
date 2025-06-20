@@ -27,6 +27,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -43,6 +44,8 @@ public class MongoDBDockerServiceTest {
 
     private static final String MONGO_DB_SERVICE_NAME = "mongodb-service";
     private static final String MONGO_DB_SERVICE_IMAGE = "mongo";
+
+    private static final String MONGO_DB_DIRECT_NETWORK = "direct-" + MONGO_DB_SERVICE_NAME;
 
     private static final String MONGO_DB_SCHEME = "mongodb://";
 
@@ -84,6 +87,7 @@ public class MongoDBDockerServiceTest {
         var service = createMongoDBService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, MONGO_DB_SERVICE_NAME, MONGO_DB_SCHEME, MONGO_DB_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, MONGO_DB_DIRECT_NETWORK, MONGO_DB_SCHEME, MONGO_DB_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -103,6 +107,7 @@ public class MongoDBDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MONGO_DB_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
     }
@@ -142,6 +147,7 @@ public class MongoDBDockerServiceTest {
         var service = createMongoDBService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, MONGO_DB_SERVICE_NAME, MONGO_DB_SCHEME, MONGO_DB_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, MONGO_DB_DIRECT_NETWORK, MONGO_DB_SCHEME, MONGO_DB_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -186,6 +192,7 @@ public class MongoDBDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MONGO_DB_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertEntriesRegistered(service, registeredEntries);
     }

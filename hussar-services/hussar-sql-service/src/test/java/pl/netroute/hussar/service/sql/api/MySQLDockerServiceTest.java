@@ -26,6 +26,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -42,6 +43,8 @@ public class MySQLDockerServiceTest {
 
     private static final String MYSQL_SERVICE_NAME = "mysql-service";
     private static final String MYSQL_SERVICE_IMAGE = "mysql";
+
+    private static final String MYSQL_DIRECT_NETWORK = "direct-" + MYSQL_SERVICE_NAME;
 
     private static final String MYSQL_SCHEME = "jdbc:mysql://";
 
@@ -84,6 +87,7 @@ public class MySQLDockerServiceTest {
         var service = createDatabaseService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, MYSQL_SERVICE_NAME, MYSQL_SCHEME, MYSQL_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, MYSQL_DIRECT_NETWORK, MYSQL_SCHEME, MYSQL_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -100,6 +104,7 @@ public class MySQLDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MYSQL_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoSchemaInitialized(schemaInitializer);
         assertNoEntriesRegistered(service);
@@ -140,6 +145,7 @@ public class MySQLDockerServiceTest {
         var service = createDatabaseService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, MYSQL_SERVICE_NAME, MYSQL_SCHEME, MYSQL_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, MYSQL_DIRECT_NETWORK, MYSQL_SCHEME, MYSQL_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -177,6 +183,7 @@ public class MySQLDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, MYSQL_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertSchemasInitialized(schemaInitializer, service, MYSQL_CREDENTIALS, schemas);
         assertEntriesRegistered(service, registeredEntries);

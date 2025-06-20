@@ -34,6 +34,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -55,6 +56,8 @@ public class RabbitMQDockerServiceTest {
     private static final String RABBITMQ_SERVICE_NAME = "rabbitmq-service";
     private static final String RABBITMQ_SERVICE_IMAGE = "rabbitmq";
     private static final String RABBITMQ_MANAGEMENT_API_SERVICE_IMAGE = "rabbitmq:3.12.14-management-alpine";
+
+    private static final String RABBITMQ_DIRECT_NETWORK = "direct-" + RABBITMQ_SERVICE_NAME;
 
     private static final String RABBITMQ_SCHEME = "amqp";
 
@@ -103,6 +106,7 @@ public class RabbitMQDockerServiceTest {
         var service = createRabbitMQService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, RABBITMQ_SERVICE_NAME, RABBITMQ_SCHEME, RABBITMQ_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, RABBITMQ_DIRECT_NETWORK, RABBITMQ_SCHEME, RABBITMQ_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -122,6 +126,7 @@ public class RabbitMQDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, RABBITMQ_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoQueuesCreated(queueConfigurer);
         assertNoEntriesRegistered(service);
@@ -160,6 +165,7 @@ public class RabbitMQDockerServiceTest {
 
         givenContainerAccessible(container, containerAccessibility);
         var network = givenNetworkConfigured(networkConfigurer, RABBITMQ_SERVICE_NAME, RABBITMQ_SCHEME, RABBITMQ_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, RABBITMQ_DIRECT_NETWORK, RABBITMQ_SCHEME, RABBITMQ_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -181,6 +187,7 @@ public class RabbitMQDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, RABBITMQ_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoQueuesCreated(queueConfigurer);
         assertNoEntriesRegistered(service);
@@ -242,6 +249,7 @@ public class RabbitMQDockerServiceTest {
 
         givenContainerAccessible(container, containerAccessibility);
         var network = givenNetworkConfigured(networkConfigurer, RABBITMQ_SERVICE_NAME, RABBITMQ_SCHEME, RABBITMQ_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, RABBITMQ_DIRECT_NETWORK, RABBITMQ_SCHEME, RABBITMQ_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -286,6 +294,7 @@ public class RabbitMQDockerServiceTest {
         assertContainerEnvVariablesConfigured(container, envVariables);
         assertName(service, RABBITMQ_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertQueuesCreated(queueConfigurer, queues);
         assertEntriesRegistered(service, registeredEntries);

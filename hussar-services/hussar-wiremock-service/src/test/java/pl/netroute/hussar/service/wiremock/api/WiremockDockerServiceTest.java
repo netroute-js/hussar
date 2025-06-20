@@ -25,6 +25,7 @@ import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertio
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStartupTimeoutConfigured;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerStopped;
 import static pl.netroute.hussar.core.service.assertion.GenericContainerAssertionHelper.assertContainerWaitStrategyConfigured;
+import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertDirectEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEndpoints;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertEntriesRegistered;
 import static pl.netroute.hussar.core.service.assertion.ServiceAssertionHelper.assertName;
@@ -39,6 +40,8 @@ public class WiremockDockerServiceTest {
 
     private static final String WIREMOCK_SERVICE_NAME = "wiremock-service";
     private static final String WIREMOCK_SERVICE_IMAGE = "wiremock/wiremock";
+
+    private static final String WIREMOCK_DIRECT_NETWORK = "direct-" + WIREMOCK_SERVICE_NAME;
 
     private DockerNetwork dockerNetwork;
     private NetworkConfigurer networkConfigurer;
@@ -66,6 +69,7 @@ public class WiremockDockerServiceTest {
         var service = createWireMockService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, HTTP_SCHEME, WIREMOCK_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, WIREMOCK_DIRECT_NETWORK, HTTP_SCHEME, WIREMOCK_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -80,6 +84,7 @@ public class WiremockDockerServiceTest {
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, WIREMOCK_SERVICE_NAME);
         assertEndpoints(service, network);
+        assertDirectEndpoints(service, directNetwork);
         assertNetworkControl(service);
         assertNoEntriesRegistered(service);
     }
@@ -104,6 +109,7 @@ public class WiremockDockerServiceTest {
         var service = createWireMockService(config, container);
 
         var network = givenNetworkConfigured(networkConfigurer, WIREMOCK_SERVICE_NAME, HTTP_SCHEME, WIREMOCK_LISTENING_PORT);
+        var directNetwork = givenNetworkConfigured(networkConfigurer, WIREMOCK_DIRECT_NETWORK, HTTP_SCHEME, WIREMOCK_LISTENING_PORT);
 
         // when
         service.start(ServiceStartupContext.defaultContext());
@@ -122,6 +128,7 @@ public class WiremockDockerServiceTest {
         assertContainerLoggingConfigured(container);
         assertContainerNoEnvVariablesConfigured(container);
         assertName(service, WIREMOCK_SERVICE_NAME);
+        assertDirectEndpoints(service, directNetwork);
         assertEndpoints(service, network);
         assertNetworkControl(service);
         assertEntriesRegistered(service, endpointEntries);
