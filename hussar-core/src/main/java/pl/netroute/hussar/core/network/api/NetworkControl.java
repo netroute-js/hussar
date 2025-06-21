@@ -31,7 +31,11 @@ public interface NetworkControl {
 
     /**
      * Resets network conditions to default behavior.
-     *
      */
     void reset();
+
+    /**
+     * A more complex orchestrated {@link NetworkScenario} to simulate multiple actions.
+     */
+    NetworkScenario scenario();
 }

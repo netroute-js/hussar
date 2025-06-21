@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class ProxyNetworkControlTest {
@@ -75,6 +76,20 @@ public class ProxyNetworkControlTest {
 
         // then
         verifier.verifyNetworkReset();
+    }
+
+    @Test
+    public void shouldReturnNetworkScenario() {
+        // given
+        // when
+        var firstScenario = networkControl.scenario();
+        var secondScenario = networkControl.scenario();
+
+        // then
+        assertThat(firstScenario).isNotEqualTo(secondScenario);
+
+        verifier.verifyNetworkScenarioCreated(firstScenario);
+        verifier.verifyNetworkScenarioCreated(secondScenario);
     }
 
 }

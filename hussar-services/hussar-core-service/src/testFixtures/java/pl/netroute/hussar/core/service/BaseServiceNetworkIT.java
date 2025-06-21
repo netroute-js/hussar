@@ -129,6 +129,35 @@ public abstract class BaseServiceNetworkIT<S extends Service> {
         assertThat(measuredDuration).isLessThan(latency);
     }
 
+    @Test
+    public void shouldSimulateTemporaryNetworkDelay() {
+        // given
+        var serviceContext = ServiceConfigureContext.defaultContext(dockerNetwork, networkOperator.getNetworkConfigurer());
+        var networkMetadata = provideResetNetworkTestMetadata(serviceContext);
+        var assertion = networkMetadata.assertion();
+
+        var delayPeriod = Duration.ofSeconds(3L);
+        var latency = Duration.ofSeconds(5L);
+
+        service = networkMetadata.service();
+
+        // when
+        service.start(ServiceStartupContext.defaultContext());
+
+        service
+                .getNetworkControl()
+                .scenario()
+                .delay(latency)
+                .wait(delayPeriod)
+                .reset()
+                .start();
+
+        var measuredDuration = measureDuration(() -> assertion.accept(service));
+
+        // then
+        assertThat(measuredDuration).isBetween(delayPeriod, latency);
+    }
+
     Duration measureDuration(Runnable operation) {
         var start = Instant.now();
         operation.run();

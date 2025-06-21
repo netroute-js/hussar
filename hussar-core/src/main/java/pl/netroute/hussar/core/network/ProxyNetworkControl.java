@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 import pl.netroute.hussar.core.network.api.NetworkControl;
+import pl.netroute.hussar.core.network.api.NetworkScenario;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -38,6 +39,11 @@ public class ProxyNetworkControl implements NetworkControl {
     @Override
     public void reset() {
         proxies.forEach(this::resetProxy);
+    }
+
+    @Override
+    public NetworkScenario scenario() {
+        return new DefaultNetworkScenario(this);
     }
 
     private void enableProxy(Proxy proxy) {

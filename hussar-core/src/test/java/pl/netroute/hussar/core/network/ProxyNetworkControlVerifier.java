@@ -6,10 +6,12 @@ import eu.rekawek.toxiproxy.model.ToxicDirection;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import pl.netroute.hussar.core.network.api.NetworkScenario;
 
 import java.time.Duration;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -32,6 +34,10 @@ class ProxyNetworkControlVerifier {
 
     void verifyNetworkReset() {
         proxies.forEach(this::verifyProxyReset);
+    }
+
+    void verifyNetworkScenarioCreated(@NonNull NetworkScenario scenario) {
+        assertThat(scenario).isInstanceOf(DefaultNetworkScenario.class);
     }
 
     private void verifyProxyEnabled(Proxy proxy) {
