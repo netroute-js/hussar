@@ -4,14 +4,16 @@ import lombok.NonNull;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import pl.netroute.hussar.core.api.Endpoint;
-import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.application.ApplicationStartupContext;
+import pl.netroute.hussar.core.application.api.Application;
 import pl.netroute.hussar.core.dependency.api.DependencyInjector;
 import pl.netroute.hussar.core.helper.SchemesHelper;
 import pl.netroute.hussar.core.lock.LockedAction;
 
 import java.util.List;
 import java.util.Optional;
+
+import static pl.netroute.hussar.spring.boot.api.DynamicConfigurationConfigurer.SERVER_PORT;
 
 /**
  * An actual implementation of {@link Application}. It guarantees seamless integration for testing Spring Boot applications.
@@ -38,7 +40,9 @@ public class SpringBootApplication implements Application {
     public List<Endpoint> getEndpoints() {
         return lockedAction.sharedAction(() -> {
             if(isInitialized()) {
-                return List.of(resolveEndpoint());
+                return resolveEndpoint()
+                        .map(List::of)
+                        .orElse(List.of());
             }
 
             return List.of();
@@ -87,12 +91,10 @@ public class SpringBootApplication implements Application {
         return dependencyInjector;
     }
 
-    private Endpoint resolveEndpoint() {
-        var port = applicationContext
-                .getEnvironment()
-                .getProperty(DynamicConfigurationConfigurer.SERVER_PORT, Integer.class);
-
-        return Endpoint.of(SchemesHelper.HTTP_SCHEME, HOSTNAME, port);
+    private Optional<Endpoint> resolveEndpoint() {
+        return Optional
+                .ofNullable(applicationContext.getEnvironment().getProperty(SERVER_PORT, Integer.class))
+                .map(port -> Endpoint.of(SchemesHelper.HTTP_SCHEME, HOSTNAME, port));
     }
 
     private ConfigurableApplicationContext initializeApplication(ApplicationStartupContext startupContext) {
