@@ -21,12 +21,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class EnvironmentOrchestrator {
     private final LockedAction lockedAction = new LockedAction();
-    private final Map<Class<? extends EnvironmentConfigurerProvider>, Environment> initializedEnvironments = new ConcurrentHashMap<>();
+
+    private final Map<Class<? extends EnvironmentConfigurerProvider>, EnvironmentInitializationResult> initializedEnvironments = new ConcurrentHashMap<>();
 
     Environment initialize(@NonNull EnvironmentConfigurerProvider environmentConfigurerProvider) {
         var configurerType = environmentConfigurerProvider.getClass();
+        var initializationResult = lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(configurerType, actualConfigurerType -> initializeEnvironment(environmentConfigurerProvider)));
 
-        return lockedAction.sharedAction(() -> initializedEnvironments.computeIfAbsent(configurerType, actualConfigurerType -> initializeEnvironment(environmentConfigurerProvider)));
+        return switch (initializationResult) {
+            case EnvironmentInitializationResult.EnvironmentInitializedResult result -> result.environment();
+            case EnvironmentInitializationResult.EnvironmentInitializationFailedResult result -> throw new HussarException("Environment initialization failed", result.exception());
+        };
     }
 
     void shutdown() {
@@ -35,22 +40,57 @@ class EnvironmentOrchestrator {
         lockedAction.exclusiveAction(() -> {
             initializedEnvironments
                     .values()
-                    .forEach(Environment::shutdown);
+                    .stream()
+                    .map(EnvironmentInitializationResult::environment)
+                    .forEach(this::shutdownEnvironment);
 
             initializedEnvironments.clear();
         });
     }
 
-    private Environment initializeEnvironment(EnvironmentConfigurerProvider provider) {
+    private EnvironmentInitializationResult initializeEnvironment(EnvironmentConfigurerProvider provider) {
         var environment = provider
                 .provide()
                 .configure(EnvironmentConfigurerContext.defaultContext());
 
-        var startupDuration = TimerHelper.measure(() -> environment.start(EnvironmentStartupContext.defaultContext()));
+        try {
+            var startupDuration = TimerHelper.measure(() -> environment.start(EnvironmentStartupContext.defaultContext()));
+            EnvironmentLogger.logEnvironmentStartup(provider, environment, startupDuration);
 
-        EnvironmentLogger.logEnvironmentStartup(provider, environment, startupDuration);
+            return EnvironmentInitializationResult.initialized(environment);
+        } catch(Exception ex) {
+            return EnvironmentInitializationResult.failed(environment, ex);
+        }
+    }
 
-        return environment;
+    private void shutdownEnvironment(Environment environment) {
+        try {
+            environment.shutdown();
+        } catch (Exception ex) {
+            log.warn("Error during shutting down environment.", ex);
+        }
+    }
+
+    private sealed interface EnvironmentInitializationResult permits
+            EnvironmentInitializationResult.EnvironmentInitializedResult,
+            EnvironmentInitializationResult.EnvironmentInitializationFailedResult {
+
+        Environment environment();
+
+        record EnvironmentInitializedResult(@NonNull Environment environment) implements EnvironmentInitializationResult{
+        }
+
+        record EnvironmentInitializationFailedResult(@NonNull Environment environment, @NonNull Exception exception) implements EnvironmentInitializationResult {
+        }
+
+        private static EnvironmentInitializedResult initialized(@NonNull Environment environment) {
+            return new EnvironmentInitializedResult(environment);
+        }
+
+        private static EnvironmentInitializationFailedResult failed(@NonNull Environment environment, @NonNull Exception exception) {
+            return new EnvironmentInitializationFailedResult(environment, exception);
+        }
+
     }
 
 }

@@ -7,12 +7,12 @@ import pl.netroute.hussar.core.environment.api.EnvironmentConfigurerProvider;
 import pl.netroute.hussar.core.test.stub.EnvironmentConfigurerStub;
 import pl.netroute.hussar.core.test.stub.EnvironmentStub;
 
-public class TestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
+public class AnotherTestEnvironmentConfigurerProvider implements EnvironmentConfigurerProvider {
 
     @Getter
     private final Environment environment;
 
-    public TestEnvironmentConfigurerProvider() {
+    public AnotherTestEnvironmentConfigurerProvider() {
         this.environment = EnvironmentStub.defaultStub();
     }
 
