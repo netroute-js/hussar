@@ -31,7 +31,9 @@ dependencyResolutionManagement {
             def kafkaClientsVersion = version("kafkaClients", "4.0.0")
             def slf4jVersion = version("slf4j", "2.0.17")
             def logbackVersion = version("logback", "1.5.18")
-            def testcontainersVersion = version("testcontainers", "1.21.1")
+            def testContainersVersion = version("testcontainers", "2.0.2")
+            def toxiproxyTestContainersVersion = version("toxiproxyTestContainers", "1.21.3")
+            def kafkaTestContainersVersion = version("kafkaTestContainers", "1.21.3")
             def wiremockVersion = version("wiremock", "3.13.1")
             def mockitoVersion = version("mockito", "5.18.0")
             def assertjVersion = version("assertj", "3.27.3")
@@ -70,9 +72,9 @@ dependencyResolutionManagement {
 
             library("kafka-clients", "org.apache.kafka", "kafka-clients").versionRef(kafkaClientsVersion)
 
-            library("testcontainers", "org.testcontainers", "testcontainers").versionRef(testcontainersVersion)
-            library("kafka-testcontainers", "org.testcontainers", "kafka").versionRef(testcontainersVersion)
-            library("toxiproxy-testcontainers", "org.testcontainers", "toxiproxy").versionRef(testcontainersVersion)
+            library("testcontainers", "org.testcontainers", "testcontainers").versionRef(testContainersVersion)
+            library("kafka-testcontainers", "org.testcontainers", "kafka").versionRef(kafkaTestContainersVersion)
+            library("toxiproxy-testcontainers", "org.testcontainers", "toxiproxy").versionRef(toxiproxyTestContainersVersion)
 
             library("wiremock", "org.wiremock", "wiremock").versionRef(wiremockVersion)
 
