@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.configuration.api.ConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.EnvVariableConfigurationEntry;
 import pl.netroute.hussar.core.configuration.api.PropertyConfigurationEntry;
 import pl.netroute.hussar.core.helper.EndpointHelper;
+import pl.netroute.hussar.core.helper.StringHelper;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseDockerService;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class SQLDBAssertionHelper {
     }
 
     public void assertDatabaseNotAccessible(@NonNull String schema, @NonNull Endpoint endpoint) {
-        var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
+        var databaseName = StringHelper.randomText(DATABASE_CHARS_COUNT);
         var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
 
         assertThatThrownBy(() -> createTemplate(schema, endpoint).execute(command))
@@ -135,7 +135,7 @@ public class SQLDBAssertionHelper {
 
     private void assertDatabaseAccessibility(@NonNull String schema, @NonNull Endpoint endpoint) {
         var template = createTemplate(schema, endpoint);
-        var databaseName = RandomStringUtils.randomAlphabetic(DATABASE_CHARS_COUNT);
+        var databaseName = StringHelper.randomText(DATABASE_CHARS_COUNT);
         var command = CREATE_DATABASE_QUERY_TEMPLATE.formatted(databaseName);
 
         assertThat(executeCommand(command, template)).isEmpty();

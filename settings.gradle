@@ -35,6 +35,7 @@ dependencyResolutionManagement {
             def wiremockVersion = version("wiremock", "3.13.1")
             def mockitoVersion = version("mockito", "5.18.0")
             def assertjVersion = version("assertj", "3.27.3")
+            def awaitilityVersion = version("awaitility", "4.3.0")
             def javaFakerVersion = version("faker", "2.4.3")
             def junit5Version = version("junit", "5.13.1")
             def junit5PlatformVersion = version("junitPlatform", "1.13.1")
@@ -79,9 +80,10 @@ dependencyResolutionManagement {
             library("junit-platform", "org.junit.platform", "junit-platform-launcher").versionRef(junit5PlatformVersion)
             library("assertj-core", "org.assertj", "assertj-core").versionRef(assertjVersion)
             library("mockito-core", "org.mockito", "mockito-core").versionRef(mockitoVersion)
+            library("awaitility", "org.awaitility", "awaitility").versionRef(awaitilityVersion)
             library("java-faker", "net.datafaker", "datafaker").versionRef(javaFakerVersion)
 
-            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core', 'java-faker'])
+            bundle('testing', ['junit-jupiter', 'assertj-core', 'mockito-core', 'awaitility', 'java-faker'])
         }
     }
 }

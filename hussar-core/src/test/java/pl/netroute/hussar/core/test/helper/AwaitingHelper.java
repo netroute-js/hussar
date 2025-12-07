@@ -3,8 +3,8 @@ package pl.netroute.hussar.core.test.helper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
-import org.testcontainers.shaded.org.awaitility.core.ThrowingRunnable;
+import org.awaitility.Awaitility;
+import org.awaitility.core.ThrowingRunnable;
 
 import java.time.Duration;
 

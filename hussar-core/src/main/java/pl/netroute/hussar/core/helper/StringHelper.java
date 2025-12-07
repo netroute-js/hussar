@@ -5,9 +5,13 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import pl.netroute.hussar.core.api.InternalUseOnly;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * A String helper class
@@ -15,6 +19,8 @@ import java.util.stream.Collectors;
 @InternalUseOnly
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringHelper {
+    private static final String ALPHA_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     /**
      * Checks whether the value is not null and not blank.
@@ -42,6 +48,33 @@ public class StringHelper {
                 .stream()
                 .map(mapper)
                 .collect(Collectors.joining(delimiter));
+    }
+
+    public static String randomText(int length) {
+        var textBuilder = new StringBuilder();
+        var availableCharactersLength = ALPHA_CHARACTERS.length();
+
+        IntStream
+                .range(0, length)
+                .mapToObj(nextCharIndex -> RANDOM.nextInt(availableCharactersLength))
+                .map(ALPHA_CHARACTERS::charAt)
+                .forEach(textBuilder::append);
+
+        return textBuilder.toString();
+    }
+
+    public static String toText(@NonNull InputStream inputStream) {
+        try {
+            var bytes = inputStream.readAllBytes();
+
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Could not deserialize InputStream to String", ex);
+        }
+    }
+
+    public static boolean isTextBlank(String text) {
+        return text == null || text.isBlank();
     }
 
 }

@@ -3,12 +3,11 @@ package pl.netroute.hussar.core.logging;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.helper.StringHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @InternalUseOnly
@@ -18,7 +17,7 @@ public class BannerLogger {
 
     public static void logBanner() {
         try(var bannerStream = getBannerInputStream()) {
-            var bannerText = IOUtils.toString(bannerStream, StandardCharsets.UTF_8);
+            var bannerText = StringHelper.toText(bannerStream);
 
             log.info(bannerText);
         } catch (IOException ex) {

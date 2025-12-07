@@ -3,9 +3,9 @@ package pl.netroute.hussar.service.sql.schema;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
-import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import pl.netroute.hussar.core.api.Endpoint;
 import pl.netroute.hussar.core.api.InternalUseOnly;
+import pl.netroute.hussar.core.helper.StringHelper;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseCredentials;
 import pl.netroute.hussar.service.sql.api.SQLDatabaseSchema;
 
@@ -34,7 +34,7 @@ public class DatabaseSchemaInitializer {
 
         createSchema(schema, endpoint, credentials);
 
-        if(!StringUtils.isBlank(scriptsLocation)) {
+        if(!StringHelper.isTextBlank(scriptsLocation)) {
             migrate(schema, scriptsLocation, endpoint, credentials);
         }
     }
